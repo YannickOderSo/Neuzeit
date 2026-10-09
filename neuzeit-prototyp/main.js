@@ -26,7 +26,7 @@
   var menu = document.querySelector("[data-menu]");
   var menuLabel = document.querySelector("[data-menu-label]");
 
-  var behindMenu = Array.prototype.slice.call(document.querySelectorAll("main, .site-footer, .palette"));
+  var behindMenu = Array.prototype.slice.call(document.querySelectorAll(".skip-link, main, .site-footer, .palette"));
 
   function setBackgroundInert(inert) {
     behindMenu.forEach(function (el) { el.inert = inert; });
@@ -157,19 +157,20 @@
     });
   }
 
-  /* Der Sonnenaufgang im Hero startet erst, wenn das Motiv sichtbar ist.
-     Auf schmalen Handys liegt es beim Laden unterhalb des Bildschirms. */
+  /* Der Sonnenaufgang im Hero startet erst, wenn die Horizontlinie sichtbar ist.
+     Auf schmalen Handys liegt sie beim Laden unterhalb des Bildschirms. */
   var heroVisual = document.querySelector(".hero__visual");
-  if (heroVisual && !reduceMotion.matches && "IntersectionObserver" in window &&
-      heroVisual.getBoundingClientRect().top + heroVisual.offsetHeight * 0.6 > window.innerHeight) {
+  var horizonLine = heroVisual && heroVisual.querySelector(".horizon__line");
+  if (horizonLine && !reduceMotion.matches && "IntersectionObserver" in window &&
+      horizonLine.getBoundingClientRect().top > window.innerHeight - 24) {
     heroVisual.classList.add("is-waiting");
     var heroObserver = new IntersectionObserver(function (entries) {
-      if (entries[0].intersectionRatio >= 0.5) {
+      if (entries[0].isIntersecting) {
         heroVisual.classList.remove("is-waiting");
         heroObserver.disconnect();
       }
-    }, { threshold: 0.5 });
-    heroObserver.observe(heroVisual);
+    }, { rootMargin: "0px 0px -24px 0px" });
+    heroObserver.observe(horizonLine);
   }
 
   /* Sanftes Scrollen erst nach dem Laden der Schriften einschalten. Sonst

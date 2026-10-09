@@ -1417,6 +1417,14 @@ html.menu-open {
 }
 
 @media (min-width: 48rem) and (max-width: 59.99rem) {
+  .steps {
+    column-gap: var(--space-s);
+  }
+
+  .step {
+    padding-right: 0;
+  }
+
   .step__text {
     font-size: var(--fs-small);
   }
@@ -1548,7 +1556,7 @@ html.menu-open {
   right: 0;
   bottom: 0;
   width: 100%;
-  height: clamp(8.5rem, 23vw, 17.25rem);
+  height: clamp(8.5rem, 23vw, 22rem);
   pointer-events: none;
 }
 
@@ -1603,8 +1611,6 @@ html.menu-open {
   position: relative;
   display: grid;
   justify-items: center;
-  align-items: end;
-  padding-bottom: 27.5%; /* Linie liegt bei 22 % der Höhe */
   width: min(100%, 15rem);
   aspect-ratio: 4 / 5;
   max-width: 100%;
@@ -1632,7 +1638,10 @@ html.menu-open {
   font-style: italic;
   line-height: 1;
   color: var(--accent-display);
-  transform: translateY(0.19em); /* Grundlinie der Initiale auf die Horizontlinie */
+  position: absolute;
+  left: 50%;
+  bottom: 22%; /* auf der Horizontlinie des Porträts */
+  transform: translate(-50%, 0.14em); /* Grundlinie statt Unterkante der Zeile */
 }
 
 .person__photo-note {
@@ -1891,6 +1900,7 @@ html.menu-open {
 }
 
 .form {
+  position: relative;
   display: grid;
   gap: var(--space-m);
   padding: clamp(1.5rem, 4vw, 2.75rem);
@@ -2009,12 +2019,16 @@ html.menu-open {
   line-height: 1.5;
 }
 
-/* leer bleibt die Statusregion im Barrierefreiheitsbaum, nur unsichtbar */
+/* leer bleibt die Statusregion im Barrierefreiheitsbaum, aber außerhalb des Layouts */
 .form__status:empty {
-  margin-top: calc(var(--space-m) * -1);
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: 0;
   padding: 0;
   border: 0;
-  background: none;
+  overflow: hidden;
+  clip-path: inset(50%);
 }
 
 .form__status strong {
@@ -2301,8 +2315,13 @@ html:not(.js) .site-header__cta {
 
 @media (forced-colors: active) {
   .menu-toggle__icon span,
-  .nav__link::after {
+  .nav__link::after,
+  .nav__link[aria-current="true"]::after {
     background: CanvasText;
+  }
+
+  .palette__swatch {
+    forced-color-adjust: none;
   }
 
   .palette__btn[aria-pressed="true"] {
@@ -2314,6 +2333,10 @@ html:not(.js) .site-header__cta {
   [data-reveal].is-pending {
     opacity: 1 !important;
     transform: none !important;
+  }
+
+  .hero__visual.is-waiting .horizon * {
+    animation: none !important;
   }
 
   .palette,
