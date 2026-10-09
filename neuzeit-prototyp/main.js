@@ -9,6 +9,16 @@
   var root = document.documentElement;
   var reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
   var desktopNav = window.matchMedia("(min-width: 60rem)");
+  var wideLayout = window.matchMedia("(min-width: 48rem)");
+
+  /* Bewegung nur, wenn niemand reduzierte Bewegung eingestellt hat.
+     Ohne die Klasse bleibt die ruhige Endfassung stehen. */
+  var motionOK = !reduceMotion.matches;
+  if (motionOK) root.classList.add("motion");
+
+  function clamp01(v) {
+    return v < 0 ? 0 : v > 1 ? 1 : v;
+  }
 
   /* ------------------------------------------------------------------------
      Kopfzeile: feine Linie, sobald gescrollt wird
@@ -101,6 +111,27 @@
      ------------------------------------------------------------------------ */
   var navLinks = Array.prototype.slice.call(document.querySelectorAll("[data-nav]"));
   var spySections = Array.prototype.slice.call(document.querySelectorAll("main > section"));
+  var nav = document.querySelector(".nav");
+  var indicator = nav && nav.querySelector(".nav__indicator");
+  var lastCurrent;
+
+  /* Marker unter dem aktiven Menüpunkt gleitet von Punkt zu Punkt */
+  function moveIndicator(link) {
+    if (!indicator || !motionOK) return;
+    if (!link || !link.offsetWidth) {
+      indicator.style.setProperty("--ind-o", "0");
+      return;
+    }
+    var wasHidden = indicator.style.getPropertyValue("--ind-o") !== "1";
+    if (wasHidden) indicator.style.transition = "none";
+    indicator.style.setProperty("--ind-x", link.offsetLeft + "px");
+    indicator.style.setProperty("--ind-w", String(link.offsetWidth));
+    if (wasHidden) {
+      void indicator.offsetWidth;
+      indicator.style.transition = "";
+    }
+    indicator.style.setProperty("--ind-o", "1");
+  }
 
   function updateActiveNav() {
     var probe = window.innerHeight * 0.4;
@@ -112,10 +143,96 @@
         break;
       }
     }
+    if (current === lastCurrent) return;
+    lastCurrent = current;
+    var active = null;
     navLinks.forEach(function (link) {
-      if (current && link.getAttribute("data-nav") === current) link.setAttribute("aria-current", "true");
-      else link.removeAttribute("aria-current");
+      if (current && link.getAttribute("data-nav") === current) {
+        link.setAttribute("aria-current", "true");
+        active = link;
+      } else {
+        link.removeAttribute("aria-current");
+      }
     });
+    moveIndicator(active);
+  }
+
+  /* ------------------------------------------------------------------------
+     Bewegung beim Scrollen: Werte von 0 bis 1 als Custom Properties.
+     Erst alle Maße lesen, dann schreiben, damit nichts ruckelt.
+     ------------------------------------------------------------------------ */
+  var progressBar = document.querySelector(".scroll-progress");
+  var hero = document.querySelector(".hero");
+  var steps = document.querySelector(".steps");
+  var stepItems = steps ? Array.prototype.slice.call(steps.querySelectorAll(".step")) : [];
+  var stepThresholds = [];
+  var stance = document.querySelector(".stance");
+  var quote = document.querySelector(".stance__quote blockquote");
+  var footerMark = document.querySelector(".footer-mark");
+
+  /* Position jedes Schritt-Markers entlang der Linie (0 bis 1) */
+  function measureSteps() {
+    if (!steps) return;
+    var box = steps.getBoundingClientRect();
+    var horizontal = wideLayout.matches;
+    var inset = horizontal ? 0 : parseFloat(getComputedStyle(root).fontSize) * 0.4;
+    var length = horizontal ? box.width : box.height - 2 * inset;
+    stepThresholds = stepItems.map(function (item) {
+      var m = item.querySelector(".step__marker").getBoundingClientRect();
+      var pos = horizontal ? m.left + m.width / 2 - box.left : m.top + m.height / 2 - box.top - inset;
+      return clamp01(pos / length);
+    });
+  }
+
+  function updateMotion() {
+    var vh = window.innerHeight;
+    var maxScroll = document.documentElement.scrollHeight - vh;
+    var heroBox = hero && hero.getBoundingClientRect();
+    var stepsBox = steps && steps.getBoundingClientRect();
+    var stanceBox = stance && stance.getBoundingClientRect();
+    var quoteBox = quote && quote.getBoundingClientRect();
+    var markBox = footerMark && footerMark.getBoundingClientRect();
+
+    if (progressBar) progressBar.style.setProperty("--page-p", (maxScroll > 0 ? clamp01(window.scrollY / maxScroll) : 0).toFixed(4));
+    if (heroBox) hero.style.setProperty("--hero-p", clamp01(-heroBox.top / heroBox.height).toFixed(4));
+    if (stepsBox) {
+      var tl = clamp01((vh * 0.8 - stepsBox.top) / (vh * 0.25 + stepsBox.height));
+      steps.style.setProperty("--tl", tl.toFixed(4));
+      stepItems.forEach(function (item, i) {
+        item.classList.toggle("is-reached", tl > 0 && tl >= (stepThresholds[i] || 0) - 0.005);
+      });
+    }
+    if (quoteBox) quote.style.setProperty("--q", clamp01((vh * 0.85 - quoteBox.top) / (vh * 0.45)).toFixed(4));
+    if (stanceBox) stance.style.setProperty("--sp", clamp01((vh - stanceBox.bottom) / (vh * 0.45)).toFixed(4));
+    if (markBox) footerMark.style.setProperty("--fm", clamp01((vh - markBox.top) / (markBox.height * 0.9)).toFixed(4));
+  }
+
+  /* Zitat in Wörter teilen; Screenreader lesen weiter den ganzen Satz */
+  if (quote && motionOK) {
+    var quoteP = quote.querySelector("p");
+    var fullText = quoteP.textContent;
+    var visual = document.createElement("span");
+    visual.setAttribute("aria-hidden", "true");
+    var count = 0;
+    fullText.split(/(\s+)/).forEach(function (part) {
+      if (!part) return;
+      if (/^\s+$/.test(part)) {
+        visual.appendChild(document.createTextNode(part));
+        return;
+      }
+      var word = document.createElement("span");
+      word.className = "qw";
+      word.style.setProperty("--i", String(count++));
+      word.textContent = part;
+      visual.appendChild(word);
+    });
+    var spoken = document.createElement("span");
+    spoken.className = "visually-hidden";
+    spoken.textContent = fullText;
+    quoteP.textContent = "";
+    quoteP.appendChild(spoken);
+    quoteP.appendChild(visual);
+    quote.style.setProperty("--n", String(count));
   }
 
   var scrollTicking = false;
@@ -125,14 +242,28 @@
     window.requestAnimationFrame(function () {
       updateHeader();
       updateActiveNav();
+      if (motionOK) updateMotion();
       scrollTicking = false;
     });
   }
 
+  function onResize() {
+    if (motionOK) measureSteps();
+    lastCurrent = undefined;
+    onScroll();
+  }
+
   window.addEventListener("scroll", onScroll, { passive: true });
-  window.addEventListener("resize", onScroll, { passive: true });
+  window.addEventListener("resize", onResize, { passive: true });
   updateHeader();
+  if (motionOK) {
+    measureSteps();
+    updateMotion();
+  }
   updateActiveNav();
+  if (document.fonts && document.fonts.ready) {
+    document.fonts.ready.then(onResize);
+  }
 
   /* ------------------------------------------------------------------------
      Sanftes Einblenden der Sektionen
@@ -140,12 +271,20 @@
      ------------------------------------------------------------------------ */
   if (!reduceMotion.matches && "IntersectionObserver" in window) {
     var revealObserver = new IntersectionObserver(function (entries) {
-      entries.forEach(function (entry) {
-        if (entry.isIntersecting) {
-          entry.target.classList.remove("is-pending");
-          revealObserver.unobserve(entry.target);
-        }
-      });
+      /* Was gleichzeitig sichtbar wird, erscheint leicht gestaffelt */
+      entries.filter(function (entry) { return entry.isIntersecting; })
+        .sort(function (a, b) {
+          return (a.boundingClientRect.top - b.boundingClientRect.top) || (a.boundingClientRect.left - b.boundingClientRect.left);
+        })
+        .forEach(function (entry, i) {
+          var el = entry.target;
+          if (i > 0) {
+            el.style.transitionDelay = Math.min(i * 90, 450) + "ms";
+            window.setTimeout(function () { el.style.transitionDelay = ""; }, 1600);
+          }
+          el.classList.remove("is-pending");
+          revealObserver.unobserve(el);
+        });
     }, { rootMargin: "0px 0px -6% 0px", threshold: 0.06 });
 
     var viewportHeight = window.innerHeight;
@@ -154,6 +293,17 @@
         el.classList.add("is-pending");
         revealObserver.observe(el);
       }
+    });
+  }
+
+  /* Leistungskarten: ein weicher Lichtkegel folgt dem Zeiger (nur Maus/Trackpad) */
+  if (motionOK && window.matchMedia("(hover: hover) and (pointer: fine)").matches) {
+    document.querySelectorAll(".service__card").forEach(function (card) {
+      card.addEventListener("pointermove", function (event) {
+        var box = card.getBoundingClientRect();
+        card.style.setProperty("--mx", (event.clientX - box.left) + "px");
+        card.style.setProperty("--my", (event.clientY - box.top) + "px");
+      }, { passive: true });
     });
   }
 
@@ -204,7 +354,28 @@
 
   paletteButtons.forEach(function (button) {
     button.addEventListener("click", function () {
-      applyPalette(button.getAttribute("data-palette-choice"), true);
+      var name = button.getAttribute("data-palette-choice");
+      if (!motionOK || !document.startViewTransition || name === root.getAttribute("data-palette")) {
+        applyPalette(name, true);
+        return;
+      }
+      /* neue Farben breiten sich kreisförmig vom gewählten Knopf aus */
+      var box = button.getBoundingClientRect();
+      var x = box.left + box.width / 2;
+      var y = box.top + box.height / 2;
+      var radius = Math.hypot(Math.max(x, window.innerWidth - x), Math.max(y, window.innerHeight - y));
+      root.style.setProperty("--vt-x", x + "px");
+      root.style.setProperty("--vt-y", y + "px");
+      root.style.setProperty("--vt-r", radius + "px");
+      root.classList.add("vt-palette");
+      try {
+        var transition = document.startViewTransition(function () { applyPalette(name, true); });
+        transition.finished.then(done, done);
+      } catch (e) {
+        applyPalette(name, true);
+        done();
+      }
+      function done() { root.classList.remove("vt-palette"); }
     });
   });
   applyPalette(root.getAttribute("data-palette") || "warm", false);
@@ -272,6 +443,26 @@
     return valid;
   }
 
+  var submitButton = form && form.querySelector(".btn--submit");
+  var submitLabel = form && form.querySelector("[data-submit-label]");
+
+  function showSuccess(name) {
+    status.textContent = "";
+    status.classList.remove("is-success");
+    var icon = document.createElement("span");
+    icon.className = "sunrise";
+    icon.setAttribute("aria-hidden", "true");
+    var title = document.createElement("strong");
+    title.textContent = "Danke, " + name + ".";
+    var text = document.createElement("span");
+    text.textContent = "Im fertigen Auftritt ginge Ihre Anfrage jetzt an Neuzeit. Dieser Prototyp versendet nichts.";
+    status.appendChild(icon);
+    status.appendChild(title);
+    status.appendChild(text);
+    void status.offsetWidth;
+    status.classList.add("is-success");
+  }
+
   if (form) {
     /* Ohne JavaScript prüft der Browser die Pflichtfelder selbst. */
     form.noValidate = true;
@@ -289,6 +480,7 @@
 
     form.addEventListener("submit", function (event) {
       event.preventDefault();
+      if (submitButton && submitButton.classList.contains("is-loading")) return;
       attempted = true;
 
       var firstInvalid = null;
@@ -304,18 +496,30 @@
 
       var name = form.elements.name.value.trim();
       status.textContent = "";
-      var title = document.createElement("strong");
-      title.textContent = "Danke, " + name + ".";
-      var text = document.createElement("span");
-      text.textContent = "Im fertigen Auftritt ginge Ihre Anfrage jetzt an Neuzeit. Dieser Prototyp versendet nichts.";
-      status.appendChild(title);
-      status.appendChild(text);
 
-      form.reset();
-      attempted = false;
-      fields.forEach(function (field) {
-        setError(field, false);
-      });
+      function finish() {
+        if (submitButton) {
+          submitButton.classList.remove("is-loading");
+          submitButton.removeAttribute("aria-disabled");
+          if (submitLabel) submitLabel.textContent = "Anfrage senden";
+        }
+        showSuccess(name);
+        form.reset();
+        attempted = false;
+        fields.forEach(function (field) {
+          setError(field, false);
+        });
+      }
+
+      /* kurzer Ladezustand, damit sich der Prototyp wie das Original anfühlt */
+      if (submitButton && motionOK) {
+        submitButton.classList.add("is-loading");
+        submitButton.setAttribute("aria-disabled", "true");
+        if (submitLabel) submitLabel.textContent = "Einen Moment …";
+        window.setTimeout(finish, 900);
+      } else {
+        finish();
+      }
     });
   }
 
