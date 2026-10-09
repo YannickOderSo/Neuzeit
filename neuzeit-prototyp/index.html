@@ -20,6 +20,7 @@
         document.documentElement.setAttribute("data-palette", savedPalette);
       }
     } catch (e) {}
+    document.documentElement.classList.add("js");
   </script>
   <script src="main.js" defer></script>
 </head>
@@ -123,7 +124,7 @@
             <rect class="horizon__tick horizon__tick--now" x="279.5" y="321" width="1.25" height="24"/>
             <text class="horizon__label" x="280" y="364" text-anchor="middle">jetzt</text>
 
-            <line class="horizon__line" x1="0" y1="320.5" x2="2600" y2="320.5" pathLength="1"/>
+            <line class="horizon__line" x1="-40" y1="320.5" x2="2600" y2="320.5" pathLength="1"/>
           </svg>
         </div>
       </div>
@@ -134,20 +135,20 @@
       <div class="container">
         <header class="section-head" data-reveal>
           <p class="eyebrow">Warum jetzt</p>
-          <h2 class="h2 section-head__title" id="warum-title">Was sich gerade ändert.</h2>
+          <h2 class="h2 section-head__title" id="warum-title">Was jetzt zählt.</h2>
         </header>
 
         <ul class="reasons" role="list">
           <li class="reason" data-reveal>
             <p class="reason__tag">Recht</p>
             <h3 class="reason__title">Seit dem <time datetime="2026-09-27">27.09.2026</time> gelten strengere Regeln für Umweltwerbung.</h3>
-            <p class="reason__text">Allgemeine Aussagen wie „umweltfreundlich“ sind nur noch mit anerkanntem Nachweis erlaubt. Wer mit Nachhaltigkeit wirbt, sollte jede Aussage belegen können.</p>
-            <p class="reason__source">Grundlage: EU-Richtlinie 2024/825</p>
+            <p class="reason__text">Pauschale Begriffe wie „umweltfreundlich“ sind gegenüber Verbrauchern nur noch erlaubt, wenn eine anerkannte hervorragende Umweltleistung belegt ist, etwa durch den Blauen Engel. Jede andere Umweltaussage muss konkret und belegbar sein.</p>
+            <p class="reason__source">Grundlage: UWG, geändert zur Umsetzung der Richtlinie (EU)&nbsp;2024/825</p>
           </li>
           <li class="reason" data-reveal>
             <p class="reason__tag">Arbeitsmarkt</p>
             <h3 class="reason__title">Der Fachkräftemangel macht die Arbeitgebermarke zur Chefsache.</h3>
-            <p class="reason__text">Gute Leute suchen sich ihren Arbeitgeber aus. Sie wollen wissen, wofür ein Unternehmen steht und wie dort gearbeitet wird.</p>
+            <p class="reason__text">Gute Leute suchen sich ihren Arbeitgeber aus. Vorher wollen sie wissen, wofür ein Unternehmen steht und wie dort gearbeitet wird.</p>
           </li>
           <li class="reason" data-reveal>
             <p class="reason__tag">Veränderung</p>
@@ -174,11 +175,11 @@
               <p class="service__num" aria-hidden="true">01</p>
               <div class="service__body">
                 <h3 class="service__title" id="service-1-title">Nachhaltigkeit glaubwürdig kommunizieren</h3>
-                <p class="service__benefit">Sie zeigen, was Ihr Unternehmen tatsächlich leistet, und jede Aussage hält einer Prüfung stand.</p>
+                <p class="service__benefit">Sie zeigen, was Ihr Unternehmen tatsächlich leistet, mit Aussagen, die sich belegen lassen.</p>
                 <ul class="service__list">
-                  <li>Bestandsaufnahme Ihrer bisherigen Umweltaussagen</li>
-                  <li>Klare Botschaften für Website, Vertrieb und Verpackung</li>
-                  <li>Leitfaden und Schulung für Teams mit Kundenkontakt</li>
+                  <li>Bisherige Umwelt&shy;aussagen sichten und bewerten</li>
+                  <li>Klare Botschaften für Website, Vertrieb und Verpackung entwickeln</li>
+                  <li>Teams mit Kunden&shy;kontakt schulen, mit eigenem Leitfaden</li>
                 </ul>
                 <p class="service__note">
                   <svg class="service__note-icon" viewBox="0 0 16 16" aria-hidden="true" focusable="false"><path d="M8 1.5 2.5 3.75v4c0 3.2 2.3 5.6 5.5 6.75 3.2-1.15 5.5-3.55 5.5-6.75v-4Z"/></svg>
@@ -192,10 +193,10 @@
               <p class="service__num" aria-hidden="true">02</p>
               <div class="service__body">
                 <h3 class="service__title" id="service-2-title">Wandel begleiten</h3>
-                <p class="service__benefit">Ihre Mitarbeitenden verstehen die Veränderung und tragen sie mit, bei Nachfolge, Digitalisierung und neuen Strukturen.</p>
+                <p class="service__benefit">Ob Nachfolge, Digitalisierung oder neue Strukturen: Ihre Mitarbeitenden verstehen die Veränderung und tragen sie mit.</p>
                 <ul class="service__list">
-                  <li>Nachfolge planen und im Unternehmen offen kommunizieren</li>
-                  <li>Digitalisierungsprojekte, die im Arbeitsalltag ankommen</li>
+                  <li>Nachfolge planen und offen im Unternehmen kommunizieren</li>
+                  <li>Digitalisierung so begleiten, dass sie im Alltag ankommt</li>
                   <li>Neue Rollen und Abläufe verständlich einführen</li>
                 </ul>
               </div>
@@ -208,8 +209,8 @@
                 <h3 class="service__title" id="service-3-title">Arbeitgebermarke für die nächste Generation</h3>
                 <p class="service__benefit">Junge Fachkräfte erkennen, wofür Ihr Unternehmen steht und warum sich der Einstieg bei Ihnen lohnt.</p>
                 <ul class="service__list">
-                  <li>Herausarbeiten, was Sie als Arbeitgeber ausmacht</li>
-                  <li>Karriereseite und Stellenanzeigen, die nach Ihnen klingen</li>
+                  <li>Heraus&shy;arbeiten, was Sie als Arbeitgeber ausmacht</li>
+                  <li>Karriere&shy;seite und Stellen&shy;anzeigen schreiben, die nach Ihnen klingen</li>
                   <li>Mitarbeitende als glaubwürdige Stimmen einbinden</li>
                 </ul>
               </div>
@@ -235,7 +236,7 @@
             <span class="step__marker" aria-hidden="true"></span>
             <p class="step__num">Schritt 1</p>
             <h3 class="step__title">Zuhören</h3>
-            <p class="step__text">Wir sprechen mit Ihnen, Ihrer Führung und Ihren Mitarbeitenden. Erst fragen wir, dann empfehlen wir.</p>
+            <p class="step__text">Wir sprechen mit Ihnen, Ihren Führungskräften und Ihren Mitarbeitenden. Erst fragen wir, dann empfehlen wir.</p>
           </li>
           <li class="step">
             <span class="step__marker" aria-hidden="true"></span>
@@ -263,21 +264,26 @@
     <section class="section section--dark stance" id="ueber-uns" aria-labelledby="haltung-title" data-spy="ueber-uns">
       <div class="container stance__inner">
         <header class="section-head section-head--plain" data-reveal>
-          <p class="eyebrow">Haltung</p>
+          <p class="eyebrow">Über uns · Haltung</p>
           <h2 class="visually-hidden" id="haltung-title">Unsere Haltung</h2>
         </header>
         <figure class="stance__quote" data-reveal>
           <blockquote>
             <p>„Neuzeit heißt nicht, alles neu zu machen. Sondern das Richtige zur richtigen Zeit.“</p>
           </blockquote>
-          <figcaption>Yannick &amp; Aurel, Gründer von Neuzeit</figcaption>
+          <figcaption>Yannick &amp; Aurel, Gründer von&nbsp;Neuzeit</figcaption>
         </figure>
         <p class="stance__text" data-reveal>Viele Unternehmen im Mittelstand sind über Jahrzehnte gewachsen. Wir bauen auf dem auf, was Sie stark gemacht hat, und ändern nur, was sich ändern muss.</p>
       </div>
-      <svg class="stance__horizon" viewBox="0 0 1200 260" preserveAspectRatio="xMaxYMax slice" aria-hidden="true" focusable="false">
-        <circle class="stance__sun" cx="960" cy="260" r="170"/>
-        <circle class="stance__ring" cx="960" cy="260" r="228"/>
-        <line class="stance__line" x1="0" y1="259.5" x2="1200" y2="259.5"/>
+      <svg class="stance__horizon" viewBox="0 0 1200 300" preserveAspectRatio="xMaxYMax slice" aria-hidden="true" focusable="false">
+        <defs>
+          <clipPath id="stance-sky"><rect x="0" y="0" width="1200" height="260"/></clipPath>
+        </defs>
+        <g clip-path="url(#stance-sky)">
+          <circle class="stance__sun" cx="960" cy="260" r="170"/>
+          <circle class="stance__ring" cx="960" cy="260" r="228"/>
+        </g>
+        <line class="stance__line" x1="0" y1="260" x2="1200" y2="260"/>
       </svg>
     </section>
 
@@ -285,7 +291,7 @@
     <section class="section" id="team" aria-labelledby="team-title" data-spy="ueber-uns">
       <div class="container">
         <header class="section-head" data-reveal>
-          <p class="eyebrow">Über uns</p>
+          <p class="eyebrow">Team</p>
           <div class="section-head__main">
             <h2 class="h2 section-head__title" id="team-title">Wer mit Ihnen arbeitet.</h2>
             <p class="section-head__intro">Yannick bringt den betriebswirtschaftlichen Blick mit, Aurel den kommunikativen. In Ihrem Projekt arbeiten beide zusammen.</p>
@@ -298,12 +304,13 @@
               <span class="person__initial">Y</span>
             </div>
             <p class="person__photo-note"><span class="ph">[Platzhalter]</span> Porträtfoto</p>
-            <h3 class="person__name">Yannick</h3>
+            <h3 class="person__name">Yannick <span class="ph">[Nachname]</span></h3>
             <p class="person__role">Strategie &amp; Mittelstand</p>
-            <p class="person__text">Yannick kennt den Mittelstand aus Studium und B2B-Vertrieb. Im Projekt achtet Yannick darauf, dass jede Empfehlung zu Ihren Zahlen, Ihren Abläufen und Ihren Kunden passt.</p>
+            <p class="person__text">Yannick hat BWL mit Schwerpunkt Mittelstands&shy;ökonomie studiert und Erfahrung im <span class="nowrap">B2B-Vertrieb</span> gesammelt. Der Anspruch im Projekt: Jede Empfehlung muss zu Ihren Zahlen, Ihren Abläufen und Ihren Kunden passen.</p>
             <ul class="person__facts" role="list">
-              <li>BWL, Schwerpunkt Mittelstandsökonomie</li>
-              <li>Erfahrung im B2B-Vertrieb</li>
+              <li>Strategie</li>
+              <li>Mittelstands&shy;ökonomie</li>
+              <li>B2B-Vertrieb</li>
             </ul>
           </li>
           <li class="person" data-reveal>
@@ -311,12 +318,12 @@
               <span class="person__initial">A</span>
             </div>
             <p class="person__photo-note"><span class="ph">[Platzhalter]</span> Porträtfoto</p>
-            <h3 class="person__name">Aurel</h3>
+            <h3 class="person__name">Aurel <span class="ph">[Nachname]</span></h3>
             <p class="person__role">Kommunikation &amp; Nachhaltigkeit</p>
-            <p class="person__text">Aurel verbindet Kommunikationspsychologie mit Nachhaltigkeit. Im Projekt sorgt Aurel dafür, dass Botschaften verstanden werden und Umweltaussagen auf Fakten beruhen.</p>
+            <p class="person__text">Aurel hat Kommunikations&shy;psychologie und Nachhaltigkeit studiert. Der Anspruch im Projekt: Botschaften, die verstanden werden, und Umweltaussagen, die sich belegen lassen.</p>
             <ul class="person__facts" role="list">
-              <li>Studium Kommunikationspsychologie</li>
-              <li>Studium Nachhaltigkeit</li>
+              <li>Kommunikations&shy;psychologie</li>
+              <li>Nachhaltigkeit</li>
             </ul>
           </li>
         </ul>
@@ -330,7 +337,7 @@
           <p class="eyebrow">Fallbeispiele</p>
           <div class="section-head__main">
             <h2 class="h2 section-head__title" id="faelle-title">Projekte aus der Praxis.</h2>
-            <p class="section-head__intro">Neuzeit steht am Anfang. Hier zeigen wir bald abgeschlossene Projekte, jeweils mit Freigabe der Kunden. Die Karten zeigen den Aufbau.</p>
+            <p class="section-head__intro">Neuzeit steht am Anfang. Sobald erste Projekte abgeschlossen sind, zeigen wir sie hier, nur mit Freigabe der Kunden. Die Karten zeigen schon jetzt den Aufbau.</p>
           </div>
         </header>
 
@@ -380,9 +387,13 @@
 
     <!-- ============ Kontakt ============ -->
     <section class="section contact" id="kontakt" aria-labelledby="kontakt-title" data-spy="kontakt">
+      <div class="container">
+        <header class="section-head section-head--plain section-head--arrive" data-reveal>
+          <p class="eyebrow">Kontakt</p>
+        </header>
+      </div>
       <div class="container contact__grid">
         <div class="contact__intro" data-reveal>
-          <p class="eyebrow">Kontakt</p>
           <h2 class="display contact__title" id="kontakt-title">Lassen Sie uns sprechen<span class="accent-mark">.</span></h2>
           <p class="lead contact__lead">Erzählen Sie uns, was Sie gerade beschäftigt. Im Erstgespräch hören wir zu und klären gemeinsam, ob und wie wir helfen können.</p>
           <a class="btn btn--primary" href="#kontakt-name" data-focus-form>Erstgespräch vereinbaren</a>
@@ -392,13 +403,13 @@
           </dl>
         </div>
 
-        <form class="form" id="kontakt-formular" novalidate aria-labelledby="form-title" data-form data-reveal>
-          <h3 class="form__title" id="form-title">Ihre Nachricht</h3>
-          <p class="form__hint">Felder mit <span aria-hidden="true">*</span><span class="visually-hidden">Sternchen</span> sind Pflichtfelder.</p>
+        <form class="form" id="kontakt-formular" method="dialog" aria-labelledby="form-title" data-form data-reveal>
+          <h3 class="form__title" id="form-title">Erstgespräch anfragen</h3>
+          <p class="form__hint">Wir melden uns innerhalb von <span class="ph">[Platzhalter: Antwortzeit]</span> mit Terminvorschlägen. Felder mit <span aria-hidden="true">*</span><span class="visually-hidden">Sternchen</span> sind Pflichtfelder.</p>
 
           <div class="field">
             <label class="field__label" for="kontakt-name">Name <span class="field__req" aria-hidden="true">*</span></label>
-            <input class="field__input" id="kontakt-name" name="name" type="text" autocomplete="name" required aria-describedby="kontakt-name-error">
+            <input class="field__input" id="kontakt-name" name="name" type="text" autocomplete="name" required>
             <p class="field__error" id="kontakt-name-error" hidden>Bitte geben Sie Ihren Namen ein.</p>
           </div>
 
@@ -409,18 +420,18 @@
 
           <div class="field">
             <label class="field__label" for="kontakt-email">E-Mail <span class="field__req" aria-hidden="true">*</span></label>
-            <input class="field__input" id="kontakt-email" name="email" type="email" autocomplete="email" inputmode="email" required aria-describedby="kontakt-email-error">
+            <input class="field__input" id="kontakt-email" name="email" type="email" autocomplete="email" inputmode="email" required>
             <p class="field__error" id="kontakt-email-error" hidden>Bitte geben Sie eine gültige E-Mail-Adresse ein, zum Beispiel name@firma.de.</p>
           </div>
 
           <div class="field">
             <label class="field__label" for="kontakt-nachricht">Nachricht <span class="field__req" aria-hidden="true">*</span></label>
-            <textarea class="field__input field__input--area" id="kontakt-nachricht" name="nachricht" rows="5" required aria-describedby="kontakt-nachricht-error"></textarea>
+            <textarea class="field__input field__input--area" id="kontakt-nachricht" name="nachricht" rows="5" required></textarea>
             <p class="field__error" id="kontakt-nachricht-error" hidden>Bitte schreiben Sie uns kurz, worum es geht.</p>
           </div>
 
           <div class="form__actions">
-            <button class="btn btn--primary" type="submit">Nachricht senden</button>
+            <button class="btn btn--primary" type="submit">Anfrage senden</button>
             <p class="form__note">Prototyp: Das Formular versendet nichts. Datenschutzhinweis <span class="ph">[Platzhalter]</span></p>
           </div>
 
@@ -464,18 +475,20 @@
   <div class="palette" role="group" aria-labelledby="palette-label">
     <p class="palette__label" id="palette-label">Farbvariante</p>
     <div class="palette__options">
-      <button class="palette__btn" type="button" data-palette-choice="warm" aria-pressed="true">
+      <button class="palette__btn" type="button" data-palette-choice="warm" title="Warm" aria-pressed="true">
         <span class="palette__swatch palette__swatch--warm" aria-hidden="true"></span>Warm
       </button>
-      <button class="palette__btn" type="button" data-palette-choice="klar" aria-pressed="false">
+      <button class="palette__btn" type="button" data-palette-choice="klar" title="Klar" aria-pressed="false">
         <span class="palette__swatch palette__swatch--klar" aria-hidden="true"></span>Klar
       </button>
-      <button class="palette__btn" type="button" data-palette-choice="frisch" aria-pressed="false">
+      <button class="palette__btn" type="button" data-palette-choice="frisch" title="Frisch" aria-pressed="false">
         <span class="palette__swatch palette__swatch--frisch" aria-hidden="true"></span>Frisch
       </button>
     </div>
   </div>
 
-  <div class="toast" role="status" aria-live="polite" data-toast hidden></div>
+  <div class="toast-region" role="status" aria-live="polite">
+    <div class="toast" data-toast hidden></div>
+  </div>
 </body>
 </html>
