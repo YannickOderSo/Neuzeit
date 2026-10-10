@@ -15,6 +15,12 @@
      Ohne die Klasse bleibt die ruhige Endfassung stehen. */
   var motionOK = !reduceMotion.matches;
   if (motionOK) root.classList.add("motion");
+  function onMotionPreference() {
+    motionOK = !reduceMotion.matches;
+    root.classList.toggle("motion", motionOK);
+  }
+  if (reduceMotion.addEventListener) reduceMotion.addEventListener("change", onMotionPreference);
+  else if (reduceMotion.addListener) reduceMotion.addListener(onMotionPreference);
 
   function clamp01(v) {
     return v < 0 ? 0 : v > 1 ? 1 : v;
@@ -122,11 +128,13 @@
       indicator.style.setProperty("--ind-o", "0");
       return;
     }
-    var wasHidden = indicator.style.getPropertyValue("--ind-o") !== "1";
-    if (wasHidden) indicator.style.transition = "none";
-    indicator.style.setProperty("--ind-x", link.offsetLeft + "px");
-    indicator.style.setProperty("--ind-w", String(link.offsetWidth));
-    if (wasHidden) {
+    var firstTime = !indicator.style.getPropertyValue("--ind-x");
+    if (firstTime) indicator.style.transition = "none";
+    var navBox = nav.getBoundingClientRect();
+    var linkBox = link.getBoundingClientRect();
+    indicator.style.setProperty("--ind-x", (linkBox.left - navBox.left) + "px");
+    indicator.style.setProperty("--ind-w", String(linkBox.width));
+    if (firstTime) {
       void indicator.offsetWidth;
       indicator.style.transition = "";
     }
@@ -142,6 +150,10 @@
         current = spySections[i].getAttribute("data-spy");
         break;
       }
+    }
+    if (!current && spySections.length) {
+      var lastSection = spySections[spySections.length - 1];
+      if (lastSection.getBoundingClientRect().bottom <= probe) current = lastSection.getAttribute("data-spy");
     }
     if (current === lastCurrent) return;
     lastCurrent = current;
@@ -166,9 +178,13 @@
   var steps = document.querySelector(".steps");
   var stepItems = steps ? Array.prototype.slice.call(steps.querySelectorAll(".step")) : [];
   var stepThresholds = [];
+  var heroLayers = hero ? Array.prototype.slice.call(hero.querySelectorAll(".horizon__lift, .horizon__rings-lift")) : [];
   var stance = document.querySelector(".stance");
+  var stanceRise = stance && stance.querySelector(".stance__rise");
   var quote = document.querySelector(".stance__quote blockquote");
   var footerMark = document.querySelector(".footer-mark");
+  var footerRise = footerMark && footerMark.querySelector(".footer-mark__rise");
+  var FOOTER_LINE = 0.866; /* Lage der Horizontlinie im Schlusslogo (Anteil der Höhe) */
 
   /* Position jedes Schritt-Markers entlang der Linie (0 bis 1) */
   function measureSteps() {
@@ -189,22 +205,29 @@
     var maxScroll = document.documentElement.scrollHeight - vh;
     var heroBox = hero && hero.getBoundingClientRect();
     var stepsBox = steps && steps.getBoundingClientRect();
-    var stanceBox = stance && stance.getBoundingClientRect();
-    var quoteBox = quote && quote.getBoundingClientRect();
-    var markBox = footerMark && footerMark.getBoundingClientRect();
+    var stanceBox = stanceRise && stance.getBoundingClientRect();
+    var markBox = footerRise && footerMark.getBoundingClientRect();
 
     if (progressBar) progressBar.style.setProperty("--page-p", (maxScroll > 0 ? clamp01(window.scrollY / maxScroll) : 0).toFixed(4));
-    if (heroBox) hero.style.setProperty("--hero-p", clamp01(-heroBox.top / heroBox.height).toFixed(4));
+    if (heroBox) {
+      var heroP = clamp01(-heroBox.top / heroBox.height).toFixed(4);
+      heroLayers.forEach(function (layer) { layer.style.setProperty("--hero-p", heroP); });
+    }
     if (stepsBox) {
       var tl = clamp01((vh * 0.8 - stepsBox.top) / (vh * 0.25 + stepsBox.height));
       steps.style.setProperty("--tl", tl.toFixed(4));
+      steps.classList.toggle("is-complete", tl >= 0.99);
       stepItems.forEach(function (item, i) {
         item.classList.toggle("is-reached", tl > 0 && tl >= (stepThresholds[i] || 0) - 0.005);
       });
     }
-    if (quoteBox) quote.style.setProperty("--q", clamp01((vh * 0.85 - quoteBox.top) / (vh * 0.45)).toFixed(4));
-    if (stanceBox) stance.style.setProperty("--sp", clamp01((vh - stanceBox.bottom) / (vh * 0.45)).toFixed(4));
-    if (markBox) footerMark.style.setProperty("--fm", clamp01((vh - markBox.top) / (markBox.height * 0.9)).toFixed(4));
+    if (stanceBox) stanceRise.style.setProperty("--sp", clamp01((vh - stanceBox.bottom) / (vh * 0.45)).toFixed(4));
+    if (markBox) {
+      /* Die Sonne geht auf, sobald die Horizontlinie im Bild ist, und steht am Seitenende */
+      var lineIn = vh - (markBox.top + markBox.height * FOOTER_LINE);
+      var remaining = Math.max(0, maxScroll - window.scrollY);
+      footerRise.style.setProperty("--fm", (lineIn <= 0 ? 0 : clamp01(lineIn / (lineIn + remaining))).toFixed(4));
+    }
   }
 
   /* Zitat in Wörter teilen; Screenreader lesen weiter den ganzen Satz */
@@ -232,7 +255,6 @@
     quoteP.textContent = "";
     quoteP.appendChild(spoken);
     quoteP.appendChild(visual);
-    quote.style.setProperty("--n", String(count));
   }
 
   var scrollTicking = false;
@@ -311,8 +333,9 @@
      Auf schmalen Handys liegt sie beim Laden unterhalb des Bildschirms. */
   var heroVisual = document.querySelector(".hero__visual");
   var horizonLine = heroVisual && heroVisual.querySelector(".horizon__line");
-  if (horizonLine && !reduceMotion.matches && "IntersectionObserver" in window &&
-      horizonLine.getBoundingClientRect().top > window.innerHeight - 24) {
+  var horizonRings = heroVisual && heroVisual.querySelector(".horizon__rings");
+  if (horizonLine && horizonRings && motionOK && "IntersectionObserver" in window &&
+      horizonRings.getBoundingClientRect().top > window.innerHeight - 24) {
     heroVisual.classList.add("is-waiting");
     var heroObserver = new IntersectionObserver(function (entries) {
       if (entries[0].isIntersecting) {
@@ -368,14 +391,35 @@
       root.style.setProperty("--vt-y", y + "px");
       root.style.setProperty("--vt-r", radius + "px");
       root.classList.add("vt-palette");
+      var transition = null;
+      function done() {
+        if (paletteTransition !== transition) return; /* ein neuerer Wechsel läuft schon */
+        paletteTransition = null;
+        root.classList.remove("vt-palette");
+      }
       try {
-        var transition = document.startViewTransition(function () { applyPalette(name, true); });
+        transition = document.startViewTransition(function () { applyPalette(name, true); });
+        paletteTransition = transition;
         transition.finished.then(done, done);
       } catch (e) {
+        paletteTransition = null;
         applyPalette(name, true);
-        done();
+        root.classList.remove("vt-palette");
       }
-      function done() { root.classList.remove("vt-palette"); }
+    });
+  });
+
+  /* Während der Enthüllung landen Klicks auf <html>; Klicks auf einen Farbknopf weiterreichen */
+  var paletteTransition = null;
+  document.addEventListener("click", function (event) {
+    if (!paletteTransition || event.target !== root) return;
+    paletteButtons.some(function (button) {
+      var b = button.getBoundingClientRect();
+      if (event.clientX >= b.left && event.clientX <= b.right && event.clientY >= b.top && event.clientY <= b.bottom) {
+        button.click();
+        return true;
+      }
+      return false;
     });
   });
   applyPalette(root.getAttribute("data-palette") || "warm", false);
@@ -461,6 +505,7 @@
     status.appendChild(text);
     void status.offsetWidth;
     status.classList.add("is-success");
+    status.scrollIntoView({ block: "nearest", behavior: motionOK ? "smooth" : "auto" });
   }
 
   if (form) {
@@ -512,11 +557,12 @@
       }
 
       /* kurzer Ladezustand, damit sich der Prototyp wie das Original anfühlt */
-      if (submitButton && motionOK) {
+      /* Ladezustand auch ohne Bewegung: er verhindert doppeltes Absenden */
+      if (submitButton) {
         submitButton.classList.add("is-loading");
         submitButton.setAttribute("aria-disabled", "true");
         if (submitLabel) submitLabel.textContent = "Einen Moment …";
-        window.setTimeout(finish, 900);
+        window.setTimeout(finish, motionOK ? 900 : 400);
       } else {
         finish();
       }

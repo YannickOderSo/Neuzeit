@@ -572,7 +572,7 @@ main:focus {
 
 /* Beim Laden löst sich die Sonne einmal von der Linie: von „aufliegend“ zur Fuge */
 .site-header .brand__sun {
-  animation: logo-lift 1.1s var(--ease-sun) 0.5s both;
+  animation: logo-lift 0.9s var(--ease-sun) 3.1s both; /* Echo, wenn die große Sonne steht */
 }
 
 @keyframes logo-lift {
@@ -925,7 +925,7 @@ html.menu-open {
   stroke-width: 1.25;
   stroke-dasharray: 1;
   stroke-dashoffset: 0;
-  animation: draw-line 1.6s var(--ease-out) both;
+  animation: draw-line 1.4s var(--ease-out) 0.35s both;
 }
 
 .horizon__sun {
@@ -935,7 +935,7 @@ html.menu-open {
 }
 
 .horizon__sun-wrap {
-  animation: sun-rise 3.2s var(--ease-sun) 0.45s both;
+  animation: sun-rise 2.4s cubic-bezier(0.4, 0, 0.15, 1) 1.05s both;
 }
 
 .horizon__rings circle {
@@ -953,7 +953,7 @@ html.menu-open {
 .horizon__rings {
   transform-box: view-box;
   transform-origin: 280px 320px;
-  animation: rings-in 2.4s var(--ease-out) 1.6s both;
+  animation: rings-in 1.8s var(--ease-out) 2.1s both;
 }
 
 .horizon__tick {
@@ -962,12 +962,12 @@ html.menu-open {
 
 .horizon__scale {
   opacity: 0.55;
-  animation: fade-in 1.2s var(--ease-out) 0.9s both;
+  animation: fade-in 1.2s var(--ease-out) 1.1s both;
 }
 
 .horizon__tick--now,
 .horizon__label {
-  animation: fade-in 1.2s var(--ease-out) 2.4s both;
+  animation: fade-in 0.9s var(--ease-out) 2.7s both;
 }
 
 .horizon__label {
@@ -2367,11 +2367,18 @@ html.menu-open {
   transform: translateY(1.5rem);
 }
 
+[data-reveal].is-pending:focus-within {
+  opacity: 1;
+  transform: none;
+  transition: none;
+}
+
 /* --------------------------------------------------------------------------
    19b. Bewegung und Interaktion
    Alles hier ist Zusatz. Ohne JavaScript oder bei reduzierter Bewegung bleibt
    die ruhige Endfassung stehen. Scroll-Werte (0 bis 1) setzt main.js als
-   Custom Properties: --page-p, --hero-p, --tl, --q, --sp, --fm.
+   Custom Properties direkt an den animierten Elementen: --page-p, --hero-p,
+   --tl, --sp, --fm.
    -------------------------------------------------------------------------- */
 
 /* Zeitlinie unter der Kopfzeile: Lesefortschritt, an der Spitze eine kleine Sonne */
@@ -2395,7 +2402,7 @@ html.menu-open {
 
 .scroll-progress__sun {
   position: absolute;
-  inset: 0;
+  inset: 0 0.3125rem;
   transform: translateX(calc(var(--page-p, 0) * 100%));
   opacity: min(1, calc(var(--page-p, 0) * 40));
 }
@@ -2446,18 +2453,18 @@ html.motion .nav__link[aria-current="true"]::after {
 
 .hero__title .word > span {
   display: inline-block;
-  animation: word-rise 1.15s var(--ease-sun) both;
-  animation-delay: calc(0.1s + var(--i, 0) * 0.09s);
+  animation: word-rise 0.8s var(--ease-sun) both;
+  animation-delay: calc(0.05s + var(--i, 0) * 0.06s);
 }
 
 .hero__title .accent-mark {
   display: inline-block;
   font-style: normal;
-  animation: mark-rise 0.7s var(--ease-sun) 0.8s both;
+  animation: mark-rise 0.7s var(--ease-sun) 0.6s both;
 }
 
 .hero .kicker {
-  animation: fade-up 0.8s var(--ease-out) both;
+  animation: slide-up 0.6s var(--ease-out) both;
 }
 
 .hero .kicker::before {
@@ -2466,11 +2473,16 @@ html.motion .nav__link[aria-current="true"]::after {
 }
 
 .hero__lead {
-  animation: fade-up 0.9s var(--ease-out) 0.55s both;
+  animation: slide-up 0.7s var(--ease-out) 0.25s both;
 }
 
 .hero .btn-row {
-  animation: fade-up 0.9s var(--ease-out) 0.7s both;
+  animation: fade-up 0.7s var(--ease-out) 0.35s both;
+}
+
+@keyframes slide-up {
+  from { transform: translateY(0.9rem); }
+  to { transform: none; }
 }
 
 @keyframes word-rise {
@@ -2517,11 +2529,11 @@ html.motion .section-head::after {
   height: 1px;
   background: var(--line);
   transform-origin: left center;
-  transition: transform 1.2s var(--ease-out) 0.1s;
+  transition: transform 1.2s var(--ease-out) 0.3s;
 }
 
 html.motion .section-head::before {
-  transition: transform 0.6s var(--ease-sun) 0.85s;
+  transition: transform 0.6s var(--ease-sun) 0.1s;
 }
 
 html.motion .section-head.is-pending::after {
@@ -2545,10 +2557,6 @@ html.motion .section-head.is-pending::before {
 
 /* Leistungen: Karten kommen leicht diagonal, Lichtkegel folgt dem Zeiger,
    die kleinen Sonnen heben sich beim Überfahren */
-.service[data-reveal].is-pending {
-  transform: translate(1.5rem, 0.75rem);
-}
-
 .service__card {
   isolation: isolate;
 }
@@ -2567,6 +2575,19 @@ html.motion .section-head.is-pending::before {
 
 .service__card:hover .service__list li::before {
   transform: translateY(-3px);
+}
+
+@property --mx { syntax: "<length-percentage>"; inherits: false; initial-value: 50%; }
+@property --my { syntax: "<length-percentage>"; inherits: false; initial-value: 0%; }
+@property --tl { syntax: "<number>"; inherits: false; initial-value: 0; }
+
+.service__card::before {
+  --mx: inherit;
+  --my: inherit;
+}
+
+.steps::before {
+  --tl: inherit;
 }
 
 @media (hover: hover) and (pointer: fine) {
@@ -2616,8 +2637,19 @@ html.motion .section-head.is-pending::before {
   }
 }
 
+@media (min-width: 48rem) {
+  .steps::after {
+    transition: border-color 0.4s var(--ease-out), opacity 0.4s var(--ease-out);
+  }
+
+  .steps.is-complete::after {
+    border-color: var(--accent-line);
+    opacity: 1;
+  }
+}
+
 html.motion .step--last .step__marker {
-  background: linear-gradient(var(--accent-graphic), var(--accent-graphic)) no-repeat 50% 100% / 100% 0%;
+  background: linear-gradient(var(--accent-graphic), var(--accent-graphic)) no-repeat 50% 100% / 100% 0%, var(--color-bg);
   box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--fg) 45%, transparent);
   transition: background-size 1.1s var(--ease-sun), box-shadow 600ms var(--ease-out);
 }
@@ -2627,9 +2659,17 @@ html.motion .step--last.is-reached .step__marker {
   box-shadow: 0 0 0 1px var(--color-motif-stroke);
 }
 
-/* Haltung: das Zitat erscheint Wort für Wort im Lesetempo, die Sonne steigt */
+/* Haltung: das Zitat steigt einmal Wort für Wort auf, die Sonne steigt beim Scrollen */
 html.motion .stance__quote .qw {
-  opacity: clamp(0.2, calc(var(--q, 1) * (var(--n, 1) + 2) - var(--i, 0)), 1);
+  display: inline-block;
+  text-indent: 0; /* sonst erbt jedes Wort das hängende Einrücken */
+  transition: opacity 0.7s var(--ease-out), transform 1.1s var(--ease-sun);
+  transition-delay: calc(0.15s + var(--i, 0) * 55ms);
+}
+
+html.motion .stance__quote.is-pending .qw {
+  opacity: 0;
+  transform: translateY(0.35em);
 }
 
 .stance__rise {
@@ -2643,7 +2683,7 @@ html.motion .stance__quote .qw {
 
 /* Kontakt: Ladezustand und Bestätigung */
 .btn--submit {
-  min-width: 11rem;
+  min-width: 13rem;
 }
 
 .btn__spinner {
@@ -2714,13 +2754,13 @@ html.motion .stance__quote .qw {
 .mobile-menu__list li:nth-child(4) { animation-delay: 0.2s; }
 
 .mobile-menu__cta {
-  animation: fade-up 0.55s var(--ease-out) 0.28s both;
+  animation: fade-up 0.55s var(--ease-out) 0.28s backwards;
 }
 
 /* Footer: großes Schlusslogo, die Sonne geht hinter dem Horizont auf */
 .footer-mark {
   margin-top: var(--space-l);
-  color: var(--fg);
+  color: color-mix(in srgb, var(--fg) 16%, transparent); /* dekorativ, aria-hidden */
 }
 
 .footer-mark__svg {
@@ -2744,6 +2784,10 @@ html.motion .stance__quote .qw {
 @media (min-width: 48rem) {
   .footer-mark {
     grid-column: 1 / -1;
+  }
+
+  .site-footer {
+    padding-bottom: calc(var(--space-2xl) + 3rem + env(safe-area-inset-bottom, 0px));
   }
 }
 
@@ -2797,6 +2841,10 @@ html:not(.js) .site-header__cta {
     background: CanvasText;
   }
 
+  html.motion .stance__quote .qw {
+    opacity: 1;
+  }
+
   .palette__btn[aria-pressed="true"] {
     border: 2px solid Highlight;
   }
@@ -2812,8 +2860,32 @@ html:not(.js) .site-header__cta {
     animation: none !important;
   }
 
+  *,
+  *::before,
+  *::after {
+    transition: none !important;
+  }
+
   .stance__quote .qw {
     opacity: 1 !important;
+    transform: none !important;
+  }
+
+  .section-head.is-pending::after,
+  .section-head.is-pending::before {
+    transform: none !important;
+  }
+
+  .reason.is-pending .reason__title time {
+    background-size: 100% 2px !important;
+  }
+
+  .person.is-pending .person__initial {
+    transform: translate(-50%, 0.14em) !important;
+  }
+
+  html.motion .step--last .step__marker {
+    background-size: 100% 100% !important;
   }
 
   .horizon__lift,
@@ -2847,6 +2919,25 @@ html:not(.js) .site-header__cta {
 /* --------------------------------------------------------------------------
    21. Reduzierte Bewegung
    -------------------------------------------------------------------------- */
+@media (prefers-reduced-motion: reduce) {
+  .horizon__lift,
+  .horizon__rings-lift,
+  .stance__rise,
+  .footer-mark__rise {
+    transform: none !important;
+  }
+
+  .stance__quote .qw {
+    opacity: 1 !important;
+    transform: none !important;
+  }
+
+  ::view-transition-old(root),
+  ::view-transition-new(root) {
+    animation: none !important;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   html {
     scroll-behavior: auto;
