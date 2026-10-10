@@ -1,0 +1,72 @@
+<footer class="site-footer">
+  <div class="container site-footer__inner">
+    <div class="site-footer__brand">
+      <a class="brand brand--on-dark" href="index.html" aria-label="neuzeit, zur Startseite">
+        {{> logo-fuss.svg}}
+      </a>
+      <p class="site-footer__claim">Change-Management für den Mittelstand: digitaler und struktureller Wandel, den Ihre Leute mittragen.</p>
+      <a class="btn btn--primary btn--small site-footer__cta" href="kontakt.html#anfrage">Potenzialgespräch vereinbaren <svg class="btn__icon" viewBox="0 0 16 16" aria-hidden="true" focusable="false"><path d="M3 8h9.5M8.5 4 12.5 8l-4 4"/></svg></a>
+    </div>
+
+    <nav class="site-footer__col" aria-labelledby="fuss-seiten">
+      <h2 class="site-footer__heading" id="fuss-seiten">Seiten</h2>
+      <ul class="site-footer__links" role="list">
+        <li><a href="index.html"{{aktuell:start}}>Start</a></li>
+        <li><a href="leistungen.html"{{aktuell:leistungen}}>Leistungen</a></li>
+        <li><a href="ueber-uns.html"{{aktuell:ueber-uns}}>Über uns</a></li>
+        <li><a href="kontakt.html"{{aktuell:kontakt}}>Kontakt</a></li>
+      </ul>
+    </nav>
+
+    <nav class="site-footer__col" aria-labelledby="fuss-leistungen">
+      <h2 class="site-footer__heading" id="fuss-leistungen">Leistungen</h2>
+      <ul class="site-footer__links" role="list">
+        <li><a href="leistungen.html#digitaler-wandel">Digitaler Wandel &amp; Nutzer&shy;akzeptanz</a></li>
+        <li><a href="leistungen.html#strukturelle-transformation">Strukturelle Transformation</a></li>
+        <li><a href="leistungen.html#compliance">Compliance als Change-Prozess</a></li>
+      </ul>
+    </nav>
+
+    <div class="site-footer__col">
+      <h2 class="site-footer__heading">Kontakt</h2>
+      <dl class="site-footer__meta">
+        <div><dt>Standort</dt><dd><span class="ph">[Platzhalter]</span></dd></div>
+        <div><dt>E-Mail</dt><dd><span class="ph">[Platzhalter]</span></dd></div>
+      </dl>
+    </div>
+
+    <div class="site-footer__bottom">
+      <p class="site-footer__small">© 2026 Neuzeit · Prototyp · ohne Cookies und Tracking</p>
+      <nav class="site-footer__legal" aria-label="Rechtliches">
+        <ul role="list">
+          <li><a href="impressum.html"{{aktuell:impressum}}>Impressum</a></li>
+          <li><a href="datenschutz.html"{{aktuell:datenschutz}}>Datenschutz</a></li>
+        </ul>
+      </nav>
+    </div>
+
+    <div class="footer-mark" aria-hidden="true">
+      {{> logo-schluss.svg}}
+    </div>
+  </div>
+</footer>
+
+<!-- Farbvarianten (nur Prototyp) -->
+<div class="palette" role="region" aria-labelledby="palette-label">
+  <p class="palette__label" id="palette-label">Farbvariante</p>
+  <div class="palette__options">
+    <button class="palette__btn" type="button" data-palette-choice="warm" title="Warm" aria-pressed="true">
+      <span class="palette__swatch palette__swatch--warm" aria-hidden="true"></span>Warm
+    </button>
+    <button class="palette__btn" type="button" data-palette-choice="klar" title="Klar" aria-pressed="false">
+      <span class="palette__swatch palette__swatch--klar" aria-hidden="true"></span>Klar
+    </button>
+    <button class="palette__btn" type="button" data-palette-choice="frisch" title="Frisch" aria-pressed="false">
+      <span class="palette__swatch palette__swatch--frisch" aria-hidden="true"></span>Frisch
+    </button>
+  </div>
+</div>
+
+<div class="toast-region" role="status" aria-live="polite">
+  <div class="toast" data-toast hidden></div>
+</div>

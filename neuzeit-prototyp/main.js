@@ -1,7 +1,7 @@
 /* ==========================================================================
    neuzeit · Website-Prototyp
    Kleine Interaktionen ohne Framework: Navigation, Einblenden, Farbvarianten,
-   Formularprüfung. Ohne JavaScript bleibt die Seite vollständig lesbar.
+   Formular, Terminbuchung. Ohne JavaScript bleibt jede Seite vollständig lesbar.
    ========================================================================== */
 (function () {
   "use strict";
@@ -101,8 +101,8 @@
       else closeMenu(false);
     });
 
-    header.addEventListener("click", function (event) {
-      if (event.target.closest('a[href^="#"]')) closeMenu(false);
+    menu.addEventListener("click", function (event) {
+      if (event.target.closest("a[href]")) closeMenu(false);
     });
 
     var onBreakpointChange = function (mq) {
@@ -113,60 +113,99 @@
   }
 
   /* ------------------------------------------------------------------------
-     Aktiver Menüpunkt beim Scrollen
+     Gleitende Marker: unter dem aktuellen Menüpunkt, beim Zeigen folgen sie
+     dem Zeiger und kehren danach zurück
      ------------------------------------------------------------------------ */
-  var navLinks = Array.prototype.slice.call(document.querySelectorAll("[data-nav]"));
-  var spySections = Array.prototype.slice.call(document.querySelectorAll("main > section"));
-  var nav = document.querySelector(".nav");
-  var indicator = nav && nav.querySelector(".nav__indicator");
-  var lastCurrent;
-
-  /* Marker unter dem aktiven Menüpunkt gleitet von Punkt zu Punkt */
-  function moveIndicator(link) {
-    if (!indicator || !motionOK) return;
-    if (!link || !link.offsetWidth) {
-      indicator.style.setProperty("--ind-o", "0");
-      return;
-    }
-    var firstTime = !indicator.style.getPropertyValue("--ind-x");
-    if (firstTime) indicator.style.transition = "none";
-    var navBox = nav.getBoundingClientRect();
-    var linkBox = link.getBoundingClientRect();
-    indicator.style.setProperty("--ind-x", (linkBox.left - navBox.left) + "px");
-    indicator.style.setProperty("--ind-w", String(linkBox.width));
-    if (firstTime) {
-      void indicator.offsetWidth;
-      indicator.style.transition = "";
-    }
-    indicator.style.setProperty("--ind-o", "1");
+  function makeIndicator(box, indicator) {
+    if (!box || !indicator) return function () {};
+    return function (link) {
+      if (!motionOK) return;
+      if (!link || !link.offsetWidth) {
+        indicator.style.setProperty("--ind-o", "0");
+        return;
+      }
+      var firstTime = !indicator.style.getPropertyValue("--ind-x");
+      if (firstTime) indicator.style.transition = "none";
+      var boxRect = box.getBoundingClientRect();
+      var linkRect = link.getBoundingClientRect();
+      indicator.style.setProperty("--ind-x", (linkRect.left - boxRect.left) + "px");
+      indicator.style.setProperty("--ind-w", String(linkRect.width));
+      if (firstTime) {
+        void indicator.offsetWidth;
+        indicator.style.transition = "";
+      }
+      indicator.style.setProperty("--ind-o", "1");
+    };
   }
 
-  function updateActiveNav() {
-    var probe = window.innerHeight * 0.4;
-    var current = null;
-    for (var i = 0; i < spySections.length; i++) {
-      var rect = spySections[i].getBoundingClientRect();
-      if (rect.top <= probe && rect.bottom > probe) {
-        current = spySections[i].getAttribute("data-spy");
-        break;
-      }
-    }
-    if (!current && spySections.length) {
-      var lastSection = spySections[spySections.length - 1];
-      if (lastSection.getBoundingClientRect().bottom <= probe) current = lastSection.getAttribute("data-spy");
-    }
-    if (current === lastCurrent) return;
-    lastCurrent = current;
+  var nav = document.querySelector(".nav");
+  var navLinks = nav ? Array.prototype.slice.call(nav.querySelectorAll(".nav__link")) : [];
+  var currentNavLink = navLinks.filter(function (link) {
+    return link.getAttribute("aria-current") === "page";
+  })[0] || null;
+  var moveNavIndicator = makeIndicator(nav, nav && nav.querySelector(".nav__indicator"));
+  if (nav && currentNavLink) nav.classList.add("has-current");
+
+  function resetNavIndicator() {
+    moveNavIndicator(currentNavLink);
+  }
+
+  navLinks.forEach(function (link) {
+    link.addEventListener("pointerenter", function () { moveNavIndicator(link); });
+    link.addEventListener("focus", function () { moveNavIndicator(link); });
+    link.addEventListener("blur", resetNavIndicator);
+  });
+  if (nav) nav.addEventListener("pointerleave", resetNavIndicator);
+
+  /* Sprungmarken auf der Leistungsseite: markieren, welcher Abschnitt gerade
+     gelesen wird */
+  var subnav = document.querySelector("[data-subnav]");
+  var subnavList = subnav && subnav.querySelector(".subnav__list");
+  var subnavLinks = subnav ? Array.prototype.slice.call(subnav.querySelectorAll(".subnav__link")) : [];
+  var subnavTargets = subnavLinks.map(function (link) {
+    return document.getElementById(decodeURIComponent(link.hash.slice(1)));
+  });
+  var moveSubnavIndicator = makeIndicator(subnav && subnav.querySelector(".subnav__inner"), subnav && subnav.querySelector(".subnav__indicator"));
+  var currentSpy = null;
+
+  function updateSpy() {
+    if (!subnav) return;
+    var subnavBox = subnav.getBoundingClientRect();
+    var probe = subnavBox.bottom + window.innerHeight * 0.25;
     var active = null;
-    navLinks.forEach(function (link) {
-      if (current && link.getAttribute("data-nav") === current) {
-        link.setAttribute("aria-current", "true");
-        active = link;
-      } else {
-        link.removeAttribute("aria-current");
-      }
+    /* erst markieren, wenn die Leiste unter der Kopfzeile klebt */
+    var pinned = !header || subnavBox.top <= header.getBoundingClientRect().bottom + 1;
+    subnavTargets.forEach(function (target, i) {
+      if (pinned && target && target.getBoundingClientRect().top <= probe) active = subnavLinks[i];
     });
-    moveIndicator(active);
+    /* am Seitenende gilt der letzte Abschnitt */
+    var last = subnavTargets[subnavTargets.length - 1];
+    if (last && window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 2 &&
+        last.getBoundingClientRect().top < window.innerHeight) {
+      active = subnavLinks[subnavLinks.length - 1];
+    }
+    if (active === currentSpy) return;
+    currentSpy = active;
+    subnavLinks.forEach(function (link) {
+      if (link === active) link.setAttribute("aria-current", "true");
+      else link.removeAttribute("aria-current");
+    });
+    /* auf schmalen Bildschirmen den aktiven Punkt in die Leiste holen */
+    if (active && subnavList && subnavList.scrollWidth > subnavList.clientWidth) {
+      var listRect = subnavList.getBoundingClientRect();
+      var linkRect = active.getBoundingClientRect();
+      if (linkRect.left < listRect.left || linkRect.right > listRect.right) {
+        subnavList.scrollTo({
+          left: subnavList.scrollLeft + linkRect.left - listRect.left - 16,
+          behavior: motionOK ? "smooth" : "auto"
+        });
+      }
+    }
+    moveSubnavIndicator(active);
+  }
+
+  if (subnavList) {
+    subnavList.addEventListener("scroll", function () { moveSubnavIndicator(currentSpy); }, { passive: true });
   }
 
   /* ------------------------------------------------------------------------
@@ -263,7 +302,7 @@
     scrollTicking = true;
     window.requestAnimationFrame(function () {
       updateHeader();
-      updateActiveNav();
+      updateSpy();
       if (motionOK) updateMotion();
       scrollTicking = false;
     });
@@ -271,7 +310,8 @@
 
   function onResize() {
     if (motionOK) measureSteps();
-    lastCurrent = undefined;
+    resetNavIndicator();
+    moveSubnavIndicator(currentSpy);
     onScroll();
   }
 
@@ -282,7 +322,8 @@
     measureSteps();
     updateMotion();
   }
-  updateActiveNav();
+  updateSpy();
+  resetNavIndicator();
   if (document.fonts && document.fonts.ready) {
     document.fonts.ready.then(onResize);
   }
@@ -452,7 +493,8 @@
   });
 
   /* ------------------------------------------------------------------------
-     Kontaktformular: Prüfung im Browser, kein Versand
+     Kontaktformular: Prüfung im Browser, Versand an einen Formulardienst
+     Ohne Eintrag in data-endpoint bleibt es bei der Vorschau ohne Versand.
      ------------------------------------------------------------------------ */
   var form = document.querySelector("[data-form]");
   var status = document.querySelector("[data-form-status]");
@@ -489,30 +531,60 @@
 
   var submitButton = form && form.querySelector(".btn--submit");
   var submitLabel = form && form.querySelector("[data-submit-label]");
+  var endpoint = form ? (form.getAttribute("data-endpoint") || "").trim() : "";
 
-  function showSuccess(name) {
+  function showStatus(kind, heading, message) {
     status.textContent = "";
-    status.classList.remove("is-success");
-    var icon = document.createElement("span");
-    icon.className = "sunrise";
-    icon.setAttribute("aria-hidden", "true");
+    status.classList.remove("is-success", "is-error");
+    if (kind === "success") {
+      var icon = document.createElement("span");
+      icon.className = "sunrise";
+      icon.setAttribute("aria-hidden", "true");
+      status.appendChild(icon);
+    }
     var title = document.createElement("strong");
-    title.textContent = "Danke, " + name + ".";
+    title.textContent = heading;
     var text = document.createElement("span");
-    text.textContent = "Im fertigen Auftritt ginge Ihre Anfrage jetzt an Neuzeit. Dieser Prototyp versendet nichts.";
-    status.appendChild(icon);
+    text.textContent = message;
     status.appendChild(title);
     status.appendChild(text);
     void status.offsetWidth;
-    status.classList.add("is-success");
+    status.classList.add(kind === "success" ? "is-success" : "is-error");
     status.scrollIntoView({ block: "nearest", behavior: motionOK ? "smooth" : "auto" });
+  }
+
+  function send(data) {
+    /* Formspree, Web3Forms und ähnliche Dienste antworten mit JSON */
+    return window.fetch(endpoint, {
+      method: "POST",
+      body: data,
+      headers: { Accept: "application/json" }
+    }).then(function (response) {
+      if (!response.ok) throw new Error("Versand fehlgeschlagen: " + response.status);
+    });
   }
 
   if (form) {
     /* Ohne JavaScript prüft der Browser die Pflichtfelder selbst. */
     form.noValidate = true;
-    var fields = Array.prototype.slice.call(form.querySelectorAll("input, textarea"));
+    var fields = Array.prototype.slice.call(form.querySelectorAll("input, textarea, select")).filter(function (field) {
+      return !field.closest(".form__trap");
+    });
     var attempted = false;
+
+    if (endpoint) {
+      var protoNote = form.querySelector("[data-form-proto]");
+      if (protoNote) protoNote.hidden = true;
+    }
+
+    /* Thema aus dem Link übernehmen, z. B. kontakt.html?thema=compliance */
+    var topicField = form.elements.thema;
+    if (topicField) {
+      var topic = new URLSearchParams(window.location.search).get("thema");
+      if (topic && Array.prototype.some.call(topicField.options, function (o) { return o.value === topic; })) {
+        topicField.value = topic;
+      }
+    }
 
     fields.forEach(function (field) {
       field.addEventListener("input", function () {
@@ -535,48 +607,106 @@
 
       if (firstInvalid) {
         status.textContent = "";
+        status.classList.remove("is-success", "is-error");
         firstInvalid.focus();
         return;
       }
 
       var name = form.elements.name.value.trim();
+      var data = new FormData(form);
+      var isBot = form.elements.website && form.elements.website.value !== "";
       status.textContent = "";
 
-      function finish() {
-        if (submitButton) {
-          submitButton.classList.remove("is-loading");
-          submitButton.removeAttribute("aria-disabled");
-          if (submitLabel) submitLabel.textContent = "Anfrage senden";
-        }
-        showSuccess(name);
-        form.reset();
-        attempted = false;
-        fields.forEach(function (field) {
-          setError(field, false);
-        });
+      function setLoading(loading) {
+        if (!submitButton) return;
+        submitButton.classList.toggle("is-loading", loading);
+        if (loading) submitButton.setAttribute("aria-disabled", "true");
+        else submitButton.removeAttribute("aria-disabled");
+        if (submitLabel) submitLabel.textContent = loading ? "Einen Moment …" : "Anfrage senden";
       }
 
-      /* kurzer Ladezustand, damit sich der Prototyp wie das Original anfühlt */
+      function done() {
+        setLoading(false);
+        showStatus("success", "Danke, " + name + ".", endpoint
+          ? "Ihre Anfrage ist bei uns angekommen. Wir melden uns mit Terminvorschlägen."
+          : "Im fertigen Auftritt ginge Ihre Anfrage jetzt an Neuzeit. Dieser Prototyp versendet nichts.");
+        form.reset();
+        attempted = false;
+        fields.forEach(function (field) { setError(field, false); });
+      }
+
+      function failed() {
+        setLoading(false);
+        showStatus("error", "Das hat leider nicht geklappt.", "Bitte versuchen Sie es in einem Moment noch einmal oder schreiben Sie uns direkt per E-Mail. Ihre Eingaben sind noch da.");
+      }
+
       /* Ladezustand auch ohne Bewegung: er verhindert doppeltes Absenden */
-      if (submitButton) {
-        submitButton.classList.add("is-loading");
-        submitButton.setAttribute("aria-disabled", "true");
-        if (submitLabel) submitLabel.textContent = "Einen Moment …";
-        window.setTimeout(finish, motionOK ? 900 : 400);
+      setLoading(true);
+      if (endpoint && !isBot) {
+        send(data).then(done, failed);
       } else {
-        finish();
+        window.setTimeout(done, motionOK ? 900 : 400);
       }
     });
   }
 
-  /* „Erstgespräch vereinbaren“ im Kontaktbereich springt direkt ins Formular */
-  document.querySelectorAll("[data-focus-form]").forEach(function (trigger) {
-    trigger.addEventListener("click", function (event) {
-      var target = document.getElementById("kontakt-name");
-      if (!target || !form) return;
-      event.preventDefault();
-      form.scrollIntoView({ behavior: reduceMotion.matches ? "auto" : "smooth", block: "start" });
-      target.focus({ preventScroll: true });
+  /* ------------------------------------------------------------------------
+     Terminbuchung mit Zwei-Klick-Lösung: Der Kalender von Calendly lädt erst,
+     wenn jemand ihn aktiv anfordert. Vorher fließen keine Daten in die USA.
+     ------------------------------------------------------------------------ */
+  document.querySelectorAll("[data-calendly]").forEach(function (box) {
+    var url = (box.getAttribute("data-calendly-url") || "").trim();
+    var loadButton = box.querySelector("[data-calendly-load]");
+    var consent = box.querySelector("[data-calendly-consent]");
+    var frame = box.querySelector("[data-calendly-frame]");
+    if (!loadButton || !consent || !frame) return;
+
+    frame.setAttribute("role", "region");
+    frame.setAttribute("aria-label", "Buchungskalender");
+
+    function showConsent() {
+      frame.hidden = true;
+      frame.textContent = "";
+      consent.hidden = false;
+      loadButton.focus();
+    }
+
+    loadButton.addEventListener("click", function () {
+      frame.textContent = "";
+      if (/^https:\/\/calendly\.com\/[\w-]/.test(url)) {
+        var iframe = document.createElement("iframe");
+        iframe.src = url + (url.indexOf("?") === -1 ? "?" : "&") + "hide_gdpr_banner=1";
+        iframe.title = "Terminbuchung über Calendly";
+        frame.appendChild(iframe);
+      } else {
+        /* Prototyp: noch kein Calendly-Link hinterlegt */
+        var box2 = document.createElement("div");
+        box2.className = "booking__placeholder";
+        var icon = document.createElement("span");
+        icon.className = "sunrise";
+        icon.setAttribute("aria-hidden", "true");
+        var title = document.createElement("strong");
+        title.textContent = "Hier erscheint der Buchungskalender.";
+        var text = document.createElement("p");
+        text.textContent = "Sobald der Calendly-Link hinterlegt ist, lädt an dieser Stelle der Kalender. ";
+        var ph = document.createElement("span");
+        ph.className = "ph";
+        ph.textContent = "[Platzhalter: Calendly-Link]";
+        text.appendChild(ph);
+        var back = document.createElement("button");
+        back.type = "button";
+        back.className = "btn btn--ghost btn--small";
+        back.textContent = "Zurück";
+        back.addEventListener("click", showConsent);
+        box2.appendChild(icon);
+        box2.appendChild(title);
+        box2.appendChild(text);
+        box2.appendChild(back);
+        frame.appendChild(box2);
+      }
+      consent.hidden = true;
+      frame.hidden = false;
+      frame.focus();
     });
   });
 })();

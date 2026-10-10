@@ -1,0 +1,42 @@
+<a class="skip-link" href="#inhalt">Zum Inhalt springen</a>
+
+<header class="site-header" data-header>
+  <div class="container site-header__inner">
+    <a class="brand" href="index.html" aria-label="neuzeit, zur Startseite"{{aktuell:start}}>
+      {{> logo-kopf.svg}}
+    </a>
+
+    <nav class="nav" aria-label="Hauptnavigation">
+      <ul class="nav__list" role="list">
+        <li><a class="nav__link" href="leistungen.html"{{aktuell:leistungen}}>Leistungen</a></li>
+        <li><a class="nav__link" href="ueber-uns.html"{{aktuell:ueber-uns}}>Über uns</a></li>
+        <li><a class="nav__link" href="kontakt.html"{{aktuell:kontakt}}>Kontakt</a></li>
+      </ul>
+      <span class="nav__indicator" aria-hidden="true"></span>
+    </nav>
+
+    <a class="btn btn--primary btn--small site-header__cta" href="kontakt.html#anfrage">Potenzialgespräch</a>
+
+    <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="mobile-menu" data-menu-toggle>
+      <span class="menu-toggle__label" data-menu-label>Menü</span>
+      <span class="menu-toggle__icon" aria-hidden="true"><span></span><span></span></span>
+    </button>
+  </div>
+
+  <div class="scroll-progress" aria-hidden="true">
+    <span class="scroll-progress__fill"></span>
+    <span class="scroll-progress__sun"></span>
+  </div>
+
+  <div class="mobile-menu" id="mobile-menu" hidden data-menu>
+    <nav class="container mobile-menu__inner" aria-label="Hauptnavigation mobil">
+      <ul class="mobile-menu__list" role="list">
+        <li><a class="mobile-menu__link" href="index.html"{{aktuell:start}}><span class="mobile-menu__num" aria-hidden="true">01</span>Start</a></li>
+        <li><a class="mobile-menu__link" href="leistungen.html"{{aktuell:leistungen}}><span class="mobile-menu__num" aria-hidden="true">02</span>Leistungen</a></li>
+        <li><a class="mobile-menu__link" href="ueber-uns.html"{{aktuell:ueber-uns}}><span class="mobile-menu__num" aria-hidden="true">03</span>Über uns</a></li>
+        <li><a class="mobile-menu__link" href="kontakt.html"{{aktuell:kontakt}}><span class="mobile-menu__num" aria-hidden="true">04</span>Kontakt</a></li>
+      </ul>
+      <a class="btn btn--primary mobile-menu__cta" href="kontakt.html#anfrage">Potenzialgespräch vereinbaren <svg class="btn__icon" viewBox="0 0 16 16" aria-hidden="true" focusable="false"><path d="M3 8h9.5M8.5 4 12.5 8l-4 4"/></svg></a>
+    </nav>
+  </div>
+</header>
