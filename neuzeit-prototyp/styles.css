@@ -307,7 +307,8 @@ main:focus {
 }
 
 /* Silbentrennung in schmalen Spalten, mobil im ganzen Fließtext.
-   Überschriften, Zitate und Buttons bleiben ungetrennt. */
+   Überschriften, Zitate, Labels und Navigation bleiben ungetrennt.
+   Die -webkit-Grenzen gelten für Safari, das hyphenate-limit-chars nicht kennt. */
 .reason__text,
 .service__list li,
 .step__text,
@@ -317,13 +318,23 @@ main:focus {
   -webkit-hyphens: auto;
   hyphens: auto;
   hyphenate-limit-chars: 10 4 4;
+  -webkit-hyphenate-limit-before: 4;
+  -webkit-hyphenate-limit-after: 4;
 }
 
 @media (max-width: 47.99rem) {
-  main :is(p, li):not(blockquote p, .offer__result p) {
+  main :is(p, li):not(blockquote p, nav li, .offer__result p, .proof__title, .chips li, .kicker, .eyebrow, .reason__tag, .person__role) {
     -webkit-hyphens: auto;
     hyphens: auto;
     hyphenate-limit-chars: 10 4 4;
+    -webkit-hyphenate-limit-before: 4;
+    -webkit-hyphenate-limit-after: 4;
+  }
+
+  /* erben sonst die Trennung von einem umgebenden li */
+  main :is(h1, h2, h3, h4, blockquote, nav, .proof__title, .chips li, .kicker, .eyebrow, .reason__tag, .person__role) {
+    -webkit-hyphens: manual;
+    hyphens: manual;
   }
 }
 
@@ -380,8 +391,7 @@ main:focus {
 .reg__title,
 .principle__title,
 .contact__heading,
-.prose h2,
-.offer__result p {
+.prose h2 {
   font-family: var(--font-display);
   font-optical-sizing: auto;
   font-weight: 400;
@@ -401,10 +411,17 @@ main:focus {
   font-weight: 340;
 }
 
-/* Sinnzeilen: Eine Zeile bricht nur innen um, wenn sie allein nicht passt */
-.display .ln,
-.h2 .ln {
-  display: inline-block;
+/* Sinnzeilen: Eine Zeile bricht nur innen um, wenn sie allein nicht passt.
+   .ln-keep hält Wortgruppen zusammen, damit kein Wort allein am Ende steht.
+   Unter 360 px wäre das zu breit, dort bricht der Titel frei um. */
+@media (min-width: 22.5rem) {
+  .display .ln {
+    display: inline-block;
+  }
+
+  .display .ln-keep {
+    white-space: nowrap;
+  }
 }
 
 .accent-mark {
@@ -1030,7 +1047,7 @@ html.menu-open {
 
 .horizon__rings {
   transform-box: view-box;
-  transform-origin: 280px 320px;
+  transform-origin: 280px 300px;
   animation: rings-in 1.8s var(--ease-out) 2.1s both;
 }
 
@@ -1068,7 +1085,7 @@ html.menu-open {
 }
 
 @keyframes sun-rise {
-  from { transform: translateY(170px); } /* ganz hinter dem Horizont, trotz Fuge */
+  from { transform: translateY(190px); } /* ganz verborgen, auch wenn die Seite schon gescrollt lädt */
   to { transform: translateY(0); }
 }
 
@@ -1690,7 +1707,7 @@ html.menu-open {
   right: 0;
   bottom: 0;
   width: 100%;
-  height: clamp(8.5rem, 23vw, 22rem);
+  height: clamp(8.5rem, 23vw, 26rem); /* hoch genug, dass die Sonne auf breiten Schirmen ganz bleibt */
   pointer-events: none;
 }
 
@@ -2914,7 +2931,7 @@ html.has-palette .site-footer {
   left: 0;
   right: 0;
   bottom: clamp(1.5rem, 4vw, 2.5rem);
-  height: calc(var(--sun-d) / 2 + var(--sun-gap) + 1px);
+  height: calc(var(--sun-d) / 2 + var(--sun-gap) + 3px); /* +2 px für die Kontur in Frisch */
   overflow: hidden;
   pointer-events: none;
 }
@@ -4042,7 +4059,7 @@ html.motion .nav__link::after {
 
 .horizon__rings-lift {
   transform-box: view-box;
-  transform-origin: 280px 320px;
+  transform-origin: 280px 300px;
   transform: scale(calc(1 + var(--hero-p, 0) * 0.08));
 }
 
