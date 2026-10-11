@@ -26,11 +26,19 @@
   <link rel="preload" href="fonts/fraunces.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="stylesheet" href="styles.css">
   <script>
-    /* Gespeicherte Farbvariante vor dem ersten Zeichnen setzen, damit nichts flackert. */
+    /* Farbvarianten nur zum Abstimmen: ?varianten blendet den Umschalter für die
+       Sitzung ein, ?varianten=aus wieder aus. Sonst gilt immer Warm. Die gespeicherte
+       Variante wird vor dem ersten Zeichnen gesetzt, damit nichts flackert. */
     try {
-      var savedPalette = localStorage.getItem("neuzeit-palette");
-      if (savedPalette === "warm" || savedPalette === "klar" || savedPalette === "frisch") {
-        document.documentElement.setAttribute("data-palette", savedPalette);
+      var paletteParam = new URLSearchParams(location.search).get("varianten");
+      if (paletteParam === "aus") sessionStorage.removeItem("neuzeit-varianten");
+      else if (paletteParam !== null) sessionStorage.setItem("neuzeit-varianten", "1");
+      if (sessionStorage.getItem("neuzeit-varianten") === "1") {
+        document.documentElement.classList.add("has-palette");
+        var savedPalette = localStorage.getItem("neuzeit-palette");
+        if (savedPalette === "warm" || savedPalette === "klar" || savedPalette === "frisch") {
+          document.documentElement.setAttribute("data-palette", savedPalette);
+        }
       }
     } catch (e) {}
     document.documentElement.classList.add("js");
@@ -136,7 +144,7 @@
           <p>Umsatzsteuer-Identifikationsnummer gemäß §&nbsp;27a Umsatzsteuergesetz, falls vorhanden: <span class="ph">[Platzhalter]</span></p>
 
           <h2>Redaktionell verantwortlich</h2>
-          <p>Nur nötig, wenn die Website journalistisch-redaktionelle Inhalte enthält (§&nbsp;18 Abs.&nbsp;2 MStV): <span class="ph">[Platzhalter: Name und Anschrift]</span></p>
+          <p>Nur nötig, wenn die Website journalistisch-redaktionelle Inhalte enthält (§&nbsp;18 Abs.&nbsp;2&nbsp;MStV): <span class="ph">[Platzhalter: Name und Anschrift]</span></p>
 
           <h2>Verbraucher&shy;streitbeilegung</h2>
           <p><span class="ph">[Platzhalter: Hinweis nach §&nbsp;36 VSBG prüfen lassen]</span> Neuzeit berät Unternehmen. Ob ein Hinweis zur Verbraucherschlichtung nötig ist, hängt unter anderem von der Zahl der Beschäftigten ab.</p>

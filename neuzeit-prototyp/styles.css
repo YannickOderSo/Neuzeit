@@ -204,6 +204,9 @@ html {
   -webkit-text-size-adjust: 100%;
   text-size-adjust: 100%;
   scroll-padding-top: calc(var(--header-h) + 1.25rem);
+}
+
+html.has-palette {
   scroll-padding-bottom: calc(6rem + env(safe-area-inset-bottom, 0px)); /* Platz für den Farbumschalter */
 }
 
@@ -224,6 +227,9 @@ body {
   line-height: var(--lh-body);
   font-weight: 450;
   font-feature-settings: "kern", "liga";
+  /* Fraunces wie die Wortmarke (LOGO.md): weiche Kanten, ruhige Formen ohne
+     eingerollte h, m, n. Manrope hat diese Achsen nicht und bleibt unberührt. */
+  font-variation-settings: "SOFT" 30, "WONK" 0;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   overflow-x: clip;
@@ -258,6 +264,11 @@ h1, h2, h3, h4, p, ul, ol, dl, dd, figure, blockquote {
   margin: 0;
 }
 
+/* keine einzelnen Wörter allein in der letzten Zeile */
+p, li, dd, figcaption, blockquote {
+  text-wrap: pretty;
+}
+
 :where(ul, ol)[role="list"] {
   list-style: none;
   padding: 0;
@@ -271,6 +282,7 @@ a {
 
 button,
 input,
+select,
 textarea {
   font: inherit;
   color: inherit;
@@ -292,6 +304,27 @@ main:focus {
 
 .nowrap {
   white-space: nowrap;
+}
+
+/* Silbentrennung in schmalen Spalten, mobil im ganzen Fließtext.
+   Überschriften, Zitate und Buttons bleiben ungetrennt. */
+.reason__text,
+.service__list li,
+.step__text,
+.case__story dd,
+.proof__text,
+.principle__text {
+  -webkit-hyphens: auto;
+  hyphens: auto;
+  hyphenate-limit-chars: 10 4 4;
+}
+
+@media (max-width: 47.99rem) {
+  main :is(p, li):not(blockquote p, .offer__result p) {
+    -webkit-hyphens: auto;
+    hyphens: auto;
+    hyphenate-limit-chars: 10 4 4;
+  }
 }
 
 .visually-hidden {
@@ -341,7 +374,14 @@ main:focus {
 .step__title,
 .person__name,
 .case__title,
-.form__title {
+.form__title,
+.proof__title,
+.faq__question,
+.reg__title,
+.principle__title,
+.contact__heading,
+.prose h2,
+.offer__result p {
   font-family: var(--font-display);
   font-optical-sizing: auto;
   font-weight: 400;
@@ -359,6 +399,12 @@ main:focus {
 .display em {
   font-style: italic;
   font-weight: 340;
+}
+
+/* Sinnzeilen: Eine Zeile bricht nur innen um, wenn sie allein nicht passt */
+.display .ln,
+.h2 .ln {
+  display: inline-block;
 }
 
 .accent-mark {
@@ -389,7 +435,6 @@ main:focus {
 .case__service,
 .field__label,
 .palette__label,
-.site-footer__meta dt,
 .contact__direct dt {
   font-family: var(--font-body);
   font-size: var(--fs-label);
@@ -405,12 +450,16 @@ main:focus {
   gap: 0.75rem;
   color: var(--fg-muted);
   margin-bottom: var(--space-m);
+  text-wrap: balance;
 }
 
 .kicker::before {
   content: "";
+  flex: none;
+  align-self: flex-start;
   width: 2rem;
   height: 1px;
+  margin-top: 0.7em;
   background: currentColor;
 }
 
@@ -450,6 +499,25 @@ main:focus {
 .text-link:hover {
   color: var(--accent-type);
   text-underline-offset: 0.45em;
+}
+
+/* derselbe Pfeil wie in den Buttons, statt eines Zeichens aus der Systemschrift */
+.text-link__icon {
+  display: inline-block;
+  width: 0.95em;
+  height: 0.95em;
+  margin-left: 0.3em;
+  vertical-align: -0.1em;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.7;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  transition: transform 350ms var(--ease-out);
+}
+
+.text-link:hover .text-link__icon {
+  transform: translateX(3px);
 }
 
 /* --------------------------------------------------------------------------
@@ -801,6 +869,11 @@ html.menu-open {
   padding-block: var(--space-section);
 }
 
+/* Zwei Abschnitte auf demselben Grund: Abstand nicht verdoppeln */
+.section:not(.section--dark, .offer--tint, .contact) + .section:not(.section--dark, .offer--tint, .contact) {
+  padding-top: calc(var(--space-section) * 0.4);
+}
+
 .section-head {
   position: relative;
   display: grid;
@@ -995,7 +1068,7 @@ html.menu-open {
 }
 
 @keyframes sun-rise {
-  from { transform: translateY(150px); }
+  from { transform: translateY(170px); } /* ganz hinter dem Horizont, trotz Fuge */
   to { transform: translateY(0); }
 }
 
@@ -1033,16 +1106,16 @@ html.menu-open {
   }
 
   .hero__visual {
-    grid-column: 7 / span 6;
+    grid-column: 8 / span 5;
     grid-row: 1;
     width: 100%;
-    margin-right: calc(var(--gutter) * -0.25);
   }
 }
 
-@media (min-width: 60rem) and (max-width: 79.99rem) {
-  .hero__visual {
-    grid-column: 8 / span 5;
+/* Die Horizontlinie verlängert die Button-Reihe nach rechts */
+@media (min-width: 75rem) {
+  .hero__text {
+    padding-bottom: 2.75rem;
   }
 }
 
@@ -1364,13 +1437,6 @@ html.menu-open {
     width: auto;
     margin-top: 0;
   }
-}
-
-/* breite Fenster: gleich breite Karten, diagonal versetzt wie Stufen zum Horizont */
-@media (min-width: 75rem) {
-  .service:nth-child(1) .service__card { margin-right: 4rem; }
-  .service:nth-child(2) .service__card { margin-inline: 2rem; }
-  .service:nth-child(3) .service__card { margin-left: 4rem; }
 }
 
 /* --------------------------------------------------------------------------
@@ -1855,10 +1921,10 @@ html.menu-open {
 
 .case__service {
   color: var(--fg-muted);
-  letter-spacing: 0.06em;
+  letter-spacing: 0;
   text-transform: none;
   font-size: var(--fs-small);
-  font-weight: 600;
+  font-weight: 500;
 }
 
 .case__title {
@@ -1917,10 +1983,6 @@ html.menu-open {
 
   .case__service {
     min-height: 2.8em;
-  }
-
-  .case:nth-child(2) {
-    margin-top: var(--space-xl);
   }
 }
 
@@ -2141,7 +2203,7 @@ html.menu-open {
   --color-motif-stroke: transparent;
   background-color: var(--color-dark);
   color: var(--fg);
-  padding-block: var(--space-2xl) calc(var(--space-2xl) + 4.5rem + env(safe-area-inset-bottom, 0px));
+  padding-block: var(--space-2xl) calc(var(--space-2xl) + env(safe-area-inset-bottom, 0px));
   transition: background-color 400ms var(--ease-out);
 }
 
@@ -2198,6 +2260,8 @@ html.menu-open {
 .site-footer__meta dt {
   margin-bottom: 0.2rem;
   color: var(--fg-muted);
+  font-size: var(--fs-small);
+  font-weight: 500;
 }
 
 .site-footer__meta dd {
@@ -2275,7 +2339,16 @@ html.menu-open {
 
 /* --------------------------------------------------------------------------
    17. Farbvarianten-Umschalter (nur Prototyp)
+   Erscheint nur mit ?varianten in der Adresse (siehe _partials/kopf.html).
    -------------------------------------------------------------------------- */
+html:not(.has-palette) .palette {
+  display: none;
+}
+
+html.has-palette .site-footer {
+  padding-bottom: calc(var(--space-2xl) + 4.5rem + env(safe-area-inset-bottom, 0px));
+}
+
 .palette {
   position: fixed;
   right: calc(env(safe-area-inset-right, 0px) + 0.75rem);
@@ -2437,7 +2510,7 @@ html.menu-open {
 
 .page-head__horizon {
   --sun-d: clamp(7rem, 15vw, 12.5rem);
-  --sun-gap: 0.4rem;
+  --sun-gap: calc(var(--sun-d) * 0.07); /* Fuge 0,14 r wie die große Logo-Fassung */
   position: relative;
   height: calc(var(--sun-d) / 2 + var(--sun-gap) + 1.5rem);
   overflow: hidden;
@@ -2715,6 +2788,7 @@ html.menu-open {
 }
 
 .quote-card figure {
+  position: relative;
   display: grid;
   align-content: start;
   gap: var(--space-m);
@@ -2728,13 +2802,20 @@ html.menu-open {
 .quote-card figure::before {
   content: "„";
   content: "„" / "";
-  height: 1.5rem;
-  margin-top: -0.75rem;
+  height: 2rem;
+  margin-top: -0.25rem;
   color: var(--accent-display);
   font-family: var(--font-display);
   font-size: 5rem;
   font-style: italic;
-  line-height: 0.6;
+  line-height: 0;
+}
+
+/* Platzhalter-Kennzeichnung in der Kartenecke, nicht im Zitatsatz */
+.quote-card__ph {
+  position: absolute;
+  top: clamp(1.5rem, 3.5vw, 2.25rem);
+  right: clamp(1.5rem, 3.5vw, 2.25rem);
 }
 
 .quote-card__text p {
@@ -2745,10 +2826,6 @@ html.menu-open {
   font-weight: 360;
   line-height: 1.45;
   text-wrap: pretty;
-}
-
-.quote-card__text .ph {
-  font-style: normal;
 }
 
 .quote-card__by {
@@ -2767,36 +2844,13 @@ html.menu-open {
   font-weight: 650;
 }
 
-/* Avatar-Platzhalter: kleine Sonne auf der Linie */
+/* Avatar-Platzhalter: neutraler Kreis, hier kommt später das Foto der Person hin */
 .quote-card__avatar {
-  position: relative;
   flex: none;
   width: 2.75rem;
   height: 2.75rem;
+  border: 1px dashed var(--color-line-strong);
   border-radius: 50%;
-  background: var(--color-surface-strong);
-  overflow: hidden;
-}
-
-.quote-card__avatar::before {
-  content: "";
-  position: absolute;
-  left: 25%;
-  right: 25%;
-  bottom: 30%;
-  height: 25%;
-  border-radius: 999px 999px 0 0;
-  background: var(--accent-graphic);
-}
-
-.quote-card__avatar::after {
-  content: "";
-  position: absolute;
-  left: 0;
-  right: 0;
-  bottom: calc(30% - 3px);
-  height: 1px;
-  background: var(--fg);
 }
 
 @media (min-width: 60rem) {
@@ -2855,11 +2909,12 @@ html.menu-open {
 
 .cta-band__horizon {
   --sun-d: clamp(6.5rem, 15vw, 14rem);
+  --sun-gap: calc(var(--sun-d) * 0.07); /* Fuge wie im Seitenkopf */
   position: absolute;
   left: 0;
   right: 0;
   bottom: clamp(1.5rem, 4vw, 2.5rem);
-  height: calc(var(--sun-d) / 2 + 0.4rem + 1px);
+  height: calc(var(--sun-d) / 2 + var(--sun-gap) + 1px);
   overflow: hidden;
   pointer-events: none;
 }
@@ -2877,7 +2932,7 @@ html.menu-open {
 .cta-band__sun {
   position: absolute;
   right: 12%;
-  bottom: calc(1px + 0.4rem);
+  bottom: calc(1px + var(--sun-gap));
   width: var(--sun-d);
   height: calc(var(--sun-d) / 2);
   border-radius: var(--sun-d) var(--sun-d) 0 0;
@@ -2887,7 +2942,7 @@ html.menu-open {
 }
 
 .cta-band__inner.is-pending .cta-band__sun {
-  transform: translateY(calc(100% + 0.5rem));
+  transform: translateY(calc(100% + var(--sun-gap) + 2px));
 }
 
 @media (min-width: 60rem) {
@@ -3567,8 +3622,8 @@ html.motion .subnav__link::after {
 }
 
 .talk-step:last-child .talk-step__num {
-  border-color: var(--accent-line);
-  background: var(--accent-graphic);
+  border-color: var(--color-accent-fill);
+  background: var(--color-accent-fill); /* Weiß darauf 5,4:1, die Grafikfarbe schafft nur 4,1:1 */
   color: var(--color-on-accent);
   box-shadow: 0 0 0 1px var(--color-motif-stroke);
 }
@@ -4020,17 +4075,6 @@ html.motion .section-head.is-pending::before {
   transform: scale(0);
 }
 
-/* Warum jetzt: das Datum wird unterstrichen, sobald die Aussage erscheint */
-.reason__title time {
-  padding-bottom: 1px;
-  background: linear-gradient(var(--accent-line), var(--accent-line)) no-repeat 0 100% / 100% 2px;
-  transition: background-size 1s var(--ease-out) 0.5s;
-}
-
-.reason.is-pending .reason__title time {
-  background-size: 0% 2px;
-}
-
 /* Leistungen: Karten kommen leicht diagonal, Lichtkegel folgt dem Zeiger,
    die kleinen Sonnen heben sich beim Überfahren */
 .service__card {
@@ -4144,7 +4188,7 @@ html.motion .stance__quote.is-pending .qw {
 }
 
 .stance__rise {
-  transform: translateY(calc((1 - var(--sp, 1)) * 150px));
+  transform: translateY(calc((1 - var(--sp, 1)) * 174px));
 }
 
 /* Team: die Initiale steigt hinter der Porträtlinie auf */
@@ -4257,7 +4301,7 @@ html.motion .stance__quote.is-pending .qw {
     grid-column: 1 / -1;
   }
 
-  .site-footer {
+  html.has-palette .site-footer {
     padding-bottom: calc(var(--space-2xl) + 3rem + env(safe-area-inset-bottom, 0px));
   }
 }
@@ -4290,7 +4334,7 @@ html.vt-from-sub .page-head__sun {
 }
 
 @keyframes page-sun-rise {
-  from { transform: translateY(calc(100% + 0.5rem)); }
+  from { transform: translateY(calc(100% + var(--sun-gap) + 2px)); }
   to { transform: none; }
 }
 
@@ -4580,10 +4624,6 @@ html:not(.js) .site-header__cta {
   .section-head.is-pending::after,
   .section-head.is-pending::before {
     transform: none !important;
-  }
-
-  .reason.is-pending .reason__title time {
-    background-size: 100% 2px !important;
   }
 
   .person.is-pending .person__initial {

@@ -26,11 +26,19 @@
   <link rel="preload" href="fonts/fraunces.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="stylesheet" href="styles.css">
   <script>
-    /* Gespeicherte Farbvariante vor dem ersten Zeichnen setzen, damit nichts flackert. */
+    /* Farbvarianten nur zum Abstimmen: ?varianten blendet den Umschalter für die
+       Sitzung ein, ?varianten=aus wieder aus. Sonst gilt immer Warm. Die gespeicherte
+       Variante wird vor dem ersten Zeichnen gesetzt, damit nichts flackert. */
     try {
-      var savedPalette = localStorage.getItem("neuzeit-palette");
-      if (savedPalette === "warm" || savedPalette === "klar" || savedPalette === "frisch") {
-        document.documentElement.setAttribute("data-palette", savedPalette);
+      var paletteParam = new URLSearchParams(location.search).get("varianten");
+      if (paletteParam === "aus") sessionStorage.removeItem("neuzeit-varianten");
+      else if (paletteParam !== null) sessionStorage.setItem("neuzeit-varianten", "1");
+      if (sessionStorage.getItem("neuzeit-varianten") === "1") {
+        document.documentElement.classList.add("has-palette");
+        var savedPalette = localStorage.getItem("neuzeit-palette");
+        if (savedPalette === "warm" || savedPalette === "klar" || savedPalette === "frisch") {
+          document.documentElement.setAttribute("data-palette", savedPalette);
+        }
       }
     } catch (e) {}
     document.documentElement.classList.add("js");

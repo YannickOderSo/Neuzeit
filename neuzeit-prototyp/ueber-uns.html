@@ -26,11 +26,19 @@
   <link rel="preload" href="fonts/fraunces.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="stylesheet" href="styles.css">
   <script>
-    /* Gespeicherte Farbvariante vor dem ersten Zeichnen setzen, damit nichts flackert. */
+    /* Farbvarianten nur zum Abstimmen: ?varianten blendet den Umschalter für die
+       Sitzung ein, ?varianten=aus wieder aus. Sonst gilt immer Warm. Die gespeicherte
+       Variante wird vor dem ersten Zeichnen gesetzt, damit nichts flackert. */
     try {
-      var savedPalette = localStorage.getItem("neuzeit-palette");
-      if (savedPalette === "warm" || savedPalette === "klar" || savedPalette === "frisch") {
-        document.documentElement.setAttribute("data-palette", savedPalette);
+      var paletteParam = new URLSearchParams(location.search).get("varianten");
+      if (paletteParam === "aus") sessionStorage.removeItem("neuzeit-varianten");
+      else if (paletteParam !== null) sessionStorage.setItem("neuzeit-varianten", "1");
+      if (sessionStorage.getItem("neuzeit-varianten") === "1") {
+        document.documentElement.classList.add("has-palette");
+        var savedPalette = localStorage.getItem("neuzeit-palette");
+        if (savedPalette === "warm" || savedPalette === "klar" || savedPalette === "frisch") {
+          document.documentElement.setAttribute("data-palette", savedPalette);
+        }
       }
     } catch (e) {}
     document.documentElement.classList.add("js");
@@ -105,7 +113,7 @@
     <section class="page-head" aria-labelledby="page-title">
       <div class="container page-head__inner">
         <p class="kicker">Über uns</p>
-        <h1 class="display page-head__title" id="page-title">Zwei Blickwinkel. Ein gemeinsamer Weg<span class="accent-mark">.</span></h1>
+        <h1 class="display page-head__title" id="page-title"><span class="ln">Zwei Blickwinkel.</span> <span class="ln">Ein gemeinsamer Weg<span class="accent-mark">.</span></span></h1>
         <p class="lead page-head__lead">Neuzeit verbindet Betriebswirtschaft und Kommunikations&shy;psychologie. Dazwischen liegt, worauf es im Wandel ankommt: Entscheidungen, die sich rechnen, und Menschen, die sie mittragen.</p>
       </div>
       <div class="page-head__horizon" aria-hidden="true" style="--sun-x: 34%"><span class="page-head__sun"></span></div>
@@ -274,7 +282,7 @@
           </div>
           <div class="cta-band__actions">
             <a class="btn btn--primary" href="kontakt.html#anfrage">Unverbindliches Potenzialgespräch vereinbaren <svg class="btn__icon" viewBox="0 0 16 16" aria-hidden="true" focusable="false"><path d="M3 8h9.5M8.5 4 12.5 8l-4 4"/></svg></a>
-            <a class="text-link" href="kontakt.html#termin">Oder direkt einen Termin wählen <span aria-hidden="true">→</span></a>
+            <a class="text-link" href="kontakt.html#termin">Oder direkt einen Termin wählen<svg class="text-link__icon" viewBox="0 0 16 16" aria-hidden="true" focusable="false"><path d="M3 8h9.5M8.5 4 12.5 8l-4 4"/></svg></a>
           </div>
           <div class="cta-band__horizon" aria-hidden="true"><span class="cta-band__sun"></span></div>
         </div>
