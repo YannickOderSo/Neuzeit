@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="de" data-palette="warm">
+<html lang="de">
 <head>
   <!-- @kopf -->
   <meta charset="utf-8">
@@ -19,28 +19,13 @@
   <meta property="og:image:height" content="630">
   <meta property="og:image:alt" content="neuzeit-Logo mit dem Satz: Lassen Sie uns sprechen.">
   <meta name="twitter:card" content="summary_large_image">
-  <meta name="theme-color" content="#F5F1EA">
-  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 32 32%22%3E%3Cstyle%3E.tile%7Bfill:%231E3A31%7D@media (prefers-color-scheme:dark)%7B.tile%7Bfill:%232A5143%7D%7D%3C/style%3E%3Crect class=%22tile%22 width=%2232%22 height=%2232%22 rx=%227%22/%3E%3Cpath fill=%22%23D4552B%22 d=%22M5 18A11 11 0 0 1 27 18Z%22/%3E%3Crect fill=%22%23F5F1EA%22 x=%222%22 y=%2220%22 width=%2228%22 height=%224%22/%3E%3C/svg%3E">
+  <meta name="theme-color" content="#FBF8F5">
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 32 32%22%3E%3Cstyle%3E.tile%7Bfill:%2318203F%7D@media (prefers-color-scheme:dark)%7B.tile%7Bfill:%23283258%7D%7D%3C/style%3E%3Crect class=%22tile%22 width=%2232%22 height=%2232%22 rx=%227%22/%3E%3Cpath fill=%22%23E95739%22 d=%22M5 18A11 11 0 0 1 27 18Z%22/%3E%3Crect fill=%22%23FBF8F5%22 x=%222%22 y=%2220%22 width=%2228%22 height=%224%22/%3E%3C/svg%3E">
   <link rel="apple-touch-icon" href="logo/apple-touch-icon.png">
   <link rel="preload" href="fonts/manrope.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="preload" href="fonts/fraunces.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="stylesheet" href="styles.css">
   <script>
-    /* Farbvarianten nur zum Abstimmen: ?varianten blendet den Umschalter für die
-       Sitzung ein, ?varianten=aus wieder aus. Sonst gilt immer Warm. Die gespeicherte
-       Variante wird vor dem ersten Zeichnen gesetzt, damit nichts flackert. */
-    try {
-      var paletteParam = new URLSearchParams(location.search).get("varianten");
-      if (paletteParam === "aus") sessionStorage.removeItem("neuzeit-varianten");
-      else if (paletteParam !== null) sessionStorage.setItem("neuzeit-varianten", "1");
-      if (sessionStorage.getItem("neuzeit-varianten") === "1") {
-        document.documentElement.classList.add("has-palette");
-        var savedPalette = localStorage.getItem("neuzeit-palette");
-        if (savedPalette === "warm" || savedPalette === "klar" || savedPalette === "frisch") {
-          document.documentElement.setAttribute("data-palette", savedPalette);
-        }
-      }
-    } catch (e) {}
     document.documentElement.classList.add("js");
     /* Seitenwechsel mit Übergang: Die Kopfzeile bleibt stehen, ihr Intro entfällt.
        Kam der Besuch von einer Unterseite, gleitet die kleine Sonne zur neuen
@@ -293,22 +278,6 @@
       </div>
     </div>
   </footer>
-
-  <!-- Farbvarianten (nur Prototyp) -->
-  <div class="palette" role="region" aria-labelledby="palette-label">
-    <p class="palette__label" id="palette-label">Farbvariante</p>
-    <div class="palette__options">
-      <button class="palette__btn" type="button" data-palette-choice="warm" title="Warm" aria-pressed="true">
-        <span class="palette__swatch palette__swatch--warm" aria-hidden="true"></span>Warm
-      </button>
-      <button class="palette__btn" type="button" data-palette-choice="klar" title="Klar" aria-pressed="false">
-        <span class="palette__swatch palette__swatch--klar" aria-hidden="true"></span>Klar
-      </button>
-      <button class="palette__btn" type="button" data-palette-choice="frisch" title="Frisch" aria-pressed="false">
-        <span class="palette__swatch palette__swatch--frisch" aria-hidden="true"></span>Frisch
-      </button>
-    </div>
-  </div>
 
   <div class="toast-region" role="status" aria-live="polite">
     <div class="toast" data-toast hidden></div>

@@ -1,6 +1,6 @@
 /* ==========================================================================
    neuzeit · Website-Prototyp
-   Kleine Interaktionen ohne Framework: Navigation, Einblenden, Farbvarianten,
+   Kleine Interaktionen ohne Framework: Navigation, Einblenden,
    Formular, Terminbuchung. Ohne JavaScript bleibt jede Seite vollständig lesbar.
    ========================================================================== */
 (function () {
@@ -42,7 +42,7 @@
   var menu = document.querySelector("[data-menu]");
   var menuLabel = document.querySelector("[data-menu-label]");
 
-  var behindMenu = Array.prototype.slice.call(document.querySelectorAll(".skip-link, main, .site-footer, .palette"));
+  var behindMenu = Array.prototype.slice.call(document.querySelectorAll(".skip-link, main, .site-footer"));
 
   function setBackgroundInert(inert) {
     behindMenu.forEach(function (el) { el.inert = inert; });
@@ -418,77 +418,6 @@
     var fontsReady = document.fonts && document.fonts.ready ? document.fonts.ready : Promise.resolve();
     fontsReady.then(function () { root.classList.add("is-ready"); });
   });
-
-  /* ------------------------------------------------------------------------
-     Farbvarianten (nur für den Prototyp)
-     ------------------------------------------------------------------------ */
-  var PALETTES = ["warm", "klar", "frisch"];
-  var paletteButtons = Array.prototype.slice.call(document.querySelectorAll("[data-palette-choice]"));
-  var themeColor = document.querySelector('meta[name="theme-color"]');
-
-  function applyPalette(name, persist) {
-    if (PALETTES.indexOf(name) === -1) name = "warm";
-    root.setAttribute("data-palette", name);
-    paletteButtons.forEach(function (button) {
-      button.setAttribute("aria-pressed", String(button.getAttribute("data-palette-choice") === name));
-    });
-    if (themeColor) {
-      var bg = getComputedStyle(root).getPropertyValue("--color-bg").trim();
-      if (bg) themeColor.setAttribute("content", bg);
-    }
-    if (persist) {
-      try { localStorage.setItem("neuzeit-palette", name); } catch (e) { /* Speicher nicht verfügbar */ }
-    }
-  }
-
-  paletteButtons.forEach(function (button) {
-    button.addEventListener("click", function () {
-      var name = button.getAttribute("data-palette-choice");
-      if (!motionOK || !document.startViewTransition || name === root.getAttribute("data-palette")) {
-        applyPalette(name, true);
-        return;
-      }
-      /* neue Farben breiten sich kreisförmig vom gewählten Knopf aus */
-      var box = button.getBoundingClientRect();
-      var x = box.left + box.width / 2;
-      var y = box.top + box.height / 2;
-      var radius = Math.hypot(Math.max(x, window.innerWidth - x), Math.max(y, window.innerHeight - y));
-      root.style.setProperty("--vt-x", x + "px");
-      root.style.setProperty("--vt-y", y + "px");
-      root.style.setProperty("--vt-r", radius + "px");
-      root.classList.add("vt-palette");
-      var transition = null;
-      function done() {
-        if (paletteTransition !== transition) return; /* ein neuerer Wechsel läuft schon */
-        paletteTransition = null;
-        root.classList.remove("vt-palette");
-      }
-      try {
-        transition = document.startViewTransition(function () { applyPalette(name, true); });
-        paletteTransition = transition;
-        transition.finished.then(done, done);
-      } catch (e) {
-        paletteTransition = null;
-        applyPalette(name, true);
-        root.classList.remove("vt-palette");
-      }
-    });
-  });
-
-  /* Während der Enthüllung landen Klicks auf <html>; Klicks auf einen Farbknopf weiterreichen */
-  var paletteTransition = null;
-  document.addEventListener("click", function (event) {
-    if (!paletteTransition || event.target !== root) return;
-    paletteButtons.some(function (button) {
-      var b = button.getBoundingClientRect();
-      if (event.clientX >= b.left && event.clientX <= b.right && event.clientY >= b.top && event.clientY <= b.bottom) {
-        button.click();
-        return true;
-      }
-      return false;
-    });
-  });
-  applyPalette(root.getAttribute("data-palette") || "warm", false);
 
   /* ------------------------------------------------------------------------
      Hinweis-Toast für Platzhalter-Links

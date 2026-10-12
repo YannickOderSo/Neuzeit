@@ -27,10 +27,6 @@ python3 -m http.server 8000
 
 Dann http://localhost:8000 aufrufen.
 
-## Farbvarianten vergleichen
-
-Standard ist die Variante „Warm“. Zum Abstimmen lässt sich der Umschalter mit `?varianten` an der Adresse einblenden, zum Beispiel `index.html?varianten`. Er bleibt dann für die Sitzung sichtbar, `?varianten=aus` blendet ihn wieder aus. Ohne den Umschalter gilt immer „Warm“, auch wenn vorher eine andere Variante gewählt war.
-
 ## Gemeinsame Teile ändern
 
 Kopfbereich, Navigation, Footer und der Aufruf „Nächster Schritt“ stehen nur einmal in `neuzeit-prototyp/_partials/`. Nach einer Änderung dort:

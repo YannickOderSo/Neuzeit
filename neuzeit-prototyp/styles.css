@@ -41,32 +41,35 @@
 :root {
   color-scheme: light;
 
-  /* Farben · Variante „Warm“ (Standard) */
-  --color-bg: #F5F1EA;               /* Papier */
-  --color-surface: #E8E0D2;          /* Sand: Karten, Flächen */
-  --color-surface-strong: #DDD3C2;   /* Sand, eine Stufe tiefer */
-  --color-text: #16201C;             /* Tinte */
-  --color-text-muted: #4B5550;       /* 6,9:1 auf Papier, 5,9:1 auf Sand */
-  --color-line: rgba(22, 32, 28, 0.16);  /* feine Trennlinien, rein dekorativ */
-  --color-line-strong: #77786F;      /* Formularränder, ≥ 3:1 auf Papier und Sand */
-  --color-dark: #1E3A31;             /* Tannengrün: dunkle Sektionen */
-  --color-on-dark: #F5F1EA;
-  --color-on-dark-muted: #C3CCC4;    /* 7,5:1 auf Tannengrün */
-  --color-line-on-dark: rgba(245, 241, 234, 0.22);
-  --color-accent: #D4552B;           /* Terrakotta: Motiv, Grafik, große Akzente */
-  --color-accent-text: #A8431F;      /* Terrakotta für kleine Schrift, ≥ 4,5:1 auf Papier und Sand */
-  --color-accent-fill: #B5481F;      /* Button-Fläche: Weiß darauf 5,4:1 (#D4552B schafft nur 4,1:1) */
-  --color-accent-fill-hover: #9E3E1A;
-  --color-accent-border: transparent;
+  /* Farben · „Nachtblau & Koralle“
+     Bild: der Himmel kurz vor Sonnenaufgang. Nachtblau trägt Schrift, Buttons und
+     dunkle Sektionen, heller Dunst die Flächen. Die Koralle gehört allein der
+     Sonne und ihren kleinen Echos (Punkt, Knoten, Ziffern, Linien). */
+  --color-bg: #FBF8F5;               /* Morgenweiß, ein Hauch Wärme */
+  --color-surface: #EDEEF1;          /* Dunst: Karten, Flächen */
+  --color-surface-strong: #E1E3E8;   /* Dunst, eine Stufe tiefer */
+  --color-text: #11182B;             /* Nachttinte, 16,7:1 auf Morgenweiß */
+  --color-text-muted: #4A5569;       /* 7,1:1 auf Morgenweiß, 6,5:1 auf Dunst */
+  --color-line: rgba(17, 24, 43, 0.14);  /* feine Trennlinien, rein dekorativ */
+  --color-line-strong: #737E92;      /* Formularränder, ≥ 3:1 auf Morgenweiß und Dunst */
+  --color-dark: #18203F;             /* Nachtblau: dunkle Sektionen, auch am Beamer noch blau */
+  --color-on-dark: #FBF8F5;          /* 15,1:1 auf Nachtblau */
+  --color-on-dark-muted: #B9C2D4;    /* 8,9:1 auf Nachtblau */
+  --color-line-on-dark: rgba(251, 248, 245, 0.2);
+  --color-accent: #E95739;           /* Koralle: Sonne, Grafik, große Ziffern, ≥ 3:1 auf Morgenweiß und Dunst */
+  --color-accent-text: #AE3F29;      /* Koralle für kleine Schrift, ≥ 4,5:1 auf allen hellen Flächen */
+  --color-accent-fill: #18203F;      /* Buttons in Nachtblau: die Sonne bleibt der einzige warme Punkt, Weiß darauf 15,9:1 */
+  --color-accent-fill-hover: #283258;
+  --color-accent-border: #FBF8F5;    /* auf Hell unsichtbar; im dunklen Footer wird der Button zur hellen Kontur */
   --color-on-accent: #FFFFFF;
-  --color-accent-line: #D4552B;      /* Linien und Marker auf Hell, ≥ 3:1 */
-  --color-error: #9F1D20;            /* Fehlermeldungen: röter als die Akzentschrift, 7,0:1 auf Papier */
-  --color-accent-on-dark: #EE8B63;   /* Terrakotta für Schrift auf Tannengrün, ≥ 4,5:1 */
-  --color-motif-on-dark: #D4552B;    /* Halbkreis auf Tannengrün (Grafik, ≥ 3:1) */
-  --color-field: #FBF9F5;            /* Eingabefelder */
-  --color-motif-stroke: transparent; /* Kontur des Halbkreises, nur nötig bei hellem Akzent */
-  --color-selection: rgba(212, 85, 43, 0.22);
-  --grain-opacity: 0.07;
+  --color-accent-line: #E95739;      /* Linien und Marker auf Hell, ≥ 3:1 */
+  --color-error: #9C1645;            /* Fehler: Beerenrot, deutlich von der Koralle getrennt, 7,6:1 */
+  --color-accent-on-dark: #FF8A70;   /* helle Koralle für Schrift auf Nachtblau, 6,9:1 */
+  --color-motif-on-dark: #E95739;    /* dieselbe Sonne auf Nachtblau, 4,5:1 */
+  --color-field: #FFFFFF;            /* Eingabefelder */
+  --color-motif-stroke: transparent; /* Koralle braucht keine Kontur */
+  --color-selection: rgba(233, 87, 57, 0.2);
+  --grain-opacity: 0.03;
 
   /* Kontext-Tokens: werden in dunklen Sektionen umgeschaltet */
   --fg: var(--color-text);
@@ -127,70 +130,6 @@
   --dur-reveal: 600ms;
 }
 
-/* Variante „Klar“: kühles Weiß, Grafit, Kobaltblau */
-:root[data-palette="klar"] {
-  --color-bg: #FAFAF7;
-  --color-surface: #EDEDE8;
-  --color-surface-strong: #E1E1DB;
-  --color-text: #1B1B1F;
-  --color-text-muted: #50525A;
-  --color-line: rgba(27, 27, 31, 0.13);
-  --color-line-strong: #76777E;
-  --color-dark: #1C1F27;
-  --color-on-dark: #FAFAF7;
-  --color-on-dark-muted: #BEC2CC;
-  --color-line-on-dark: rgba(250, 250, 247, 0.2);
-  --color-accent: #2F5BEA;
-  --color-accent-text: #2F5BEA;
-  --color-accent-fill: #2F5BEA;
-  --color-accent-fill-hover: #2149C8;
-  --color-accent-border: transparent;
-  --color-on-accent: #FFFFFF;
-  --color-accent-line: #2F5BEA;
-  --color-error: #B3261E;
-  --color-accent-on-dark: #8CA5F7;
-  --color-motif-on-dark: #4C74F2;
-  --color-field: #FFFFFF;
-  --color-motif-stroke: transparent;
-  --color-selection: rgba(47, 91, 234, 0.18);
-  --grain-opacity: 0.035;
-}
-
-/* Variante „Frisch“: Salbeiweiß, Tiefgrün, Limette */
-:root[data-palette="frisch"] {
-  --color-bg: #F2F4F1;
-  --color-surface: #E1E7DF;
-  --color-surface-strong: #D4DCD1;
-  --color-text: #0F2A22;
-  --color-text-muted: #3D544A;
-  --color-line: rgba(15, 42, 34, 0.15);
-  --color-line-strong: #6A7E74;
-  --color-dark: #0F2A22;
-  --color-on-dark: #F2F4F1;
-  --color-on-dark-muted: #B9CAC0;
-  --color-line-on-dark: rgba(242, 244, 241, 0.2);
-  --color-accent: #C8F169;           /* Limette: auf Hell nur als Fläche mit Kontur */
-  --color-accent-text: #2E6A1E;      /* Tiefes Grün für Schrift, ≥ 4,5:1 */
-  --color-accent-fill: #C8F169;
-  --color-accent-fill-hover: #B4E04C;
-  --color-accent-border: #0F2A22;
-  --color-on-accent: #0F2A22;        /* 11,8:1 auf Limette */
-  --color-accent-line: #2E6A1E;      /* Limette wäre auf Hell unsichtbar */
-  --color-error: #B3261E;
-  --color-accent-on-dark: #C8F169;
-  --color-motif-on-dark: #C8F169;
-  --color-field: #FAFBF9;
-  --color-motif-stroke: #0F2A22;
-  --color-selection: rgba(200, 241, 105, 0.55);
-  --grain-opacity: 0.05;
-}
-
-:root[data-palette="frisch"] {
-  --accent-display: var(--color-accent-text);
-  --accent-mark: var(--color-accent);
-  --accent-mark-stroke: 1.5px var(--color-accent-border);
-}
-
 /* --------------------------------------------------------------------------
    2. Grundlagen
    -------------------------------------------------------------------------- */
@@ -204,10 +143,6 @@ html {
   -webkit-text-size-adjust: 100%;
   text-size-adjust: 100%;
   scroll-padding-top: calc(var(--header-h) + 1.25rem);
-}
-
-html.has-palette {
-  scroll-padding-bottom: calc(6rem + env(safe-area-inset-bottom, 0px)); /* Platz für den Farbumschalter */
 }
 
 /* sanftes Scrollen erst, wenn Schriften geladen sind (main.js setzt .is-ready) */
@@ -451,7 +386,6 @@ main:focus {
 .case__label,
 .case__service,
 .field__label,
-.palette__label,
 .contact__direct dt {
   font-family: var(--font-body);
   font-size: var(--fs-label);
@@ -2478,119 +2412,6 @@ html.menu-open .site-header__cta,
 }
 
 /* --------------------------------------------------------------------------
-   17. Farbvarianten-Umschalter (nur Prototyp)
-   Erscheint nur mit ?varianten in der Adresse (siehe _partials/kopf.html).
-   -------------------------------------------------------------------------- */
-html:not(.has-palette) .palette {
-  display: none;
-}
-
-html.has-palette .site-footer {
-  padding-bottom: calc(var(--space-2xl) + 4.5rem + env(safe-area-inset-bottom, 0px));
-}
-
-.palette {
-  position: fixed;
-  right: calc(env(safe-area-inset-right, 0px) + 0.75rem);
-  bottom: calc(env(safe-area-inset-bottom, 0px) + 0.75rem);
-  z-index: 90;
-  display: grid;
-  gap: 0.35rem;
-  padding: 0.5rem 0.55rem 0.55rem;
-  border: 1px solid var(--color-line);
-  border-radius: var(--radius-m);
-  background: color-mix(in srgb, var(--color-bg) 94%, transparent);
-  -webkit-backdrop-filter: blur(10px);
-  backdrop-filter: blur(10px);
-  box-shadow: 0 10px 30px -12px rgba(0, 0, 0, 0.28);
-  color: var(--color-text);
-  --focus: var(--color-accent-text);
-}
-
-.palette__label {
-  padding-inline: 0.3rem;
-  color: var(--color-text-muted);
-  font-size: 0.6875rem;
-}
-
-.palette__options {
-  display: flex;
-  gap: 0.25rem;
-}
-
-.palette__btn {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.4rem;
-  min-height: 2.5rem;
-  padding: 0.4rem 0.7rem 0.4rem 0.45rem;
-  border: 1px solid transparent;
-  border-radius: var(--radius-pill);
-  background: transparent;
-  font-size: 0.875rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: background-color var(--dur-calm) var(--ease-out), border-color var(--dur-calm) var(--ease-out);
-}
-
-.palette__btn:hover {
-  background: var(--color-surface);
-}
-
-.palette__btn[aria-pressed="true"] {
-  border-color: var(--color-text);
-  background: var(--color-surface);
-}
-
-.palette__swatch {
-  position: relative;
-  flex: none;
-  width: 1.25rem;
-  height: 1.25rem;
-  border-radius: 50%;
-  overflow: hidden;
-  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.25);
-}
-
-/* Mobil nur die Farbkreise; die Namen bleiben als zugänglicher Name erhalten */
-@media (max-width: 47.99rem) {
-  .palette {
-    padding: 0.3rem;
-  }
-
-  .palette__label {
-    position: absolute;
-    width: 1px;
-    height: 1px;
-    overflow: hidden;
-    clip: rect(0 0 0 0);
-    white-space: nowrap;
-  }
-
-  .palette__btn {
-    justify-content: center;
-    gap: 0;
-    min-width: 2.75rem;
-    min-height: 2.75rem;
-    padding: 0.6rem;
-    font-size: 0;
-  }
-}
-
-/* Jede Kachel zeigt die eigenen Farben der Variante: Hintergrund, Dunkelton, Akzent */
-.palette__swatch--warm {
-  background: conic-gradient(#F5F1EA 0 33%, #1E3A31 0 66%, #D4552B 0);
-}
-
-.palette__swatch--klar {
-  background: conic-gradient(#FAFAF7 0 33%, #1C1F27 0 66%, #2F5BEA 0);
-}
-
-.palette__swatch--frisch {
-  background: conic-gradient(#F2F4F1 0 33%, #0F2A22 0 66%, #C8F169 0);
-}
-
-/* --------------------------------------------------------------------------
    18. Hinweis-Toast für Platzhalter-Links
    -------------------------------------------------------------------------- */
 .toast {
@@ -3860,10 +3681,6 @@ html.motion .subnav__link::after {
   box-shadow: 0 0 0 1px var(--color-motif-stroke);
 }
 
-:root[data-palette="frisch"] .talk-step:last-child .talk-step__num {
-  border-color: var(--color-accent-border);
-}
-
 .talk-step p {
   color: var(--fg-muted);
   line-height: 1.55;
@@ -4520,10 +4337,6 @@ html.motion .stance__quote.is-pending .qw {
   .footer-mark {
     grid-column: 1 / -1;
   }
-
-  html.has-palette .site-footer {
-    padding-bottom: calc(var(--space-2xl) + 3rem + env(safe-area-inset-bottom, 0px));
-  }
 }
 
 /* Seitenkopf: Linie zieht sich, dann geht die kleine Sonne auf.
@@ -4675,31 +4488,16 @@ html.motion .proto-demo.is-pending * {
   transform: translateY(0.75rem);
 }
 
-/* Farbvariante wechseln: neue Farben breiten sich kreisförmig vom Knopf aus */
-html.vt-palette *,
-html.vt-palette *::before,
-html.vt-palette *::after {
-  transition: none !important;
-}
-
+/* Seitenwechsel: eigene Animationen statt der Standard-Überblendung (19c) */
 ::view-transition-old(root),
 ::view-transition-new(root) {
   animation: none;
   mix-blend-mode: normal;
 }
 
-html.vt-palette::view-transition-new(root) {
-  animation: palette-reveal 750ms var(--ease-out) both;
-}
-
-@keyframes palette-reveal {
-  from { clip-path: circle(0 at var(--vt-x, 50%) var(--vt-y, 50%)); }
-  to { clip-path: circle(var(--vt-r, 150vmax) at var(--vt-x, 50%) var(--vt-y, 50%)); }
-}
-
 /* --------------------------------------------------------------------------
    19c. Seitenwechsel (View Transitions zwischen Dokumenten)
-   Kopfzeile und Farbumschalter bleiben stehen, der Inhalt blendet weich über,
+   Die Kopfzeile bleibt stehen, der Inhalt blendet weich über,
    die kleine Sonne gleitet zur Position der neuen Seite und der Marker in
    der Navigation zum neuen Menüpunkt. Bei reduzierter Bewegung: kein Übergang.
    -------------------------------------------------------------------------- */
@@ -4709,47 +4507,43 @@ html.vt-palette::view-transition-new(root) {
   }
 }
 
-html:not(.vt-palette) .site-header {
+html .site-header {
   view-transition-name: site-header;
 }
 
-html:not(.vt-palette) .palette {
-  view-transition-name: palette;
-}
-
-html:not(.vt-palette) .nav.has-current .nav__indicator {
+html .nav.has-current .nav__indicator {
   view-transition-name: nav-indicator;
 }
 
-html:not(.vt-palette) .page-head__sun {
+html .page-head__sun {
   view-transition-name: page-sun;
 }
 
-html:not(.vt-palette)::view-transition-old(root) {
+html::view-transition-old(root) {
   animation: page-out 200ms var(--ease-out) both;
 }
 
-html:not(.vt-palette)::view-transition-new(root) {
+html::view-transition-new(root) {
   animation: page-in 460ms var(--ease-out) 60ms both;
 }
 
-html:not(.vt-palette)::view-transition-group(page-sun) {
+html::view-transition-group(page-sun) {
   animation-duration: 900ms;
   animation-timing-function: var(--ease-sun);
 }
 
-html:not(.vt-palette)::view-transition-group(nav-indicator) {
+html::view-transition-group(nav-indicator) {
   animation-duration: 550ms;
   animation-timing-function: var(--ease-sun);
 }
 
 /* Ohne Gegenstück auf der neuen Seite (zurück zur Startseite) geht die kleine
    Sonne an ihrer Fuge unter, der Marker verschwindet rasch */
-html:not(.vt-palette)::view-transition-old(page-sun):only-child {
+html::view-transition-old(page-sun):only-child {
   animation: page-sun-set 200ms var(--ease-out) both; /* so schnell wie page-out */
 }
 
-html:not(.vt-palette)::view-transition-old(nav-indicator):only-child {
+html::view-transition-old(nav-indicator):only-child {
   animation-duration: 200ms;
 }
 
@@ -4760,7 +4554,7 @@ html:not(.vt-palette)::view-transition-old(nav-indicator):only-child {
 
 /* Start → Unterseite: Die neue Sonne geht im Übergangsbild hinter ihrer Fuge auf,
    statt unter der Linie zu stehen (das Bild wird nicht vom Horizont beschnitten) */
-html:not(.vt-palette)::view-transition-new(page-sun):only-child {
+html::view-transition-new(page-sun):only-child {
   animation: page-sun-rise-vt 900ms var(--ease-sun) both;
 }
 
@@ -4780,8 +4574,7 @@ html:not(.vt-palette)::view-transition-new(page-sun):only-child {
 /* --------------------------------------------------------------------------
    20. Ohne JavaScript, Kontrastmodus, Druck
    -------------------------------------------------------------------------- */
-html:not(.js) .menu-toggle,
-html:not(.js) .palette {
+html:not(.js) .menu-toggle {
   display: none !important;
 }
 
@@ -4796,10 +4589,6 @@ html:not(.js) .site-header__cta {
     background: CanvasText;
   }
 
-  .palette__swatch {
-    forced-color-adjust: none;
-  }
-
   .nav__indicator,
   .scroll-progress__fill {
     background: CanvasText;
@@ -4807,10 +4596,6 @@ html:not(.js) .site-header__cta {
 
   html.motion .stance__quote .qw {
     opacity: 1;
-  }
-
-  .palette__btn[aria-pressed="true"] {
-    border: 2px solid Highlight;
   }
 }
 
@@ -4858,7 +4643,6 @@ html:not(.js) .site-header__cta {
     display: none !important;
   }
 
-  .palette,
   .toast-region,
   .menu-toggle,
   .mobile-menu,
