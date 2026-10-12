@@ -122,7 +122,7 @@ Ein Abschnitt hat oben und unten `--space-section`. Folgen zwei Abschnitte auf d
 
 | Breite | Was sich ändert |
 | --- | --- |
-| 40rem (640 px) | Navigation statt Menü-Button, Footer dreispaltig |
+| 40rem (640 px) | Navigation statt Menü-Button, Footer zweispaltig unter der Marke |
 | 48rem (768 px) | zweispaltige Bausteine (Team, Profile, Grundsätze), Leistungslisten dreispaltig, Zeitlinie im Vorgehen waagerecht; darunter Silbentrennung im ganzen Fließtext und Anlässe als Liste statt Pillen |
 | 60rem (960 px) | 12-Spalten-Raster, klebende Spalten (Leistungen, Kontakt) |
 | 75rem (1200 px) | volle Containerbreite, Leistungskarten mit Nummer links, Gründe eingerückt |
@@ -179,14 +179,14 @@ Die Sonne bedeutet Ankunft und Neubeginn. Sie ist Signet, keine Dekoration.
 
 ## Platzhalter
 
-Was fehlt, ist sichtbar markiert, damit nichts erfunden wirkt. Platzhalter bilden eine eigene Anmerkungsebene außerhalb der Markenfarben.
+Neuzeit ist noch nicht gegründet. Was es erst nach Gründung oder Aufträgen gibt (Kundenstimmen, Fallbeispiele, Fotos, Kontaktdaten, Nachnamen), steht nicht auf den öffentlichen Seiten, auch nicht als Platzhalter. Markierte Platzhalter gibt es nur noch in Impressum und Datenschutz (Pflichtangaben) und in den internen Vorlagen. Die Bausteine unten bleiben für später erhalten. Platzhalter bilden eine eigene Anmerkungsebene außerhalb der Markenfarben.
 
 - **`.ph`**: Systemschrift Monospace, 0.75rem, 1px gestrichelter Rand in `--color-line-strong`, Grund 45 % Dunst tief, Schrift `--fg-muted`. `.ph--strong` mit durchgezogenem Rand markiert ganze Karten. Auf Nachtblau Rand `--line` und 6 % `--fg` als Grund.
 - **Text** in eckigen Klammern: `[Platzhalter]` oder `[Platzhalter: was hier hingehört]`.
 - **Platzhalter-Links** mit `data-placeholder="…"` zeigen einen Hinweis („… folgt. Im Prototyp ist das ein Platzhalter.“), statt ins Leere zu führen.
 - **Bildplatzhalter `.photo`**: Rahmen in Dunst (auf getöntem Grund Morgenweiß), `--radius-l`, Format 4:3, `.photo--wide` 3:1 (unter 40rem 3:2). Innere Linie 16 px vom Rand, vier Schnittmarken als 12-px-Winkel in `--fg-muted`. Oben links das Format als `.ph` („Foto · 4:3“, für Screenreader „Platzhalter für ein Foto:“), mittig das Briefing `.photo__brief` in Fraunces kursiv: wer tut was, wo.
-- **Porträt** `.person__portrait`: Bogenform in Dunst mit Horizontlinie, die Initiale in Fraunces kursiv steigt dahinter auf. Darunter der Hinweis „[Platzhalter] Porträtfoto“.
-- **Kundenstimmen und Fallbeispiele** als Platzhalter-Karten, Avatar als gestrichelter Kreis. Inhalte nur mit Freigabe.
+- **Porträt** `.person__portrait`: Bogenform in Dunst mit Horizontlinie, die Initiale in Fraunces kursiv steigt dahinter auf. Steht als Monogramm für sich, bis es Porträtfotos gibt.
+- **Kundenstimmen und Fallbeispiele** (`.quote-card`, `.case`, Vorlage `fallbeispiel.html`): derzeit auf keiner öffentlichen Seite. Nach den ersten Aufträgen wieder einsetzen, Inhalte nur mit Freigabe.
 
 ## Icons
 

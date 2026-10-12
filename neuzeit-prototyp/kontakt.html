@@ -123,13 +123,7 @@
               <p><strong>Sie entscheiden in Ruhe.</strong> Sie erfahren, wo wir ansetzen würden. Ob es weitergeht, entscheiden Sie danach.</p>
             </li>
           </ol>
-          <p class="contact__facts"><strong>Unverbindlich.</strong> Dauer <span class="ph">[Platzhalter]</span>, per Video oder vor Ort <span class="ph">[Platzhalter]</span></p>
-
-          <dl class="contact__direct">
-            <div><dt>E-Mail</dt><dd><span class="ph">[Platzhalter]</span></dd></div>
-            <div><dt>Telefon</dt><dd><span class="ph">[Platzhalter]</span></dd></div>
-          </dl>
-          <a class="text-link" href="#termin">Lieber direkt einen Termin <span class="nowrap">wählen<svg class="text-link__icon" viewBox="0 0 16 16" aria-hidden="true" focusable="false"><path d="M3 8h9.5M8.5 4 12.5 8l-4 4"/></svg></span></a>
+          <a class="text-link" href="#termin" data-calendly-only hidden>Lieber direkt einen Termin <span class="nowrap">wählen<svg class="text-link__icon" viewBox="0 0 16 16" aria-hidden="true" focusable="false"><path d="M3 8h9.5M8.5 4 12.5 8l-4 4"/></svg></span></a>
         </div>
 
         <!-- Versand freischalten (ohne Adresse bleibt es bei der Vorschau):
@@ -139,7 +133,7 @@
              So funktioniert der Versand auch ohne JavaScript. Nur https-Adressen werden genutzt. -->
         <form class="form" id="anfrage" method="dialog" aria-labelledby="form-title" data-form data-endpoint="" data-reveal>
           <h2 class="form__title" id="form-title">Potenzialgespräch anfragen</h2>
-          <p class="form__hint">Wir melden uns innerhalb von <span class="ph">[Platzhalter: Antwortzeit]</span> mit Terminvorschlägen. Felder mit <span aria-hidden="true">*</span><span class="visually-hidden">Sternchen</span> sind Pflichtfelder.</p>
+          <p class="form__hint">Wir melden uns mit Terminvorschlägen. Felder mit <span aria-hidden="true">*</span><span class="visually-hidden">Sternchen</span> sind Pflichtfelder.</p>
 
           <div class="field">
             <label class="field__label" for="kontakt-name">Name <span class="field__req" aria-hidden="true">*</span></label>
@@ -204,8 +198,10 @@
     <!-- ============ Termin direkt buchen (Zwei-Klick-Lösung) ============ -->
     <!-- Calendly: In data-calendly-url den eigenen Link eintragen, z. B.
          https://calendly.com/name/potenzialgespraech. Der Kalender lädt erst nach Klick;
-         die Farben der Seite setzt main.js (CALENDLY_PARAMS). -->
-    <section class="section booking-section" id="termin" aria-labelledby="termin-title">
+         die Farben der Seite setzt main.js (CALENDLY_PARAMS). Ohne Link bleiben dieser
+         Abschnitt und der Verweis „Lieber direkt einen Termin wählen“ ausgeblendet
+         (data-calendly-only), main.js zeigt beides erst mit gültigem Link. -->
+    <section class="section booking-section" id="termin" aria-labelledby="termin-title" data-calendly-only hidden>
       <div class="container">
         <div class="booking" data-calendly data-calendly-url="">
           <div class="booking__text" data-reveal>
@@ -258,16 +254,8 @@
         </ul>
       </nav>
 
-      <div class="site-footer__col">
-        <h2 class="site-footer__heading">Kontakt</h2>
-        <dl class="site-footer__meta">
-          <div><dt>Standort</dt><dd><span class="ph">[Platzhalter]</span></dd></div>
-          <div><dt>E-Mail</dt><dd><span class="ph">[Platzhalter]</span></dd></div>
-        </dl>
-      </div>
-
       <div class="site-footer__bottom">
-        <p class="site-footer__print">neuzeit · Change-Management für den Mittelstand · <span class="ph">[Platzhalter: Webadresse]</span> · <span class="ph">[Platzhalter: E-Mail]</span></p>
+        <p class="site-footer__print">neuzeit · Change-Management für den Mittelstand</p>
         <p class="site-footer__small">© 2026 Neuzeit · Prototyp · kein Tracking, Cookies nur mit Ihrer Einwilligung</p>
         <nav class="site-footer__legal" aria-label="Rechtliches">
           <ul role="list">

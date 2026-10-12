@@ -1,6 +1,6 @@
 # Neuzeit
 
-Klickbarer Website-Prototyp für **Neuzeit**, eine geplante Beratung für Change-Management im Mittelstand: digitaler und struktureller Wandel, Nutzerakzeptanz neuer Software und Compliance als Change-Prozess. Fehlende Inhalte sind sichtbar als [Platzhalter] markiert. Erfunden ist nichts: keine Kundenstimmen, keine Zahlen, keine Fotos.
+Klickbarer Website-Prototyp für **Neuzeit**, eine geplante Beratung für Change-Management im Mittelstand: digitaler und struktureller Wandel, Nutzerakzeptanz neuer Software und Compliance als Change-Prozess. Neuzeit ist noch nicht gegründet und hat noch keine Aufträge abgeschlossen. Was es erst danach geben kann, fehlt deshalb bewusst: Kundenstimmen, Fallbeispiele, Fotos, Kontaktdaten. Erfunden ist nichts. Markierte [Platzhalter] stehen nur noch in Impressum und Datenschutz, für Pflichtangaben, die mit der Gründung feststehen.
 
 **Online ansehen:** https://yannickoderso.github.io/Neuzeit/ (über GitHub Pages, mit SSL)
 
@@ -8,13 +8,13 @@ Klickbarer Website-Prototyp für **Neuzeit**, eine geplante Beratung für Change
 
 | Datei | Inhalt |
 | --- | --- |
-| `index.html` | Start: Positionierung, Vertrauenssignale, Warum jetzt, Leistungen, Haltung, Vorgehen, Team, Referenzen |
+| `index.html` | Start: Positionierung, Vertrauenssignale, Warum jetzt, Leistungen, Haltung, Vorgehen, Team |
 | `leistungen.html` | Die drei Leistungen im Detail, Sprungmarken, häufige Fragen |
 | `ueber-uns.html` | Yannick und Aurel, Arbeitsweise, Prototyping als Methode |
 | `kontakt.html` | Ablauf des Potenzialgesprächs, Formular, Terminbuchung per Calendly |
 | `impressum.html`, `datenschutz.html` | Vorlagen mit Platzhaltern, vor dem Livegang rechtlich prüfen lassen |
 | `styleguide.html` | intern: Gestaltungssystem mit Farben, Schrift, Logo und allen Bausteinen |
-| `fallbeispiel.html` | intern: Vorlage für Fallbeispiele, erst mit Freigabe des Kunden füllen |
+| `fallbeispiel.html` | intern: Vorlage für Fallbeispiele, nirgends verlinkt; erst nach Aufträgen und mit Freigabe des Kunden füllen |
 
 Alle Dateien liegen in `neuzeit-prototyp/`. Es gibt kein Framework und keinen Build-Schritt.
 
@@ -63,11 +63,12 @@ Das Skript setzt die Teile in alle Seiten ein, schreibt Titel, Beschreibung und 
 ## Vor dem Livegang
 
 1. **Formular:** In `kontakt.html` beim Formular `data-endpoint` mit der Adresse eines Formulardienstes füllen (z. B. Formspree oder Web3Forms; dort die Ziel-E-Mail hinterlegen). Für den Versand ohne JavaScript zusätzlich `action` und `method="post"` setzen. Solange das Feld leer ist, versendet das Formular nichts.
-2. **Terminbuchung:** In `kontakt.html` `data-calendly-url` mit dem eigenen Calendly-Link füllen. Der Kalender lädt erst nach einem Klick (Zwei-Klick-Lösung); vorher fließen keine Daten zu Calendly.
+2. **Terminbuchung:** In `kontakt.html` `data-calendly-url` mit dem eigenen Calendly-Link füllen. Erst dann erscheinen der Abschnitt „Termin direkt buchen“ und der Verweis darauf, vorher sind beide ausgeblendet. Der Kalender lädt erst nach einem Klick (Zwei-Klick-Lösung); vorher fließen keine Daten zu Calendly. Den Verweis „Oder direkt einen Termin wählen“ im CTA-Band dann in `_partials/cta.html` wieder ergänzen (`kontakt.html#termin`).
 3. **Cookie-Banner:** Die Seite setzt keine eigenen Cookies und hat kein Tracking, deshalb gibt es keinen Banner. Calendly kann Cookies setzen, lädt aber erst nach einem Klick mit Hinweis und Einwilligung. Kommt Analytics oder ein anderer Dienst dazu, wird ein Banner nötig.
 4. **Rechtstexte:** Impressum und Datenschutzerklärung ergänzen und von einer Kanzlei prüfen lassen, ebenso die Aussagen zu EU AI Act, NIS2 und DSGVO.
 5. **Suchmaschinen:** In `tools/sync.py` `INDEXIERBAR = True` setzen und das Skript ausführen. Bei eigener Domain auch `BASIS_URL` anpassen.
-6. **Inhalte:** Alle [Platzhalter] ersetzen: Nachnamen, Porträts, Fotos, Kontaktdaten, Kundenstimmen und Fallbeispiele (nur mit Freigabe).
+6. **Nach der Gründung:** Kontaktdaten ergänzen, im Footer als eigene Spalte (`.site-footer__meta`, Hinweis zum Raster in `styles.css`) und auf der Kontaktseite (`.contact__direct`). Nachnamen und Porträtfotos bei Bedarf in Start- und Über-uns-Seite.
+7. **Nach den ersten Aufträgen:** Kundenstimmen (`.quote-card`), Fallbeispiele (`.case`, Vorlage `fallbeispiel.html`) und Fotos aus Projekten (`.photo`) wieder einbauen, nur mit Freigabe der Kunden. Die Bausteine stehen weiter in `styles.css`, den Bildplatzhalter zeigt auch `styleguide.html`.
 
 ## Weitere Ordner
 
