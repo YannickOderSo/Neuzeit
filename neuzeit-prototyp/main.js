@@ -221,9 +221,6 @@
   var stance = document.querySelector(".stance");
   var stanceRise = stance && stance.querySelector(".stance__rise");
   var quote = document.querySelector(".stance__quote blockquote");
-  var footerMark = document.querySelector(".footer-mark");
-  var footerRise = footerMark && footerMark.querySelector(".footer-mark__rise");
-  var FOOTER_LINE = 0.866; /* Lage der Horizontlinie im Schlusslogo (Anteil der Höhe) */
 
   /* Position jedes Schritt-Markers entlang der Linie (0 bis 1) */
   function measureSteps() {
@@ -245,7 +242,6 @@
     var heroBox = hero && hero.getBoundingClientRect();
     var stepsBox = steps && steps.getBoundingClientRect();
     var stanceBox = stanceRise && stance.getBoundingClientRect();
-    var markBox = footerRise && footerMark.getBoundingClientRect();
 
     if (progressBar) progressBar.style.setProperty("--page-p", (maxScroll > 0 ? clamp01(window.scrollY / maxScroll) : 0).toFixed(4));
     if (heroBox) {
@@ -261,12 +257,6 @@
       });
     }
     if (stanceBox) stanceRise.style.setProperty("--sp", clamp01((vh - stanceBox.bottom) / (vh * 0.45)).toFixed(4));
-    if (markBox) {
-      /* Die Sonne geht auf, sobald die Horizontlinie im Bild ist, und steht am Seitenende */
-      var lineIn = vh - (markBox.top + markBox.height * FOOTER_LINE);
-      var remaining = Math.max(0, maxScroll - window.scrollY);
-      footerRise.style.setProperty("--fm", (lineIn <= 0 ? 0 : clamp01(lineIn / (lineIn + remaining))).toFixed(4));
-    }
   }
 
   /* Zitat in Wörter teilen; Screenreader lesen weiter den ganzen Satz */
@@ -342,8 +332,8 @@
         .forEach(function (entry, i) {
           var el = entry.target;
           if (i > 0) {
-            el.style.transitionDelay = Math.min(i * 90, 450) + "ms";
-            window.setTimeout(function () { el.style.transitionDelay = ""; }, 1600);
+            el.style.transitionDelay = Math.min(i * 70, 210) + "ms";
+            window.setTimeout(function () { el.style.transitionDelay = ""; }, 1000);
           }
           el.classList.remove("is-pending");
           revealObserver.unobserve(el);
