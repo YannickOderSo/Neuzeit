@@ -56,4 +56,3 @@ Das Skript setzt die Teile in alle Seiten ein, schreibt Titel, Beschreibung und 
 - `neuzeit-prototyp/logo/`: Logo in allen Varianten, Favicon, Profilbild und `LOGO.md` mit den Regeln
 - `neuzeit-prototyp/fonts/`: Fraunces und Manrope, selbst ausgeliefert (SIL Open Font License)
 - `neuzeit-prototyp/og/`: Vorschaubilder für geteilte Links (1200 × 630)
-- `neuzeit-prototyp/tools/szenen.py`: erzeugt die abstrakten Personen-Szenen, die bis zu echten Fotos als Bildplatzhalter dienen
