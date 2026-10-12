@@ -1,0 +1,419 @@
+/* ==========================================================================
+   Gestaltungssystem (styleguide.html, intern)
+   Nur Darstellungshilfen für die Übersicht: Farbfelder, Schriftproben,
+   Logo-Bühnen, Maße. Die Bausteine selbst kommen unverändert aus styles.css.
+   Farben nur über Tokens.
+   ========================================================================== */
+
+/* Inhalte rücken wie überall unter den Titel (Spalte 4 bis 12) */
+.sg-body {
+  display: grid;
+  gap: var(--space-m);
+  min-width: 0;
+}
+
+@media (min-width: 60rem) {
+  .sg-body {
+    margin-left: calc((100% + var(--space-m)) / 12 * 3);
+  }
+
+  /* Bausteine, die auf ihren Seiten selbst einrücken, stehen hier schon in der Spalte */
+  .sg-body .prose,
+  .sg-body .faq {
+    margin-left: 0;
+  }
+}
+
+.sg-title {
+  margin-top: var(--space-l);
+  color: var(--fg-muted);
+  font-size: var(--fs-label);
+  font-weight: 650;
+  letter-spacing: 0.12em;
+  line-height: 1.4;
+  text-transform: uppercase;
+}
+
+.sg-title:first-child {
+  margin-top: 0;
+}
+
+.sg-code {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;
+  font-size: 0.8125em;
+  font-weight: 500;
+  letter-spacing: 0;
+  overflow-wrap: anywhere;
+}
+
+/* --------------------------------------------------------------------------
+   Farbfelder
+   -------------------------------------------------------------------------- */
+.sg-swatches {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 9rem), 1fr));
+  gap: var(--space-m) var(--space-s);
+}
+
+@media (min-width: 48rem) {
+  .sg-swatches {
+    grid-template-columns: repeat(auto-fill, minmax(11.5rem, 1fr));
+    column-gap: var(--space-m);
+  }
+}
+
+.sg-swatch {
+  display: grid;
+  align-content: start;
+  gap: 0.2rem;
+  min-width: 0;
+}
+
+.sg-swatch__chip {
+  aspect-ratio: 3 / 2;
+  margin-bottom: 0.5rem;
+  border-radius: var(--radius-m);
+  background: var(--sg-color);
+  box-shadow: inset 0 0 0 1px var(--line); /* helle Felder heben sich vom Grund ab */
+}
+
+.sg-swatch__name {
+  color: var(--fg);
+  font-weight: 650;
+  line-height: 1.35;
+}
+
+.sg-swatch .sg-code {
+  color: var(--fg);
+}
+
+.sg-swatch__meta {
+  color: var(--fg-muted);
+  font-size: var(--fs-small);
+  line-height: 1.45;
+}
+
+.sg-rules {
+  margin-top: var(--space-s);
+}
+
+/* --------------------------------------------------------------------------
+   Schriftproben
+   -------------------------------------------------------------------------- */
+.sg-fonts {
+  display: grid;
+  gap: var(--space-m);
+}
+
+@media (min-width: 48rem) {
+  .sg-fonts {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+.sg-font {
+  display: grid;
+  align-content: start;
+  gap: 0.35rem;
+  padding: clamp(1.5rem, 3.5vw, 2.25rem);
+  border-radius: var(--radius-l);
+  background: var(--color-surface);
+}
+
+.sg-font__sample {
+  color: var(--fg);
+  font-size: clamp(4rem, 9vw, 6.5rem);
+  font-weight: 650;
+  line-height: 1;
+  letter-spacing: -0.02em;
+}
+
+.sg-font--display .sg-font__sample {
+  font-family: var(--font-display);
+  font-weight: 380;
+}
+
+.sg-font__name {
+  margin-top: var(--space-s);
+  color: var(--fg);
+  font-weight: 650;
+}
+
+.sg-font__text {
+  color: var(--fg-muted);
+  line-height: 1.55;
+  text-wrap: pretty;
+}
+
+.sg-specimens {
+  display: grid;
+  margin-top: var(--space-l);
+  border-top: 1px solid var(--line);
+}
+
+.sg-specimens:first-child {
+  margin-top: 0;
+}
+
+.sg-row {
+  display: grid;
+  gap: var(--space-s);
+  padding-block: var(--space-m);
+  border-bottom: 1px solid var(--line);
+  min-width: 0;
+}
+
+@media (min-width: 48rem) {
+  .sg-row {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 2.5fr);
+    gap: var(--space-m);
+    align-items: start;
+  }
+}
+
+.sg-row > dd {
+  min-width: 0;
+}
+
+.sg-meta {
+  color: var(--fg-muted);
+  font-size: var(--fs-small);
+  line-height: 1.45;
+  text-wrap: pretty;
+}
+
+.sg-meta .sg-code {
+  color: var(--fg);
+}
+
+.sg-row .prose blockquote {
+  margin-block: 0;
+}
+
+.sg-measure {
+  max-width: var(--measure);
+  text-wrap: pretty;
+}
+
+.sg-small {
+  color: var(--fg-muted);
+  font-size: var(--fs-small);
+}
+
+.sg-labels {
+  display: grid;
+  gap: var(--space-s);
+}
+
+.sg-labels .kicker {
+  margin-bottom: 0;
+}
+
+/* zwei Proben nebeneinander, wo Platz ist */
+.sg-pair {
+  display: grid;
+  gap: var(--space-m);
+  align-items: start;
+}
+
+@media (min-width: 60rem) {
+  .sg-pair {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+/* --------------------------------------------------------------------------
+   Logo-Bühnen
+   -------------------------------------------------------------------------- */
+.sg-logos {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 16rem), 1fr));
+  gap: var(--space-m);
+}
+
+.sg-logo {
+  display: grid;
+  gap: var(--space-2xs);
+  min-width: 0;
+}
+
+.sg-logo__stage {
+  display: grid;
+  place-items: center;
+  aspect-ratio: 16 / 9;
+  padding: 12% 14%;
+  border-radius: var(--radius-l);
+  background: var(--color-surface);
+}
+
+.sg-logo__stage--dark {
+  background: var(--color-dark);
+}
+
+.sg-logo__stage img {
+  width: 100%;
+  height: auto;
+}
+
+.sg-logo__stage .sg-logo__mark {
+  width: auto;
+  height: 3.5rem;
+}
+
+.sg-logo__caption {
+  color: var(--fg-muted);
+  font-size: var(--fs-small);
+  line-height: 1.45;
+}
+
+.sg-logo__caption .sg-code {
+  display: block;
+  color: var(--fg);
+}
+
+/* --------------------------------------------------------------------------
+   Bedienung
+   -------------------------------------------------------------------------- */
+.sg-dark {
+  display: grid;
+  gap: var(--space-s);
+  justify-items: start;
+  padding: clamp(1.5rem, 3.5vw, 2.25rem);
+  border-radius: var(--radius-l);
+}
+
+.sg-dark__text {
+  max-width: var(--measure);
+  color: var(--fg-muted);
+  line-height: 1.55;
+}
+
+/* Formular auf Dunst wie auf der Kontaktseite */
+.sg-stage {
+  padding: clamp(0.75rem, 2vw, 1.25rem);
+  border-radius: calc(var(--radius-l) + 0.25rem);
+  background: var(--color-surface);
+}
+
+.sg-form {
+  max-width: 34rem;
+}
+
+.sg-photo {
+  max-width: 34rem;
+}
+
+/* --------------------------------------------------------------------------
+   Maße
+   -------------------------------------------------------------------------- */
+.sg-spaces {
+  display: grid;
+  border-top: 1px solid var(--line);
+}
+
+.sg-spaces li {
+  display: grid;
+  grid-template-columns: 9.5rem minmax(0, 1fr) 5.5rem;
+  gap: var(--space-s);
+  align-items: center;
+  padding-block: 0.6rem;
+  border-bottom: 1px solid var(--line);
+}
+
+.sg-spaces .sg-code {
+  color: var(--fg);
+}
+
+.sg-spaces__bar {
+  width: var(--sg-space);
+  height: 0.75rem;
+  border-radius: 2px;
+  background: var(--color-dark);
+}
+
+.sg-spaces__value {
+  color: var(--fg-muted);
+  font-size: var(--fs-small);
+  text-align: right;
+}
+
+@media (max-width: 29.99rem) {
+  .sg-spaces li {
+    grid-template-columns: minmax(0, 1fr) auto;
+  }
+
+  .sg-spaces__bar {
+    grid-column: 1 / -1;
+    grid-row: 2;
+    max-width: 100%;
+  }
+}
+
+.sg-radii {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 10rem), 1fr));
+  gap: var(--space-m);
+}
+
+.sg-radii li {
+  display: grid;
+  gap: 0.2rem;
+}
+
+.sg-radii__shape {
+  height: 4.5rem;
+  margin-bottom: 0.5rem;
+  border: 1px solid var(--color-line-strong);
+  border-radius: var(--sg-radius);
+  background: var(--color-surface);
+}
+
+.sg-radii .sg-code {
+  color: var(--fg);
+}
+
+.sg-table-wrap {
+  overflow-x: auto;
+}
+
+.sg-table {
+  width: 100%;
+  min-width: 34rem;
+  border-collapse: collapse;
+  font-size: var(--fs-small);
+  line-height: 1.45;
+}
+
+.sg-table th,
+.sg-table td {
+  padding: 0.7rem var(--space-s) 0.7rem 0;
+  border-bottom: 1px solid var(--line);
+  text-align: left;
+  vertical-align: top;
+}
+
+.sg-table th {
+  color: var(--fg-muted);
+  font-size: var(--fs-label);
+  font-weight: 650;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.sg-table td {
+  color: var(--fg-muted);
+}
+
+.sg-table td:first-child {
+  color: var(--fg);
+  white-space: nowrap;
+}
+
+@media print {
+  .sg-swatch__chip,
+  .sg-spaces__bar,
+  .sg-logo__stage--dark {
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+}

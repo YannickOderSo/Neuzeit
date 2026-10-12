@@ -1,6 +1,6 @@
 # Logo neuzeit
 
-**Idee:** Die Sonne steht nicht mehr auf der Linie, sie hat sich gerade gelöst. Das ist der Moment, in dem etwas Neues beginnt, ohne dass man den Boden unter den Füßen verliert. Erkennungsmerkmale sind die Fuge zwischen Sonne und Horizont, die Proportionen und das Terrakotta.
+**Idee:** Die Sonne steht nicht mehr auf der Linie, sie hat sich gerade gelöst. Das ist der Moment, in dem etwas Neues beginnt, ohne dass man den Boden unter den Füßen verliert. Erkennungsmerkmale sind die Fuge zwischen Sonne und Horizont, die Proportionen und die Koralle der Sonne.
 
 ## Dateien
 
@@ -9,7 +9,7 @@
 | `neuzeit-logo.svg` | Hauptlogo für große Anwendungen ab etwa 48 px Höhe: Druck, Präsentation, Schild |
 | `neuzeit-logo-klein.svg` | kleine Größen bis etwa 48 px Höhe: Website-Kopfzeile, E-Mail-Signatur |
 | `neuzeit-logo-claim.svg` | mit Unterzeile „Beratung für den Mittelstand“: Visitenkarte, Briefbogen, LinkedIn-Titelbild |
-| `neuzeit-logo-invers.svg` | auf Tannengrün oder dunklen Flächen |
+| `neuzeit-logo-invers.svg` | auf Nachtblau oder dunklen Flächen |
 | `neuzeit-logo-einfarbig.svg` | Stempel, Gravur, Fax: Fuge etwas breiter, damit sie nicht zuläuft |
 | `neuzeit-zeichen.svg` | Zeichen allein, wenn der Name schon daneben steht |
 | `favicon.svg` | Browser-Tab, pixelgenau für 16 und 32 px |
@@ -37,13 +37,15 @@ Alle Logo-Dateien sind reine Konturen, sie brauchen keine Schrift.
 
 ## Farben
 
+Palette „Nachtblau & Koralle“: Nachtblau steht für Ruhe und Verlässlichkeit, die Koralle gehört allein der Sonne. Es gibt nur diese eine Palette.
+
 | Fläche | Sonne | Linie und Schrift |
 | --- | --- | --- |
-| Papier `#F5F1EA` | Terrakotta `#D4552B` | Tinte `#16201C` |
-| Tannengrün `#1E3A31` | Terrakotta `#D4552B` | Papier `#F5F1EA` |
-| Variante Klar | Kobalt `#2F5BEA` | `#1B1B1F` |
-| Variante Frisch | Limette `#C8F169` mit Kontur `#0F2A22` | `#0F2A22` |
-| einfarbig | Tinte | Tinte |
+| Morgenweiß `#FBF8F5` oder Weiß | Koralle `#E95739` | Nachttinte `#11182B` |
+| Nachtblau `#18203F` | Koralle `#E95739` | Morgenweiß `#FBF8F5` |
+| einfarbig | Nachttinte | Nachttinte |
+
+Die Sonne erreicht auf Morgenweiß 3,4:1 und auf Nachtblau 4,5:1, sie bleibt auch in Graustufen und bei Farbsehschwäche klar erkennbar. Für den Druck die Koralle am Farbfächer abstimmen (Richtung Pantone Warm Red bzw. 7416 C, 4c etwa 0/75/75/0) und Nachtblau andrucken (4c etwa 100/85/35/45). **[Platzhalter: Druckfarben am Fächer festlegen]**
 
 ## Regeln
 
@@ -51,7 +53,7 @@ Alle Logo-Dateien sind reine Konturen, sie brauchen keine Schrift.
 - **Mindestgröße:** Die kleine Fassung bekommt mindestens 20 px Höhe. Darunter nur das Zeichen oder das Favicon verwenden.
 - **Fuge:** Die Fuge zwischen Sonne und Linie bleibt immer sichtbar. Sie ist das wichtigste Merkmal.
 - **Nicht verändern:** Das Logo nicht verzerren und nicht drehen. Keine Schatten, keine Verläufe, keine Sonnenstrahlen.
-- **Limette:** Auf hellem Grund erscheint Limette nur mit dunkler Kontur.
+- **Koralle nur für die Sonne:** Buttons, Flächen und Schrift bleiben Nachtblau oder Tinte. So ist die Sonne überall der einzige warme Punkt.
 - **Website:** Auf der Website hebt sich die Sonne beim Laden einmal von der Linie ab. Bei reduzierter Bewegung entfällt das.
 
 ## Vor der Anmeldung als Marke

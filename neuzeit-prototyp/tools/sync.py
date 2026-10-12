@@ -20,6 +20,10 @@ Platzhalter in den Teilen:
     {{name}}          Wert aus SEITEN bzw. allgemeine Werte unten
     {{aktuell:start}} wird zu aria-current="page", wenn die Seite gemeint ist
     {{> datei}}       fügt eine Datei aus _partials/ ein (z. B. das Logo)
+
+Die Fehlerseite liegt als 404.html im Hauptordner des Repos, weil GitHub Pages
+sie dort für jede unbekannte Adresse ausliefert. Sie bekommt ein <base> mit dem
+Pfad aus BASIS_URL, damit Stile, Schriften und Links in jeder Tiefe stimmen.
 """
 
 import json
@@ -27,6 +31,7 @@ import pathlib
 import re
 import sys
 from html import escape
+from urllib.parse import urljoin, urlparse
 
 ORDNER = pathlib.Path(__file__).resolve().parent.parent
 TEILE = ORDNER / "_partials"
@@ -81,17 +86,56 @@ SEITEN = {
         "titel": "Impressum · Neuzeit",
         "og_titel": "Impressum",
         "beschreibung": "Impressum von Neuzeit, Change-Management für den Mittelstand.",
-        "og": "start",
+        "og": "neutral",
     },
     "datenschutz.html": {
         "seite": "datenschutz",
         "pfad": "datenschutz.html",
         "titel": "Datenschutzerklärung · Neuzeit",
         "og_titel": "Datenschutzerklärung",
-        "beschreibung": "Wie Neuzeit mit Ihren Daten umgeht: keine Cookies, kein Tracking, "
-                        "Kontaktformular und Terminbuchung nur auf Ihren Wunsch.",
-        "og": "start",
+        "beschreibung": "Wie Neuzeit mit Ihren Daten umgeht: kein Tracking, keine eigenen Cookies. "
+                        "Kontaktformular und Terminkalender nur auf Ihren Wunsch.",
+        "og": "neutral",
     },
+    # Interne Seiten: nicht in Navigation und Sitemap, nie indexierbar
+    "styleguide.html": {
+        "seite": "styleguide",
+        "pfad": "styleguide.html",
+        "titel": "Gestaltungssystem · Neuzeit",
+        "og_titel": "Gestaltungssystem",
+        "beschreibung": "Farben, Schrift, Bausteine und Regeln des Neuzeit-Auftritts auf einen Blick.",
+        "og": "neutral",
+        "intern": True,
+    },
+    "fallbeispiel.html": {
+        "seite": "fallbeispiel",
+        "pfad": "fallbeispiel.html",
+        "titel": "Fallbeispiel (Vorlage) · Neuzeit",
+        "og_titel": "Fallbeispiel",
+        "beschreibung": "Vorlage für Fallbeispiele von Neuzeit: Ausgangslage, Vorgehen und Ergebnis.",
+        "og": "neutral",
+        "intern": True,
+    },
+    # Fehlerseite im Hauptordner des Repos, mit <base> (siehe oben)
+    "../404.html": {
+        "seite": "fehler",
+        "pfad": "../404.html",
+        "titel": "Seite nicht gefunden · Neuzeit",
+        "og_titel": "Seite nicht gefunden",
+        "beschreibung": "Diese Adresse gibt es bei Neuzeit nicht oder nicht mehr.",
+        "og": "neutral",
+        "intern": True,
+        "base": True,
+    },
+}
+
+# Satz auf dem jeweiligen Vorschaubild (og/<name>.png), für den Alternativtext.
+# og/neutral.png zeigt nur Logo und Horizont. tools/og.mjs erzeugt die Bilder.
+OG_SAETZE = {
+    "start": "Wandel, den Ihre Leute mittragen.",
+    "leistungen": "Drei Wege durch den Wandel.",
+    "ueber-uns": "Zwei Blickwinkel. Ein gemeinsamer Weg.",
+    "kontakt": "Lassen Sie uns sprechen.",
 }
 
 BEREICHE = {
@@ -124,11 +168,12 @@ def werte(seite):
         "titel": escape(seite["titel"]),
         "og_titel": escape(seite["og_titel"]),
         "beschreibung": escape(seite["beschreibung"]),
-        "url": BASIS_URL + seite["pfad"],
+        "url": urljoin(BASIS_URL, seite["pfad"]),
         "basis": BASIS_URL,
         "og": seite["og"],
-        "og_alt": escape("neuzeit-Logo mit dem Satz: " + seite["og_titel"]),
-        "robots": "index, follow" if INDEXIERBAR else "noindex",
+        "og_alt": escape("neuzeit-Logo mit dem Satz: " + OG_SAETZE[seite["og"]]
+                         if seite["og"] in OG_SAETZE else "neuzeit-Logo"),
+        "robots": "index, follow" if INDEXIERBAR and not seite.get("intern") else "noindex",
         "jsonld": jsonld(seite),
     }
 
@@ -170,6 +215,9 @@ def seite_aktualisieren(datei, seite):
             sys.exit(f"{datei}: Marke <!-- @{marke} --> fehlt")
         tiefe = treffer.group(1)
         inhalt = fuellen((TEILE / teil).read_text("utf-8"), seite)
+        if marke == "kopf" and seite.get("base"):
+            basis = f'<base href="{urlparse(BASIS_URL).path}">'
+            inhalt = inhalt.replace('<meta charset="utf-8">', '<meta charset="utf-8">\n' + basis, 1)
         neu = f"{tiefe}<!-- @{marke} -->\n{einruecken(inhalt, tiefe)}\n{tiefe}<!-- /@{marke} -->"
         html = html[: treffer.start()] + neu + html[treffer.end():]
     pfad.write_text(html, "utf-8")
@@ -177,7 +225,7 @@ def seite_aktualisieren(datei, seite):
 
 def sitemap():
     eintraege = "\n".join(
-        f"  <url><loc>{BASIS_URL + s['pfad']}</loc></url>" for s in SEITEN.values()
+        f"  <url><loc>{urljoin(BASIS_URL, s['pfad'])}</loc></url>" for s in SEITEN.values() if not s.get("intern")
     )
     (ORDNER / "sitemap.xml").write_text(
         '<?xml version="1.0" encoding="UTF-8"?>\n'

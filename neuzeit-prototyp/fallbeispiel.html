@@ -1,0 +1,269 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <!-- @kopf -->
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Fallbeispiel (Vorlage) · Neuzeit</title>
+  <meta name="description" content="Vorlage für Fallbeispiele von Neuzeit: Ausgangslage, Vorgehen und Ergebnis.">
+  <meta name="robots" content="noindex">
+  <link rel="canonical" href="https://yannickoderso.github.io/Neuzeit/neuzeit-prototyp/fallbeispiel.html">
+  <meta property="og:type" content="website">
+  <meta property="og:locale" content="de_DE">
+  <meta property="og:site_name" content="Neuzeit">
+  <meta property="og:title" content="Fallbeispiel">
+  <meta property="og:description" content="Vorlage für Fallbeispiele von Neuzeit: Ausgangslage, Vorgehen und Ergebnis.">
+  <meta property="og:url" content="https://yannickoderso.github.io/Neuzeit/neuzeit-prototyp/fallbeispiel.html">
+  <meta property="og:image" content="https://yannickoderso.github.io/Neuzeit/neuzeit-prototyp/og/neutral.png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:alt" content="neuzeit-Logo">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="theme-color" content="#FBF8F5">
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 32 32%22%3E%3Cstyle%3E.tile%7Bfill:%2318203F%7D@media (prefers-color-scheme:dark)%7B.tile%7Bfill:%23283258%7D%7D%3C/style%3E%3Crect class=%22tile%22 width=%2232%22 height=%2232%22 rx=%227%22/%3E%3Cpath fill=%22%23E95739%22 d=%22M5 18A11 11 0 0 1 27 18Z%22/%3E%3Crect fill=%22%23FBF8F5%22 x=%222%22 y=%2220%22 width=%2228%22 height=%224%22/%3E%3C/svg%3E">
+  <link rel="apple-touch-icon" href="logo/apple-touch-icon.png">
+  <link rel="preload" href="fonts/manrope.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="fonts/fraunces.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="stylesheet" href="styles.css">
+  <script>
+    document.documentElement.classList.add("js");
+    /* Seitenwechsel mit Übergang: Die Kopfzeile bleibt stehen, ihr Intro entfällt.
+       Kam der Besuch von einer Unterseite, gleitet die kleine Sonne zur neuen
+       Position, statt neu aufzugehen. Die Klassen bleiben stehen, sonst würden
+       die Animationen nach dem Übergang doch noch starten. */
+    window.addEventListener("pagereveal", function (event) {
+      if (!event.viewTransition) return;
+      var root = document.documentElement;
+      root.classList.add("vt-nav");
+      try {
+        var from = window.navigation && navigation.activation && navigation.activation.from;
+        if (from && /\/(leistungen|ueber-uns|kontakt|impressum|datenschutz)\.html/.test(from.url)) {
+          root.classList.add("vt-from-sub");
+        }
+      } catch (e) {}
+    });
+  </script>
+  <script src="main.js" defer></script>
+  <!-- /@kopf -->
+</head>
+<body data-page="impressum">
+  <!-- @kopfzeile -->
+  <a class="skip-link" href="#inhalt">Zum Inhalt springen</a>
+
+  <header class="site-header" data-header>
+    <div class="container site-header__inner">
+      <a class="brand" href="index.html" aria-label="neuzeit, zur Startseite">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 -74.8 447.02 81.6" class="brand__logo" aria-hidden="true" focusable="false"><path class="logo-accent brand__sun" d="M17.82 -13.6H84.19Q85 -13.6 84.99 -14.42A34 34 0 0 0 17.01 -14.42Q17 -13.6 17.82 -13.6Z"/><rect class="logo-ink" x="0" y="-6.8" width="102.01" height="6.8" rx="0.82"/><g transform="translate(120.78 0)"><path class="logo-ink" d="M20.92 -44.5V-7.29Q20.92 -5.83 21.38 -5.14Q21.83 -4.45 22.76 -4.15L24.86 -3.63Q26.32 -3.06 26.32 -1.86Q26.32 0 24.08 0H5.95Q4.84 0 4.27 -0.48Q3.69 -0.97 3.69 -1.81Q3.69 -2.49 4.1 -2.95Q4.5 -3.4 5.33 -3.71L7.53 -4.22Q8.46 -4.52 8.92 -5.18Q9.38 -5.85 9.38 -7.27V-36.77Q9.38 -37.95 9 -38.46Q8.63 -38.98 7.82 -39.11L4.76 -39.25Q3.97 -39.45 3.6 -39.85Q3.22 -40.25 3.22 -40.87Q3.22 -41.59 3.68 -42.06Q4.13 -42.53 5.22 -42.92L14.31 -46Q15.78 -46.54 16.72 -46.79Q17.67 -47.05 18.48 -47.05Q19.67 -47.05 20.3 -46.35Q20.92 -45.66 20.92 -44.5ZM19.51 -33.59 17.54 -35.69 19.69 -37.64Q25.45 -42.94 29.95 -45.15Q34.45 -47.36 38.51 -47.36Q44.6 -47.36 48.36 -43.52Q52.12 -39.68 52.12 -32.98V-7.44Q52.12 -5.94 52.63 -5.21Q53.14 -4.48 54.13 -4.19L56.1 -3.71Q56.92 -3.4 57.33 -2.94Q57.73 -2.49 57.73 -1.81Q57.73 -0.97 57.17 -0.48Q56.61 0 55.46 0H37.29Q35.04 0 35.04 -1.86Q35.04 -3.06 36.49 -3.63L38.68 -4.15Q39.69 -4.45 40.14 -5.19Q40.58 -5.94 40.58 -7.44V-30.99Q40.58 -35.63 38.32 -37.94Q36.06 -40.26 32.26 -40.26Q29.85 -40.26 27.14 -39.1Q24.44 -37.94 21.53 -35.37Z"/><path class="logo-ink" d="M106.82 -28.92Q106.82 -26.61 105.48 -25.38Q104.15 -24.16 101.61 -24.16H70.67V-27.47H92.72Q95.12 -27.47 95.12 -29.67Q95.12 -36.1 92.46 -39.6Q89.81 -43.1 85.51 -43.1Q82.07 -43.1 79.45 -41.11Q76.83 -39.12 75.36 -35.39Q73.89 -31.66 73.89 -26.45Q73.89 -16.76 78.44 -11.77Q83 -6.78 90.38 -6.78Q95.16 -6.78 98.64 -8.99Q102.11 -11.19 103.58 -14.75Q104.2 -15.51 104.63 -15.81Q105.05 -16.11 105.52 -16.1Q106.15 -16.09 106.48 -15.57Q106.81 -15.05 106.79 -14.2Q106.54 -10.04 103.91 -6.55Q101.28 -3.05 96.82 -0.95Q92.37 1.15 86.6 1.15Q79.64 1.15 74.39 -1.78Q69.14 -4.7 66.21 -9.98Q63.29 -15.27 63.29 -22.3Q63.29 -29.56 66.17 -35.21Q69.04 -40.86 74.37 -44.11Q79.71 -47.36 87.03 -47.36Q93.09 -47.36 97.53 -44.98Q101.97 -42.61 104.4 -38.45Q106.82 -34.29 106.82 -28.92Z"/><path class="logo-ink" d="M149.15 -5.46V-9.08L148.84 -9.39V-36.74Q148.84 -37.92 148.46 -38.43Q148.08 -38.95 147.27 -39.08L144.21 -39.22Q143.43 -39.42 143.05 -39.82Q142.68 -40.22 142.68 -40.84Q142.68 -41.56 143.13 -42.03Q143.58 -42.5 144.68 -42.89L153.77 -45.97Q155.23 -46.51 156.18 -46.76Q157.12 -47.02 157.94 -47.02Q159.13 -47.02 159.75 -46.32Q160.38 -45.63 160.38 -44.47V-7.29Q160.38 -5.87 160.85 -5.18Q161.32 -4.5 162.23 -4.22L164.34 -3.73Q165.19 -3.43 165.6 -2.97Q166.01 -2.51 166.01 -1.81Q166.01 -0.97 165.44 -0.49Q164.86 0 163.71 0H154.17Q151.9 0 150.53 -1.46Q149.15 -2.91 149.15 -5.46ZM118.28 -13.27V-36.74Q118.28 -37.92 117.9 -38.43Q117.53 -38.95 116.71 -39.08L113.65 -39.22Q112.87 -39.42 112.49 -39.82Q112.12 -40.22 112.12 -40.84Q112.12 -41.56 112.57 -42.03Q113.02 -42.5 114.12 -42.89L123.22 -45.97Q124.72 -46.52 125.66 -46.77Q126.59 -47.02 127.33 -47.02Q128.56 -47.02 129.2 -46.32Q129.83 -45.63 129.83 -44.47V-15.27Q129.83 -10.61 132.04 -8.29Q134.26 -5.96 137.94 -5.96Q140.3 -5.96 142.93 -7.14Q145.57 -8.31 148.47 -10.85L150.49 -12.64L152.46 -10.52L150.31 -8.58Q144.59 -3.31 140.15 -1.08Q135.71 1.14 131.7 1.14Q125.73 1.14 122.01 -2.71Q118.28 -6.57 118.28 -13.27Z"/><path class="logo-ink" d="M210.48 -40.59 183.37 -1.68 181.56 -3.78H196.79Q199.25 -3.78 200.88 -4.31Q202.51 -4.85 203.87 -6.32Q205.23 -7.8 206.85 -10.57L209.07 -14.59Q209.62 -15.53 210.26 -15.85Q210.9 -16.16 211.66 -16.03Q212.52 -15.88 212.89 -15.26Q213.25 -14.64 213.03 -13.65L210.18 -1.01Q209.88 0.27 209.38 0.82Q208.88 1.37 208.04 1.37Q207.03 1.37 205.99 0.69Q204.94 0 202.82 0H174.76Q173.04 0 172.32 -0.56Q171.6 -1.12 171.6 -2.07Q171.6 -2.8 171.94 -3.59Q172.28 -4.38 173.15 -5.59L200.25 -44.4L202.02 -42.51H187.2Q185.08 -42.51 183.62 -42.03Q182.15 -41.55 180.97 -40.3Q179.8 -39.05 178.53 -36.72L176.68 -33.2Q176.18 -32.29 175.55 -31.96Q174.93 -31.63 174.11 -31.79Q173.28 -31.97 172.89 -32.62Q172.5 -33.28 172.71 -34.28L175.05 -45.17Q175.35 -46.53 175.87 -47.07Q176.39 -47.6 177.27 -47.6Q178.29 -47.6 179.3 -46.95Q180.32 -46.3 182.37 -46.3H209.28Q210.87 -46.3 211.56 -45.8Q212.26 -45.31 212.26 -44.33Q212.26 -43.64 211.87 -42.81Q211.49 -41.99 210.48 -40.59Z"/><path class="logo-ink" d="M262.01 -28.92Q262.01 -26.61 260.67 -25.38Q259.34 -24.16 256.8 -24.16H225.86V-27.47H247.91Q250.31 -27.47 250.31 -29.67Q250.31 -36.1 247.65 -39.6Q245 -43.1 240.7 -43.1Q237.26 -43.1 234.64 -41.11Q232.02 -39.12 230.55 -35.39Q229.08 -31.66 229.08 -26.45Q229.08 -16.76 233.63 -11.77Q238.19 -6.78 245.57 -6.78Q250.35 -6.78 253.83 -8.99Q257.3 -11.19 258.77 -14.75Q259.39 -15.51 259.82 -15.81Q260.24 -16.11 260.71 -16.1Q261.34 -16.09 261.67 -15.57Q262 -15.05 261.98 -14.2Q261.73 -10.04 259.1 -6.55Q256.47 -3.05 252.01 -0.95Q247.56 1.15 241.79 1.15Q234.83 1.15 229.58 -1.78Q224.33 -4.7 221.4 -9.98Q218.48 -15.27 218.48 -22.3Q218.48 -29.56 221.36 -35.21Q224.23 -40.86 229.56 -44.11Q234.9 -47.36 242.22 -47.36Q248.28 -47.36 252.72 -44.98Q257.16 -42.61 259.59 -38.45Q262.01 -34.29 262.01 -28.92Z"/><path class="logo-ink" d="M285.76 -44.5V-7.29Q285.76 -5.87 286.23 -5.19Q286.69 -4.5 287.61 -4.22L289.72 -3.73Q290.56 -3.43 290.98 -2.97Q291.39 -2.51 291.39 -1.81Q291.39 -0.97 290.82 -0.48Q290.24 0 289.09 0H270.79Q269.68 0 269.1 -0.48Q268.53 -0.97 268.53 -1.81Q268.53 -2.49 268.93 -2.95Q269.34 -3.41 270.16 -3.71L272.37 -4.22Q273.3 -4.52 273.76 -5.19Q274.22 -5.86 274.22 -7.27V-36.77Q274.22 -37.95 273.84 -38.46Q273.46 -38.98 272.65 -39.11L269.59 -39.25Q268.81 -39.45 268.44 -39.85Q268.06 -40.25 268.06 -40.87Q268.06 -41.59 268.51 -42.06Q268.97 -42.53 270.06 -42.92L279.15 -46Q280.66 -46.55 281.59 -46.8Q282.53 -47.05 283.27 -47.05Q284.5 -47.05 285.13 -46.35Q285.76 -45.66 285.76 -44.5ZM279.01 -55.38Q275.6 -55.38 273.51 -57.28Q271.42 -59.17 271.42 -62.16Q271.42 -65.15 273.51 -67.02Q275.61 -68.89 279.01 -68.89Q282.45 -68.89 284.56 -67.01Q286.67 -65.14 286.67 -62.16Q286.67 -59.17 284.56 -57.28Q282.45 -55.38 279.01 -55.38Z"/><path class="logo-ink" d="M299.29 -41.94 296.53 -42.56Q295.53 -42.89 295.11 -43.37Q294.69 -43.85 294.69 -44.52Q294.69 -45.34 295.27 -45.82Q295.84 -46.3 296.8 -46.3H299.92Q301.02 -46.3 301.74 -46.73Q302.47 -47.16 303.11 -48.3L307.69 -55.57Q308.42 -56.65 309.23 -57.21Q310.04 -57.77 310.85 -57.77Q311.79 -57.77 312.33 -57.19Q312.87 -56.6 312.87 -55.51V-12.91Q312.87 -9.49 314.28 -7.71Q315.69 -5.94 318.2 -5.94Q319.76 -5.94 320.75 -6.47Q321.75 -7.01 322.42 -7.76Q323.09 -8.51 323.67 -9.16Q324.25 -9.81 324.94 -10.04Q325.53 -10.08 325.91 -9.65Q326.28 -9.22 326.23 -8.28Q326.06 -5.8 324.44 -3.7Q322.82 -1.61 320.08 -0.34Q317.33 0.92 313.83 0.92Q308.03 0.92 304.71 -2.03Q301.39 -4.98 301.39 -11V-39.07Q301.39 -40.33 300.91 -40.97Q300.43 -41.61 299.29 -41.94ZM308.11 -41.99 308.16 -46.3H323.87Q324.93 -46.3 325.49 -45.88Q326.05 -45.47 326.05 -44.64Q326.05 -43.5 324.95 -42.75Q323.86 -41.99 321.46 -41.99Z"/></g></svg>
+      </a>
+
+      <nav class="nav" aria-label="Hauptnavigation">
+        <ul class="nav__list" role="list">
+          <li><a class="nav__link" href="leistungen.html">Leistungen</a></li>
+          <li><a class="nav__link" href="ueber-uns.html">Über uns</a></li>
+          <li><a class="nav__link" href="kontakt.html">Kontakt</a></li>
+        </ul>
+        <span class="nav__indicator" aria-hidden="true"></span>
+      </nav>
+
+      <a class="btn btn--primary btn--small site-header__cta" href="kontakt.html#anfrage">Potenzialgespräch</a>
+
+      <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="mobile-menu" data-menu-toggle>
+        <span class="menu-toggle__label" data-menu-label>Menü</span>
+        <span class="menu-toggle__icon" aria-hidden="true"><span></span><span></span></span>
+      </button>
+    </div>
+
+    <div class="scroll-progress" aria-hidden="true">
+      <span class="scroll-progress__fill"></span>
+      <span class="scroll-progress__sun"></span>
+    </div>
+
+    <div class="mobile-menu" id="mobile-menu" hidden data-menu>
+      <nav class="container mobile-menu__inner" aria-label="Hauptnavigation mobil">
+        <ul class="mobile-menu__list" role="list">
+          <li><a class="mobile-menu__link" href="index.html"><span class="mobile-menu__num" aria-hidden="true">01</span>Start</a></li>
+          <li><a class="mobile-menu__link" href="leistungen.html"><span class="mobile-menu__num" aria-hidden="true">02</span>Leistungen</a></li>
+          <li><a class="mobile-menu__link" href="ueber-uns.html"><span class="mobile-menu__num" aria-hidden="true">03</span>Über uns</a></li>
+          <li><a class="mobile-menu__link" href="kontakt.html"><span class="mobile-menu__num" aria-hidden="true">04</span>Kontakt</a></li>
+        </ul>
+        <a class="btn btn--primary mobile-menu__cta" href="kontakt.html#anfrage">Potenzialgespräch vereinbaren <svg class="btn__icon" viewBox="0 0 16 16" aria-hidden="true" focusable="false"><path d="M3 8h9.5M8.5 4 12.5 8l-4 4"/></svg></a>
+      </nav>
+    </div>
+  </header>
+  <!-- /@kopfzeile -->
+
+  <main id="inhalt" tabindex="-1">
+    <section class="page-head page-head--small" aria-labelledby="page-title">
+      <div class="container page-head__inner">
+        <p class="kicker"><span>Fallbeispiel · Leistung <span class="ph">[Platzhalter]</span></span></p>
+        <h1 class="display page-head__title" id="page-title">[Projekttitel: Branche und Aufgabe in einem Satz]</h1>
+        <dl class="case-facts">
+          <div><dt>Branche</dt><dd><span class="ph">[Platzhalter]</span></dd></div>
+          <div><dt>Mitarbeitende</dt><dd><span class="ph">[Platzhalter]</span></dd></div>
+          <div><dt>Zeitraum</dt><dd><span class="ph">[Platzhalter]</span></dd></div>
+          <div><dt>Leistung</dt><dd><span class="ph">[Platzhalter: 01, 02 oder 03]</span></dd></div>
+        </dl>
+      </div>
+      <div class="page-head__horizon" aria-hidden="true" style="--sun-x: 62%"><span class="page-head__sun"></span></div>
+    </section>
+
+    <div class="section case-section">
+      <div class="container case-study">
+        <section class="case-part" aria-labelledby="ausgangslage-title" data-reveal>
+          <h2 class="case-part__title" id="ausgangslage-title">Ausgangslage</h2>
+          <div class="case-part__body prose">
+            <p><span class="ph">[Platzhalter]</span> Was war die Frage des Kunden? Zwei bis drei Sätze, erst nach Freigabe.</p>
+            <h3>[Zwischentitel, falls nötig]</h3>
+            <ul role="list">
+              <li><span class="ph">[Platzhalter]</span> Was sollte sich ändern?</li>
+              <li><span class="ph">[Platzhalter]</span> Wen betraf es?</li>
+              <li><span class="ph">[Platzhalter]</span> Was stand im Weg?</li>
+            </ul>
+          </div>
+        </section>
+
+        <figure class="photo photo--wide" data-reveal>
+          <div class="photo__frame" aria-hidden="true"></div>
+          <figcaption class="photo__caption"><span class="ph"><span class="visually-hidden">Platzhalter für ein Foto:</span><span aria-hidden="true">Foto · 3:1, mobil 3:2</span></span> <span class="photo__brief">[Briefing: Motiv aus dem Projekt, nur mit Freigabe des Kunden]</span></figcaption>
+        </figure>
+
+        <section class="case-part" aria-labelledby="vorgehen-title" data-reveal>
+          <h2 class="case-part__title" id="vorgehen-title">Vorgehen</h2>
+          <div class="case-part__body">
+            <p class="case-part__intro"><span class="ph">[Platzhalter]</span> Wie lief das Projekt ab? Für jeden Schritt ein Satz: Was ist konkret passiert?</p>
+          </div>
+          <ol class="steps" role="list">
+            <li class="step">
+              <span class="step__marker" aria-hidden="true"></span>
+              <p class="step__num">Schritt 1</p>
+              <h3 class="step__title">Zuhören</h3>
+              <p class="step__text"><span class="ph">[Platzhalter]</span> Mit wem haben wir gesprochen, was war zu hören?</p>
+            </li>
+            <li class="step">
+              <span class="step__marker" aria-hidden="true"></span>
+              <p class="step__num">Schritt 2</p>
+              <h3 class="step__title">Verstehen</h3>
+              <p class="step__text"><span class="ph">[Platzhalter]</span> Welches Bild der Lage ist entstanden?</p>
+            </li>
+            <li class="step">
+              <span class="step__marker" aria-hidden="true"></span>
+              <p class="step__num">Schritt 3</p>
+              <h3 class="step__title">Gestalten</h3>
+              <p class="step__text"><span class="ph">[Platzhalter]</span> Welche Maßnahmen, Botschaften oder Prototypen sind entstanden?</p>
+            </li>
+            <li class="step step--last">
+              <span class="step__marker" aria-hidden="true"></span>
+              <p class="step__num">Schritt 4</p>
+              <h3 class="step__title">Verankern</h3>
+              <p class="step__text"><span class="ph">[Platzhalter]</span> Wie ist das Neue im Alltag angekommen?</p>
+            </li>
+          </ol>
+        </section>
+
+        <section class="case-part" aria-labelledby="ergebnis-title">
+          <h2 class="case-part__title" id="ergebnis-title">Ergebnis</h2>
+          <div class="case-part__body">
+            <div class="offer__result" data-reveal>
+              <p><span class="ph">[Platzhalter]</span> Ein konkretes, belegbares Ergebnis, nur mit Freigabe des Kunden.</p>
+              <div class="offer__outputs">
+                <h3 class="offer__label">Was der Kunde danach in der Hand hat</h3>
+                <ul role="list">
+                  <li><span class="ph">[Platzhalter]</span></li>
+                  <li><span class="ph">[Platzhalter]</span></li>
+                  <li><span class="ph">[Platzhalter]</span></li>
+                </ul>
+              </div>
+            </div>
+            <div class="quote-card" data-reveal>
+              <figure>
+                <span class="ph ph--strong quote-card__ph">[Platzhalter]</span>
+                <blockquote class="quote-card__text"><p>Zitat einer Kundin oder eines Kunden: Was hat sich durch das Projekt im Alltag verändert? Zwei bis drei Sätze, erst nach Freigabe.</p></blockquote>
+                <figcaption class="quote-card__by"><span class="quote-card__avatar" aria-hidden="true"></span><span><span class="quote-card__name">Name, Funktion</span> <span class="ph">[Platzhalter]</span><br><span class="quote-card__org">Unternehmen, Branche</span></span></figcaption>
+              </figure>
+            </div>
+          </div>
+        </section>
+      </div>
+    </div>
+
+    <!-- @cta -->
+    <section class="cta-band" aria-labelledby="cta-title">
+      <div class="container">
+        <div class="cta-band__inner" data-reveal>
+          <div class="cta-band__text">
+            <p class="eyebrow">Nächster Schritt</p>
+            <h2 class="h2 cta-band__title" id="cta-title">Wo steht Ihr Unternehmen im Wandel?</h2>
+            <p class="cta-band__lead">Im unverbindlichen Potenzialgespräch schauen wir gemeinsam auf Ihr Vorhaben. Sie erfahren, wo wir ansetzen würden und ob wir die Richtigen dafür sind.</p>
+          </div>
+          <div class="cta-band__actions">
+            <a class="btn btn--primary" href="kontakt.html#anfrage">Potenzialgespräch vereinbaren <svg class="btn__icon" viewBox="0 0 16 16" aria-hidden="true" focusable="false"><path d="M3 8h9.5M8.5 4 12.5 8l-4 4"/></svg></a>
+            <a class="text-link" href="kontakt.html#termin">Oder direkt einen Termin <span class="nowrap">wählen<svg class="text-link__icon" viewBox="0 0 16 16" aria-hidden="true" focusable="false"><path d="M3 8h9.5M8.5 4 12.5 8l-4 4"/></svg></span></a>
+          </div>
+          <div class="cta-band__horizon" aria-hidden="true"><span class="cta-band__sun"></span></div>
+        </div>
+      </div>
+    </section>
+    <!-- /@cta -->
+  </main>
+
+  <!-- @fusszeile -->
+  <footer class="site-footer">
+    <div class="container site-footer__inner">
+      <div class="site-footer__brand">
+        <a class="brand brand--on-dark" href="index.html" aria-label="neuzeit, zur Startseite">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 -68.99 442.61 75.53" class="brand__logo brand__logo--large" aria-hidden="true" focusable="false"><path class="logo-accent brand__sun" d="M29.91 -9.36H101.14Q101.92 -9.36 101.92 -10.15A36.4 36.4 0 0 0 29.13 -10.15Q29.12 -9.36 29.91 -9.36Z"/><rect class="logo-ink" x="0" y="-3.61" width="131.05" height="3.61" rx="0.78"/><g transform="translate(150.66 0)"><path class="logo-ink" d="M18.48 -43.65V-5.6Q18.48 -4.43 18.85 -3.86Q19.22 -3.28 20.05 -3.04L22.47 -2.55Q23.52 -2.15 23.52 -1.28Q23.52 0 22.03 0H4.16Q3.44 0 3.04 -0.34Q2.64 -0.68 2.64 -1.26Q2.64 -1.73 2.93 -2.06Q3.21 -2.39 3.79 -2.61L6.31 -3.11Q7.15 -3.34 7.52 -3.9Q7.9 -4.45 7.9 -5.57V-37.13Q7.9 -37.98 7.62 -38.36Q7.34 -38.75 6.7 -38.85L3.48 -38.93Q2.91 -39.07 2.65 -39.37Q2.38 -39.66 2.38 -40.1Q2.38 -40.61 2.71 -40.95Q3.03 -41.28 3.8 -41.55L14.02 -44.72Q15.09 -45.1 15.7 -45.25Q16.31 -45.4 16.84 -45.4Q17.64 -45.4 18.06 -44.92Q18.48 -44.44 18.48 -43.65ZM17.31 -33.4 15.93 -34.91 17.88 -36.71Q23.14 -41.62 27.36 -43.64Q31.58 -45.67 35.42 -45.67Q40.98 -45.67 44.42 -42.2Q47.86 -38.73 47.86 -32.22V-5.81Q47.86 -4.57 48.32 -3.93Q48.77 -3.29 49.69 -3.05L51.87 -2.61Q52.45 -2.39 52.74 -2.07Q53.02 -1.75 53.02 -1.26Q53.02 -0.68 52.63 -0.34Q52.24 0 51.47 0H33.54Q32.02 0 32.02 -1.28Q32.02 -2.15 33.1 -2.55L35.6 -3.04Q36.56 -3.29 36.92 -3.95Q37.29 -4.6 37.29 -5.81V-30.54Q37.29 -35.15 35.11 -37.4Q32.92 -39.64 29.24 -39.64Q26.85 -39.64 24.3 -38.55Q21.76 -37.46 19.11 -35.03Z"/><path class="logo-ink" d="M97.26 -27.58Q97.26 -25.96 96.34 -25.09Q95.42 -24.22 93.67 -24.22H63.57V-26.63H84.76Q86.55 -26.63 86.55 -28.37Q86.55 -35.35 83.98 -39.03Q81.41 -42.7 77.39 -42.7Q74.06 -42.7 71.58 -40.71Q69.11 -38.72 67.74 -34.91Q66.36 -31.1 66.36 -25.65Q66.36 -15.89 70.74 -10.85Q75.12 -5.81 82.17 -5.81Q86.99 -5.81 90.44 -8.29Q93.89 -10.77 94.99 -14.8Q95.35 -15.33 95.65 -15.54Q95.95 -15.74 96.26 -15.74Q96.68 -15.74 96.93 -15.4Q97.17 -15.06 97.14 -14.41Q96.83 -10.14 94.33 -6.63Q91.82 -3.12 87.65 -1.03Q83.47 1.06 78.12 1.06Q71.67 1.06 66.82 -1.75Q61.98 -4.55 59.29 -9.64Q56.6 -14.74 56.6 -21.53Q56.6 -28.54 59.29 -33.99Q61.99 -39.44 66.96 -42.57Q71.94 -45.69 78.74 -45.69Q84.37 -45.69 88.53 -43.35Q92.68 -41.01 94.97 -36.92Q97.26 -32.83 97.26 -27.58Z"/><path class="logo-ink" d="M135.37 -3.79V-8.46L135.2 -8.76V-37.08Q135.2 -37.93 134.92 -38.31Q134.65 -38.7 134.01 -38.8L130.78 -38.88Q130.21 -39.02 129.95 -39.31Q129.69 -39.61 129.69 -40.05Q129.69 -40.56 130.01 -40.9Q130.34 -41.23 131.1 -41.5L141.32 -44.67Q142.38 -45.05 142.99 -45.2Q143.61 -45.35 144.14 -45.35Q144.94 -45.35 145.36 -44.87Q145.78 -44.39 145.78 -43.6V-5.6Q145.78 -4.47 146.17 -3.9Q146.56 -3.33 147.36 -3.11L149.78 -2.64Q150.4 -2.43 150.68 -2.1Q150.96 -1.77 150.96 -1.26Q150.96 -0.68 150.57 -0.34Q150.18 0 149.41 0H138.89Q137.23 0 136.3 -0.99Q135.37 -1.99 135.37 -3.79ZM106.2 -12.56V-37.08Q106.2 -37.93 105.92 -38.31Q105.63 -38.7 104.98 -38.8L101.75 -38.88Q101.19 -39.02 100.92 -39.31Q100.66 -39.61 100.66 -40.05Q100.66 -40.56 100.99 -40.9Q101.31 -41.23 102.07 -41.5L112.32 -44.67Q113.4 -45.06 114.01 -45.2Q114.62 -45.35 115.12 -45.35Q115.94 -45.35 116.36 -44.87Q116.78 -44.39 116.78 -43.6V-14.24Q116.78 -9.58 118.95 -7.31Q121.12 -5.04 124.7 -5.04Q127.02 -5.04 129.52 -6.14Q132.02 -7.24 134.69 -9.66L136.51 -11.3L137.89 -9.76L135.94 -7.96Q130.68 -3.07 126.5 -1.04Q122.31 0.99 118.52 0.99Q113.09 0.99 109.65 -2.49Q106.2 -5.98 106.2 -12.56Z"/><path class="logo-ink" d="M190.69 -40.67 165.17 -1.24 163.45 -2.65H177.76Q180.08 -2.65 181.72 -3.26Q183.36 -3.86 184.83 -5.51Q186.3 -7.16 188.02 -10.23L190.13 -14.22Q190.53 -14.89 190.97 -15.13Q191.41 -15.36 191.95 -15.24Q192.51 -15.13 192.74 -14.68Q192.97 -14.24 192.81 -13.5L190.01 -0.54Q189.79 0.44 189.44 0.84Q189.1 1.24 188.54 1.24Q187.74 1.24 186.86 0.62Q185.98 0 184.19 0H156.37Q155.23 0 154.74 -0.41Q154.24 -0.82 154.24 -1.51Q154.24 -2.01 154.46 -2.55Q154.68 -3.08 155.23 -3.89L180.82 -43.32L182.55 -41.99H168.25Q166.33 -41.99 164.9 -41.42Q163.47 -40.85 162.23 -39.42Q160.99 -37.99 159.65 -35.4L157.75 -31.69Q157.39 -31.02 156.93 -30.76Q156.47 -30.51 155.9 -30.62Q155.31 -30.76 155.07 -31.22Q154.83 -31.68 154.98 -32.44L157.41 -43.98Q157.63 -44.98 157.98 -45.37Q158.34 -45.76 158.95 -45.76Q159.72 -45.76 160.59 -45.2Q161.45 -44.64 163.15 -44.64H189.88Q190.91 -44.64 191.38 -44.3Q191.85 -43.95 191.85 -43.25Q191.85 -42.77 191.6 -42.2Q191.34 -41.64 190.69 -40.67Z"/><path class="logo-ink" d="M236.54 -27.58Q236.54 -25.96 235.62 -25.09Q234.7 -24.22 232.95 -24.22H202.85V-26.63H224.04Q225.83 -26.63 225.83 -28.37Q225.83 -35.35 223.26 -39.03Q220.69 -42.7 216.67 -42.7Q213.34 -42.7 210.86 -40.71Q208.39 -38.72 207.02 -34.91Q205.64 -31.1 205.64 -25.65Q205.64 -15.89 210.02 -10.85Q214.4 -5.81 221.45 -5.81Q226.27 -5.81 229.72 -8.29Q233.17 -10.77 234.27 -14.8Q234.63 -15.33 234.93 -15.54Q235.23 -15.74 235.54 -15.74Q235.96 -15.74 236.21 -15.4Q236.45 -15.06 236.42 -14.41Q236.11 -10.14 233.61 -6.63Q231.1 -3.12 226.93 -1.03Q222.75 1.06 217.4 1.06Q210.95 1.06 206.1 -1.75Q201.26 -4.55 198.57 -9.64Q195.88 -14.74 195.88 -21.53Q195.88 -28.54 198.57 -33.99Q201.27 -39.44 206.24 -42.57Q211.22 -45.69 218.02 -45.69Q223.65 -45.69 227.81 -43.35Q231.96 -41.01 234.25 -36.92Q236.54 -32.83 236.54 -27.58Z"/><path class="logo-ink" d="M256.63 -43.65V-5.6Q256.63 -4.46 257.01 -3.9Q257.4 -3.34 258.22 -3.11L260.63 -2.64Q261.24 -2.44 261.53 -2.1Q261.82 -1.77 261.82 -1.26Q261.82 -0.68 261.42 -0.34Q261.03 0 260.26 0H242.32Q241.59 0 241.2 -0.34Q240.8 -0.68 240.8 -1.26Q240.8 -1.73 241.08 -2.06Q241.37 -2.39 241.95 -2.61L244.47 -3.11Q245.3 -3.35 245.68 -3.9Q246.05 -4.46 246.05 -5.57V-37.13Q246.05 -37.98 245.78 -38.36Q245.5 -38.75 244.86 -38.85L241.63 -38.93Q241.07 -39.07 240.8 -39.37Q240.54 -39.66 240.54 -40.1Q240.54 -40.61 240.87 -40.95Q241.19 -41.28 241.95 -41.55L252.17 -44.72Q253.26 -45.11 253.86 -45.26Q254.47 -45.4 254.98 -45.4Q255.79 -45.4 256.21 -44.92Q256.63 -44.44 256.63 -43.65ZM250.73 -53.29Q247.68 -53.29 245.8 -55.14Q243.92 -56.99 243.92 -59.82Q243.92 -62.66 245.81 -64.5Q247.71 -66.34 250.73 -66.34Q253.81 -66.34 255.72 -64.5Q257.62 -62.65 257.62 -59.83Q257.62 -56.99 255.71 -55.14Q253.8 -53.29 250.73 -53.29Z"/><path class="logo-ink" d="M267.55 -41.25 264.11 -41.93Q263.4 -42.16 263.13 -42.52Q262.86 -42.87 262.86 -43.37Q262.86 -43.94 263.27 -44.29Q263.68 -44.64 264.32 -44.64H267.93Q268.67 -44.64 269.16 -44.95Q269.64 -45.27 270.1 -46.09L275.69 -53.89Q276.22 -54.65 276.8 -55.05Q277.38 -55.45 277.98 -55.45Q278.65 -55.45 279.04 -55.02Q279.44 -54.6 279.44 -53.77V-11.85Q279.44 -8.32 280.85 -6.54Q282.27 -4.75 284.77 -4.75Q286.06 -4.75 287 -5.17Q287.93 -5.59 288.63 -6.27Q289.34 -6.94 289.91 -7.69Q290.49 -8.44 291.03 -9.1Q291.42 -9.23 291.71 -8.96Q292 -8.69 291.94 -7.97Q291.53 -5.36 290.06 -3.36Q288.59 -1.36 286.21 -0.23Q283.83 0.9 280.67 0.9Q275.18 0.9 272.1 -1.87Q269.03 -4.63 269.03 -10.35V-39.12Q269.03 -40.06 268.72 -40.55Q268.42 -41.04 267.55 -41.25ZM275.4 -41.54 275.54 -44.64H290.38Q291.15 -44.64 291.54 -44.35Q291.93 -44.06 291.93 -43.46Q291.93 -42.63 291.15 -42.08Q290.36 -41.54 288.69 -41.54Z"/></g></svg>
+        </a>
+        <p class="site-footer__claim">Change-Management für den Mittelstand: digitaler und struktureller Wandel, den Ihre Leute mittragen.</p>
+        <a class="btn btn--primary btn--small site-footer__cta" href="kontakt.html#anfrage">Potenzialgespräch vereinbaren <svg class="btn__icon" viewBox="0 0 16 16" aria-hidden="true" focusable="false"><path d="M3 8h9.5M8.5 4 12.5 8l-4 4"/></svg></a>
+      </div>
+
+      <nav class="site-footer__col" aria-labelledby="fuss-seiten">
+        <h2 class="site-footer__heading" id="fuss-seiten">Seiten</h2>
+        <ul class="site-footer__links" role="list">
+          <li><a href="index.html">Start</a></li>
+          <li><a href="leistungen.html">Leistungen</a></li>
+          <li><a href="ueber-uns.html">Über uns</a></li>
+          <li><a href="kontakt.html">Kontakt</a></li>
+        </ul>
+      </nav>
+
+      <nav class="site-footer__col" aria-labelledby="fuss-leistungen">
+        <h2 class="site-footer__heading" id="fuss-leistungen">Leistungen</h2>
+        <ul class="site-footer__links" role="list">
+          <li><a href="leistungen.html#digitaler-wandel">Digitaler Wandel &amp; Nutzer&shy;akzeptanz</a></li>
+          <li><a href="leistungen.html#strukturelle-transformation">Strukturelle Transformation</a></li>
+          <li><a href="leistungen.html#compliance">Compliance als Change-Prozess</a></li>
+        </ul>
+      </nav>
+
+      <div class="site-footer__col">
+        <h2 class="site-footer__heading">Kontakt</h2>
+        <dl class="site-footer__meta">
+          <div><dt>Standort</dt><dd><span class="ph">[Platzhalter]</span></dd></div>
+          <div><dt>E-Mail</dt><dd><span class="ph">[Platzhalter]</span></dd></div>
+        </dl>
+      </div>
+
+      <div class="site-footer__bottom">
+        <p class="site-footer__print">neuzeit · Change-Management für den Mittelstand · <span class="ph">[Platzhalter: Webadresse]</span> · <span class="ph">[Platzhalter: E-Mail]</span></p>
+        <p class="site-footer__small">© 2026 Neuzeit · Prototyp · kein Tracking, Cookies nur mit Ihrer Einwilligung</p>
+        <nav class="site-footer__legal" aria-label="Rechtliches">
+          <ul role="list">
+            <li><a href="impressum.html">Impressum</a></li>
+            <li><a href="datenschutz.html">Datenschutz</a></li>
+          </ul>
+        </nav>
+      </div>
+
+      <div class="footer-mark" aria-hidden="true">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 -68.99 442.61 75.53" class="footer-mark__svg" aria-hidden="true" focusable="false"><path class="logo-accent" d="M29.91 -9.36H101.14Q101.92 -9.36 101.92 -10.15A36.4 36.4 0 0 0 29.13 -10.15Q29.12 -9.36 29.91 -9.36Z"/><rect class="logo-ink" x="0" y="-3.61" width="131.05" height="3.61" rx="0.78"/><g transform="translate(150.66 0)"><path class="logo-ink" d="M18.48 -43.65V-5.6Q18.48 -4.43 18.85 -3.86Q19.22 -3.28 20.05 -3.04L22.47 -2.55Q23.52 -2.15 23.52 -1.28Q23.52 0 22.03 0H4.16Q3.44 0 3.04 -0.34Q2.64 -0.68 2.64 -1.26Q2.64 -1.73 2.93 -2.06Q3.21 -2.39 3.79 -2.61L6.31 -3.11Q7.15 -3.34 7.52 -3.9Q7.9 -4.45 7.9 -5.57V-37.13Q7.9 -37.98 7.62 -38.36Q7.34 -38.75 6.7 -38.85L3.48 -38.93Q2.91 -39.07 2.65 -39.37Q2.38 -39.66 2.38 -40.1Q2.38 -40.61 2.71 -40.95Q3.03 -41.28 3.8 -41.55L14.02 -44.72Q15.09 -45.1 15.7 -45.25Q16.31 -45.4 16.84 -45.4Q17.64 -45.4 18.06 -44.92Q18.48 -44.44 18.48 -43.65ZM17.31 -33.4 15.93 -34.91 17.88 -36.71Q23.14 -41.62 27.36 -43.64Q31.58 -45.67 35.42 -45.67Q40.98 -45.67 44.42 -42.2Q47.86 -38.73 47.86 -32.22V-5.81Q47.86 -4.57 48.32 -3.93Q48.77 -3.29 49.69 -3.05L51.87 -2.61Q52.45 -2.39 52.74 -2.07Q53.02 -1.75 53.02 -1.26Q53.02 -0.68 52.63 -0.34Q52.24 0 51.47 0H33.54Q32.02 0 32.02 -1.28Q32.02 -2.15 33.1 -2.55L35.6 -3.04Q36.56 -3.29 36.92 -3.95Q37.29 -4.6 37.29 -5.81V-30.54Q37.29 -35.15 35.11 -37.4Q32.92 -39.64 29.24 -39.64Q26.85 -39.64 24.3 -38.55Q21.76 -37.46 19.11 -35.03Z"/><path class="logo-ink" d="M97.26 -27.58Q97.26 -25.96 96.34 -25.09Q95.42 -24.22 93.67 -24.22H63.57V-26.63H84.76Q86.55 -26.63 86.55 -28.37Q86.55 -35.35 83.98 -39.03Q81.41 -42.7 77.39 -42.7Q74.06 -42.7 71.58 -40.71Q69.11 -38.72 67.74 -34.91Q66.36 -31.1 66.36 -25.65Q66.36 -15.89 70.74 -10.85Q75.12 -5.81 82.17 -5.81Q86.99 -5.81 90.44 -8.29Q93.89 -10.77 94.99 -14.8Q95.35 -15.33 95.65 -15.54Q95.95 -15.74 96.26 -15.74Q96.68 -15.74 96.93 -15.4Q97.17 -15.06 97.14 -14.41Q96.83 -10.14 94.33 -6.63Q91.82 -3.12 87.65 -1.03Q83.47 1.06 78.12 1.06Q71.67 1.06 66.82 -1.75Q61.98 -4.55 59.29 -9.64Q56.6 -14.74 56.6 -21.53Q56.6 -28.54 59.29 -33.99Q61.99 -39.44 66.96 -42.57Q71.94 -45.69 78.74 -45.69Q84.37 -45.69 88.53 -43.35Q92.68 -41.01 94.97 -36.92Q97.26 -32.83 97.26 -27.58Z"/><path class="logo-ink" d="M135.37 -3.79V-8.46L135.2 -8.76V-37.08Q135.2 -37.93 134.92 -38.31Q134.65 -38.7 134.01 -38.8L130.78 -38.88Q130.21 -39.02 129.95 -39.31Q129.69 -39.61 129.69 -40.05Q129.69 -40.56 130.01 -40.9Q130.34 -41.23 131.1 -41.5L141.32 -44.67Q142.38 -45.05 142.99 -45.2Q143.61 -45.35 144.14 -45.35Q144.94 -45.35 145.36 -44.87Q145.78 -44.39 145.78 -43.6V-5.6Q145.78 -4.47 146.17 -3.9Q146.56 -3.33 147.36 -3.11L149.78 -2.64Q150.4 -2.43 150.68 -2.1Q150.96 -1.77 150.96 -1.26Q150.96 -0.68 150.57 -0.34Q150.18 0 149.41 0H138.89Q137.23 0 136.3 -0.99Q135.37 -1.99 135.37 -3.79ZM106.2 -12.56V-37.08Q106.2 -37.93 105.92 -38.31Q105.63 -38.7 104.98 -38.8L101.75 -38.88Q101.19 -39.02 100.92 -39.31Q100.66 -39.61 100.66 -40.05Q100.66 -40.56 100.99 -40.9Q101.31 -41.23 102.07 -41.5L112.32 -44.67Q113.4 -45.06 114.01 -45.2Q114.62 -45.35 115.12 -45.35Q115.94 -45.35 116.36 -44.87Q116.78 -44.39 116.78 -43.6V-14.24Q116.78 -9.58 118.95 -7.31Q121.12 -5.04 124.7 -5.04Q127.02 -5.04 129.52 -6.14Q132.02 -7.24 134.69 -9.66L136.51 -11.3L137.89 -9.76L135.94 -7.96Q130.68 -3.07 126.5 -1.04Q122.31 0.99 118.52 0.99Q113.09 0.99 109.65 -2.49Q106.2 -5.98 106.2 -12.56Z"/><path class="logo-ink" d="M190.69 -40.67 165.17 -1.24 163.45 -2.65H177.76Q180.08 -2.65 181.72 -3.26Q183.36 -3.86 184.83 -5.51Q186.3 -7.16 188.02 -10.23L190.13 -14.22Q190.53 -14.89 190.97 -15.13Q191.41 -15.36 191.95 -15.24Q192.51 -15.13 192.74 -14.68Q192.97 -14.24 192.81 -13.5L190.01 -0.54Q189.79 0.44 189.44 0.84Q189.1 1.24 188.54 1.24Q187.74 1.24 186.86 0.62Q185.98 0 184.19 0H156.37Q155.23 0 154.74 -0.41Q154.24 -0.82 154.24 -1.51Q154.24 -2.01 154.46 -2.55Q154.68 -3.08 155.23 -3.89L180.82 -43.32L182.55 -41.99H168.25Q166.33 -41.99 164.9 -41.42Q163.47 -40.85 162.23 -39.42Q160.99 -37.99 159.65 -35.4L157.75 -31.69Q157.39 -31.02 156.93 -30.76Q156.47 -30.51 155.9 -30.62Q155.31 -30.76 155.07 -31.22Q154.83 -31.68 154.98 -32.44L157.41 -43.98Q157.63 -44.98 157.98 -45.37Q158.34 -45.76 158.95 -45.76Q159.72 -45.76 160.59 -45.2Q161.45 -44.64 163.15 -44.64H189.88Q190.91 -44.64 191.38 -44.3Q191.85 -43.95 191.85 -43.25Q191.85 -42.77 191.6 -42.2Q191.34 -41.64 190.69 -40.67Z"/><path class="logo-ink" d="M236.54 -27.58Q236.54 -25.96 235.62 -25.09Q234.7 -24.22 232.95 -24.22H202.85V-26.63H224.04Q225.83 -26.63 225.83 -28.37Q225.83 -35.35 223.26 -39.03Q220.69 -42.7 216.67 -42.7Q213.34 -42.7 210.86 -40.71Q208.39 -38.72 207.02 -34.91Q205.64 -31.1 205.64 -25.65Q205.64 -15.89 210.02 -10.85Q214.4 -5.81 221.45 -5.81Q226.27 -5.81 229.72 -8.29Q233.17 -10.77 234.27 -14.8Q234.63 -15.33 234.93 -15.54Q235.23 -15.74 235.54 -15.74Q235.96 -15.74 236.21 -15.4Q236.45 -15.06 236.42 -14.41Q236.11 -10.14 233.61 -6.63Q231.1 -3.12 226.93 -1.03Q222.75 1.06 217.4 1.06Q210.95 1.06 206.1 -1.75Q201.26 -4.55 198.57 -9.64Q195.88 -14.74 195.88 -21.53Q195.88 -28.54 198.57 -33.99Q201.27 -39.44 206.24 -42.57Q211.22 -45.69 218.02 -45.69Q223.65 -45.69 227.81 -43.35Q231.96 -41.01 234.25 -36.92Q236.54 -32.83 236.54 -27.58Z"/><path class="logo-ink" d="M256.63 -43.65V-5.6Q256.63 -4.46 257.01 -3.9Q257.4 -3.34 258.22 -3.11L260.63 -2.64Q261.24 -2.44 261.53 -2.1Q261.82 -1.77 261.82 -1.26Q261.82 -0.68 261.42 -0.34Q261.03 0 260.26 0H242.32Q241.59 0 241.2 -0.34Q240.8 -0.68 240.8 -1.26Q240.8 -1.73 241.08 -2.06Q241.37 -2.39 241.95 -2.61L244.47 -3.11Q245.3 -3.35 245.68 -3.9Q246.05 -4.46 246.05 -5.57V-37.13Q246.05 -37.98 245.78 -38.36Q245.5 -38.75 244.86 -38.85L241.63 -38.93Q241.07 -39.07 240.8 -39.37Q240.54 -39.66 240.54 -40.1Q240.54 -40.61 240.87 -40.95Q241.19 -41.28 241.95 -41.55L252.17 -44.72Q253.26 -45.11 253.86 -45.26Q254.47 -45.4 254.98 -45.4Q255.79 -45.4 256.21 -44.92Q256.63 -44.44 256.63 -43.65ZM250.73 -53.29Q247.68 -53.29 245.8 -55.14Q243.92 -56.99 243.92 -59.82Q243.92 -62.66 245.81 -64.5Q247.71 -66.34 250.73 -66.34Q253.81 -66.34 255.72 -64.5Q257.62 -62.65 257.62 -59.83Q257.62 -56.99 255.71 -55.14Q253.8 -53.29 250.73 -53.29Z"/><path class="logo-ink" d="M267.55 -41.25 264.11 -41.93Q263.4 -42.16 263.13 -42.52Q262.86 -42.87 262.86 -43.37Q262.86 -43.94 263.27 -44.29Q263.68 -44.64 264.32 -44.64H267.93Q268.67 -44.64 269.16 -44.95Q269.64 -45.27 270.1 -46.09L275.69 -53.89Q276.22 -54.65 276.8 -55.05Q277.38 -55.45 277.98 -55.45Q278.65 -55.45 279.04 -55.02Q279.44 -54.6 279.44 -53.77V-11.85Q279.44 -8.32 280.85 -6.54Q282.27 -4.75 284.77 -4.75Q286.06 -4.75 287 -5.17Q287.93 -5.59 288.63 -6.27Q289.34 -6.94 289.91 -7.69Q290.49 -8.44 291.03 -9.1Q291.42 -9.23 291.71 -8.96Q292 -8.69 291.94 -7.97Q291.53 -5.36 290.06 -3.36Q288.59 -1.36 286.21 -0.23Q283.83 0.9 280.67 0.9Q275.18 0.9 272.1 -1.87Q269.03 -4.63 269.03 -10.35V-39.12Q269.03 -40.06 268.72 -40.55Q268.42 -41.04 267.55 -41.25ZM275.4 -41.54 275.54 -44.64H290.38Q291.15 -44.64 291.54 -44.35Q291.93 -44.06 291.93 -43.46Q291.93 -42.63 291.15 -42.08Q290.36 -41.54 288.69 -41.54Z"/></g></svg>
+      </div>
+    </div>
+  </footer>
+
+  <div class="toast-region" role="status" aria-live="polite">
+    <div class="toast" data-toast hidden></div>
+  </div>
+  <!-- /@fusszeile -->
+</body>
+</html>

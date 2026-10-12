@@ -1,46 +1,31 @@
 <!doctype html>
-<html lang="de" data-palette="warm">
+<html lang="de">
 <head>
   <!-- @kopf -->
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <title>Datenschutzerklärung · Neuzeit</title>
-  <meta name="description" content="Wie Neuzeit mit Ihren Daten umgeht: keine Cookies, kein Tracking, Kontaktformular und Terminbuchung nur auf Ihren Wunsch.">
+  <meta name="description" content="Wie Neuzeit mit Ihren Daten umgeht: kein Tracking, keine eigenen Cookies. Kontaktformular und Terminkalender nur auf Ihren Wunsch.">
   <meta name="robots" content="noindex">
   <link rel="canonical" href="https://yannickoderso.github.io/Neuzeit/neuzeit-prototyp/datenschutz.html">
   <meta property="og:type" content="website">
   <meta property="og:locale" content="de_DE">
   <meta property="og:site_name" content="Neuzeit">
   <meta property="og:title" content="Datenschutzerklärung">
-  <meta property="og:description" content="Wie Neuzeit mit Ihren Daten umgeht: keine Cookies, kein Tracking, Kontaktformular und Terminbuchung nur auf Ihren Wunsch.">
+  <meta property="og:description" content="Wie Neuzeit mit Ihren Daten umgeht: kein Tracking, keine eigenen Cookies. Kontaktformular und Terminkalender nur auf Ihren Wunsch.">
   <meta property="og:url" content="https://yannickoderso.github.io/Neuzeit/neuzeit-prototyp/datenschutz.html">
-  <meta property="og:image" content="https://yannickoderso.github.io/Neuzeit/neuzeit-prototyp/og/start.png">
+  <meta property="og:image" content="https://yannickoderso.github.io/Neuzeit/neuzeit-prototyp/og/neutral.png">
   <meta property="og:image:width" content="1200">
   <meta property="og:image:height" content="630">
-  <meta property="og:image:alt" content="neuzeit-Logo mit dem Satz: Datenschutzerklärung">
+  <meta property="og:image:alt" content="neuzeit-Logo">
   <meta name="twitter:card" content="summary_large_image">
-  <meta name="theme-color" content="#F5F1EA">
-  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 32 32%22%3E%3Cstyle%3E.tile%7Bfill:%231E3A31%7D@media (prefers-color-scheme:dark)%7B.tile%7Bfill:%232A5143%7D%7D%3C/style%3E%3Crect class=%22tile%22 width=%2232%22 height=%2232%22 rx=%227%22/%3E%3Cpath fill=%22%23D4552B%22 d=%22M5 18A11 11 0 0 1 27 18Z%22/%3E%3Crect fill=%22%23F5F1EA%22 x=%222%22 y=%2220%22 width=%2228%22 height=%224%22/%3E%3C/svg%3E">
+  <meta name="theme-color" content="#FBF8F5">
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 32 32%22%3E%3Cstyle%3E.tile%7Bfill:%2318203F%7D@media (prefers-color-scheme:dark)%7B.tile%7Bfill:%23283258%7D%7D%3C/style%3E%3Crect class=%22tile%22 width=%2232%22 height=%2232%22 rx=%227%22/%3E%3Cpath fill=%22%23E95739%22 d=%22M5 18A11 11 0 0 1 27 18Z%22/%3E%3Crect fill=%22%23FBF8F5%22 x=%222%22 y=%2220%22 width=%2228%22 height=%224%22/%3E%3C/svg%3E">
   <link rel="apple-touch-icon" href="logo/apple-touch-icon.png">
   <link rel="preload" href="fonts/manrope.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="preload" href="fonts/fraunces.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="stylesheet" href="styles.css">
   <script>
-    /* Farbvarianten nur zum Abstimmen: ?varianten blendet den Umschalter für die
-       Sitzung ein, ?varianten=aus wieder aus. Sonst gilt immer Warm. Die gespeicherte
-       Variante wird vor dem ersten Zeichnen gesetzt, damit nichts flackert. */
-    try {
-      var paletteParam = new URLSearchParams(location.search).get("varianten");
-      if (paletteParam === "aus") sessionStorage.removeItem("neuzeit-varianten");
-      else if (paletteParam !== null) sessionStorage.setItem("neuzeit-varianten", "1");
-      if (sessionStorage.getItem("neuzeit-varianten") === "1") {
-        document.documentElement.classList.add("has-palette");
-        var savedPalette = localStorage.getItem("neuzeit-palette");
-        if (savedPalette === "warm" || savedPalette === "klar" || savedPalette === "frisch") {
-          document.documentElement.setAttribute("data-palette", savedPalette);
-        }
-      }
-    } catch (e) {}
     document.documentElement.classList.add("js");
     /* Seitenwechsel mit Übergang: Die Kopfzeile bleibt stehen, ihr Intro entfällt.
        Kam der Besuch von einer Unterseite, gleitet die kleine Sonne zur neuen
@@ -117,14 +102,32 @@
     </section>
 
     <section class="section legal" aria-label="Datenschutzhinweise">
-      <div class="container">
+      <div class="container legal__grid">
+        <nav class="legal__toc" aria-labelledby="toc-title" data-toc>
+          <p class="legal__toc-title" id="toc-title">Inhalt</p>
+          <ol class="legal__toc-list" role="list">
+            <li><a class="legal__toc-link" href="#auf-einen-blick">Auf einen Blick</a></li>
+            <li><a class="legal__toc-link" href="#verantwortlich">Verantwortlich</a></li>
+            <li><a class="legal__toc-link" href="#hosting">Hosting und Server-Protokolle</a></li>
+            <li><a class="legal__toc-link" href="#kontaktformular">Kontaktformular und E-Mail</a></li>
+            <li><a class="legal__toc-link" href="#calendly">Terminbuchung über Calendly</a></li>
+            <li><a class="legal__toc-link" href="#rechte">Ihre Rechte</a></li>
+          </ol>
+        </nav>
+
         <div class="prose">
           <p class="legal-note"><strong>Vorlage.</strong> Diese Seite ist ein Entwurf mit Platzhaltern. Vor der Veröffentlichung ergänzen, an Hosting und Formulardienst anpassen und rechtlich prüfen lassen.</p>
 
-          <h2>Auf einen Blick</h2>
-          <p>Diese Website setzt keine Cookies und nutzt keine Analyse- oder Trackingdienste. Die Schriften liegen auf unserem eigenen Server, beim Laden werden dafür keine Daten an Dritte übertragen. Personenbezogene Daten verarbeiten wir nur, wenn Sie uns schreiben oder den Buchungskalender aktiv laden.</p>
+          <h2 id="auf-einen-blick">Auf einen Blick</h2>
+          <ul class="legal-facts" role="list">
+            <li>Kein Tracking, keine eigenen Cookies</li>
+            <li>Schriften vom selben Server wie die Website</li>
+            <li>Beim Aufruf nur technisch nötige Server-Protokolle</li>
+            <li>Alles Weitere nur, wenn Sie uns schreiben oder den Kalender laden</li>
+          </ul>
+          <p>Diese Website setzt keine eigenen Cookies und nutzt keine Analyse- oder Trackingdienste. Die Schriften kommen vom selben Server wie die Website, dafür werden keine Daten an Dritte übertragen. Wie bei jeder Website verarbeitet unser Hosting-Anbieter beim Aufruf technisch notwendige Daten, darunter Ihre IP-Adresse (siehe <a href="#hosting">Hosting und Server-Protokolle</a>). Weitere personenbezogene Daten verarbeiten wir nur, wenn Sie uns schreiben oder den Buchungskalender aktiv laden. Erst mit dem Kalender kann Calendly auch Cookies setzen.</p>
 
-          <h2>Verantwortlich</h2>
+          <h2 id="verantwortlich">Verantwortlich</h2>
           <p>Verantwortlich für die Datenverarbeitung auf dieser Website ist: <span class="ph">[Platzhalter: Name, Anschrift, E-Mail, wie im Impressum]</span></p>
 
           <h2 id="hosting">Hosting und Server-Protokolle</h2>
@@ -137,12 +140,9 @@
 
           <h2 id="calendly">Terminbuchung über Calendly</h2>
           <p>Auf der Kontaktseite können Sie einen Termin über Calendly buchen, einen Dienst der Calendly LLC in den USA. Der Kalender lädt erst, wenn Sie auf „Kalender laden“ klicken. Erst dann werden Daten an Calendly übertragen, darunter Ihre IP-Adresse; Calendly kann dabei Cookies setzen. Buchen Sie einen Termin, verarbeitet Calendly auch die Angaben, die Sie dort eingeben.</p>
-          <p>Rechtsgrundlage ist Ihre Einwilligung nach Art.&nbsp;6 Abs.&nbsp;1 lit.&nbsp;a DSGVO und §&nbsp;25 Abs.&nbsp;1 TDDDG, die Sie mit dem Klick erteilen. Sie können sie jederzeit für die Zukunft widerrufen. <span class="ph">[Platzhalter: Übermittlung in die USA und deren Grundlage prüfen, z. B. EU-US Data Privacy Framework]</span></p>
+          <p>Rechtsgrundlage ist Ihre Einwilligung nach Art.&nbsp;6 Abs.&nbsp;1 lit.&nbsp;a DSGVO und §&nbsp;25 Abs.&nbsp;1 TDDDG, die Sie mit dem Klick erteilen. Die Einwilligung gilt nur für diesen Seitenaufruf, gespeichert wird sie nicht. Sie können sie jederzeit für die Zukunft widerrufen, indem Sie den Kalender mit „Kalender wieder schließen“ entfernen oder die Seite schließen oder neu laden. Cookies, die Calendly gesetzt hat, löschen Sie in den Einstellungen Ihres Browsers. <span class="ph">[Platzhalter: Übermittlung in die USA und deren Grundlage prüfen, z. B. EU-US Data Privacy Framework]</span></p>
 
-          <h2>Speicherung im Browser</h2>
-          <p>Nur im Prototyp: Die gewählte Farbvariante speichern wir im lokalen Speicher Ihres Browsers, damit sie beim nächsten Aufruf erhalten bleibt. Dabei werden keine Daten an uns übertragen. Grundlage ist §&nbsp;25 Abs.&nbsp;2 Nr.&nbsp;2 TDDDG, weil Sie diese Funktion selbst auswählen.</p>
-
-          <h2>Ihre Rechte</h2>
+          <h2 id="rechte">Ihre Rechte</h2>
           <p>Sie haben das Recht auf Auskunft (Art.&nbsp;15 DSGVO), Berichtigung (Art.&nbsp;16), Löschung (Art.&nbsp;17), Einschränkung der Verarbeitung (Art.&nbsp;18), Datenübertragbarkeit (Art.&nbsp;20) und Widerspruch (Art.&nbsp;21). Eine Einwilligung können Sie jederzeit mit Wirkung für die Zukunft widerrufen (Art.&nbsp;7 Abs.&nbsp;3). Außerdem können Sie sich bei einer Datenschutz-Aufsichtsbehörde beschweren (Art.&nbsp;77), zum Beispiel bei <span class="ph">[Platzhalter: zuständige Landesbehörde]</span>.</p>
 
           <p class="legal-date">Stand: <span class="ph">[Platzhalter: Datum]</span></p>
@@ -190,7 +190,8 @@
       </div>
 
       <div class="site-footer__bottom">
-        <p class="site-footer__small">© 2026 Neuzeit · Prototyp · ohne Cookies und Tracking</p>
+        <p class="site-footer__print">neuzeit · Change-Management für den Mittelstand · <span class="ph">[Platzhalter: Webadresse]</span> · <span class="ph">[Platzhalter: E-Mail]</span></p>
+        <p class="site-footer__small">© 2026 Neuzeit · Prototyp · kein Tracking, Cookies nur mit Ihrer Einwilligung</p>
         <nav class="site-footer__legal" aria-label="Rechtliches">
           <ul role="list">
             <li><a href="impressum.html">Impressum</a></li>
@@ -204,22 +205,6 @@
       </div>
     </div>
   </footer>
-
-  <!-- Farbvarianten (nur Prototyp) -->
-  <div class="palette" role="region" aria-labelledby="palette-label">
-    <p class="palette__label" id="palette-label">Farbvariante</p>
-    <div class="palette__options">
-      <button class="palette__btn" type="button" data-palette-choice="warm" title="Warm" aria-pressed="true">
-        <span class="palette__swatch palette__swatch--warm" aria-hidden="true"></span>Warm
-      </button>
-      <button class="palette__btn" type="button" data-palette-choice="klar" title="Klar" aria-pressed="false">
-        <span class="palette__swatch palette__swatch--klar" aria-hidden="true"></span>Klar
-      </button>
-      <button class="palette__btn" type="button" data-palette-choice="frisch" title="Frisch" aria-pressed="false">
-        <span class="palette__swatch palette__swatch--frisch" aria-hidden="true"></span>Frisch
-      </button>
-    </div>
-  </div>
 
   <div class="toast-region" role="status" aria-live="polite">
     <div class="toast" data-toast hidden></div>

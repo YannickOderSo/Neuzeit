@@ -1,6 +1,6 @@
 /* ==========================================================================
    neuzeit · Website-Prototyp
-   Kleine Interaktionen ohne Framework: Navigation, Einblenden, Farbvarianten,
+   Kleine Interaktionen ohne Framework: Navigation, Einblenden,
    Formular, Terminbuchung. Ohne JavaScript bleibt jede Seite vollständig lesbar.
    ========================================================================== */
 (function () {
@@ -42,7 +42,7 @@
   var menu = document.querySelector("[data-menu]");
   var menuLabel = document.querySelector("[data-menu-label]");
 
-  var behindMenu = Array.prototype.slice.call(document.querySelectorAll(".skip-link, main, .site-footer, .palette"));
+  var behindMenu = Array.prototype.slice.call(document.querySelectorAll(".skip-link, main, .site-footer"));
 
   function setBackgroundInert(inert) {
     behindMenu.forEach(function (el) { el.inert = inert; });
@@ -243,6 +243,38 @@
     subnavList.addEventListener("scroll", function () { moveSubnavIndicator(currentSpy); }, { passive: true });
   }
 
+  /* Inhaltsverzeichnis der Rechtstexte: Leselinie knapp unter der Kopfzeile,
+     höchstens 7rem tief. Kurze Abschnitte liegen dicht beieinander; nach einem
+     Klick muss der angesprungene Abschnitt markiert sein, nicht der nächste. */
+  var toc = document.querySelector("[data-toc]");
+  var tocLinks = toc ? Array.prototype.slice.call(toc.querySelectorAll("a[href^='#']")) : [];
+  var tocTargets = tocLinks.map(function (link) {
+    return document.getElementById(decodeURIComponent(link.hash.slice(1)));
+  });
+  var currentToc = null;
+
+  function updateToc() {
+    if (!toc) return;
+    var rem = parseFloat(getComputedStyle(document.documentElement).fontSize) || 16;
+    var probe = (header ? header.getBoundingClientRect().bottom : 0) + Math.min(window.innerHeight * 0.25, 7 * rem);
+    var active = null;
+    tocTargets.forEach(function (target, i) {
+      if (target && target.getBoundingClientRect().top <= probe) active = tocLinks[i];
+    });
+    /* am Seitenende gilt der letzte Abschnitt */
+    var last = tocTargets[tocTargets.length - 1];
+    if (last && window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 2 &&
+        last.getBoundingClientRect().top < window.innerHeight) {
+      active = tocLinks[tocLinks.length - 1];
+    }
+    if (active === currentToc) return;
+    currentToc = active;
+    tocLinks.forEach(function (link) {
+      if (link === active) link.setAttribute("aria-current", "true");
+      else link.removeAttribute("aria-current");
+    });
+  }
+
   /* ------------------------------------------------------------------------
      Bewegung beim Scrollen: Werte von 0 bis 1 als Custom Properties.
      Erst alle Maße lesen, dann schreiben, damit nichts ruckelt.
@@ -328,6 +360,7 @@
     window.requestAnimationFrame(function () {
       updateHeader();
       updateSpy();
+      updateToc();
       if (motionOK) updateMotion();
       scrollTicking = false;
     });
@@ -348,6 +381,7 @@
     updateMotion();
   }
   updateSpy();
+  updateToc();
   resetNavIndicator();
   if (document.fonts && document.fonts.ready) {
     document.fonts.ready.then(onResize);
@@ -420,75 +454,29 @@
   });
 
   /* ------------------------------------------------------------------------
-     Farbvarianten (nur für den Prototyp)
+     Druck: alle Antworten der häufigen Fragen aufklappen, danach wie vorher.
+     name="faq" lässt nur eine offene Antwort zu, deshalb kurz entfernen.
      ------------------------------------------------------------------------ */
-  var PALETTES = ["warm", "klar", "frisch"];
-  var paletteButtons = Array.prototype.slice.call(document.querySelectorAll("[data-palette-choice]"));
-  var themeColor = document.querySelector('meta[name="theme-color"]');
+  var printedDetails = null;
 
-  function applyPalette(name, persist) {
-    if (PALETTES.indexOf(name) === -1) name = "warm";
-    root.setAttribute("data-palette", name);
-    paletteButtons.forEach(function (button) {
-      button.setAttribute("aria-pressed", String(button.getAttribute("data-palette-choice") === name));
-    });
-    if (themeColor) {
-      var bg = getComputedStyle(root).getPropertyValue("--color-bg").trim();
-      if (bg) themeColor.setAttribute("content", bg);
-    }
-    if (persist) {
-      try { localStorage.setItem("neuzeit-palette", name); } catch (e) { /* Speicher nicht verfügbar */ }
-    }
-  }
-
-  paletteButtons.forEach(function (button) {
-    button.addEventListener("click", function () {
-      var name = button.getAttribute("data-palette-choice");
-      if (!motionOK || !document.startViewTransition || name === root.getAttribute("data-palette")) {
-        applyPalette(name, true);
-        return;
-      }
-      /* neue Farben breiten sich kreisförmig vom gewählten Knopf aus */
-      var box = button.getBoundingClientRect();
-      var x = box.left + box.width / 2;
-      var y = box.top + box.height / 2;
-      var radius = Math.hypot(Math.max(x, window.innerWidth - x), Math.max(y, window.innerHeight - y));
-      root.style.setProperty("--vt-x", x + "px");
-      root.style.setProperty("--vt-y", y + "px");
-      root.style.setProperty("--vt-r", radius + "px");
-      root.classList.add("vt-palette");
-      var transition = null;
-      function done() {
-        if (paletteTransition !== transition) return; /* ein neuerer Wechsel läuft schon */
-        paletteTransition = null;
-        root.classList.remove("vt-palette");
-      }
-      try {
-        transition = document.startViewTransition(function () { applyPalette(name, true); });
-        paletteTransition = transition;
-        transition.finished.then(done, done);
-      } catch (e) {
-        paletteTransition = null;
-        applyPalette(name, true);
-        root.classList.remove("vt-palette");
-      }
+  window.addEventListener("beforeprint", function () {
+    if (printedDetails) return;
+    printedDetails = Array.prototype.slice.call(document.querySelectorAll("details.faq__item")).map(function (item) {
+      var state = { item: item, open: item.open, name: item.getAttribute("name") };
+      item.removeAttribute("name");
+      item.open = true;
+      return state;
     });
   });
 
-  /* Während der Enthüllung landen Klicks auf <html>; Klicks auf einen Farbknopf weiterreichen */
-  var paletteTransition = null;
-  document.addEventListener("click", function (event) {
-    if (!paletteTransition || event.target !== root) return;
-    paletteButtons.some(function (button) {
-      var b = button.getBoundingClientRect();
-      if (event.clientX >= b.left && event.clientX <= b.right && event.clientY >= b.top && event.clientY <= b.bottom) {
-        button.click();
-        return true;
-      }
-      return false;
+  window.addEventListener("afterprint", function () {
+    if (!printedDetails) return;
+    printedDetails.forEach(function (state) {
+      state.item.open = state.open;
+      if (state.name !== null) state.item.setAttribute("name", state.name);
     });
+    printedDetails = null;
   });
-  applyPalette(root.getAttribute("data-palette") || "warm", false);
 
   /* ------------------------------------------------------------------------
      Hinweis-Toast für Platzhalter-Links

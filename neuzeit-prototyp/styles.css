@@ -10,10 +10,13 @@
    Fraunces und Manrope, SIL Open Font License 1.1, siehe fonts/OFL-*.txt
    -------------------------------------------------------------------------- */
 /* @font-face:start */
+/* Fraunces ist in den Dateien schon auf SOFT 30, WONK 0 und wght 300–500
+   festgelegt (fonts/README.md). font-variation-settings bei body bleibt als
+   Absicherung, wirkt aber nicht mehr. */
 @font-face {
   font-family: "Fraunces";
   font-style: normal;
-  font-weight: 100 900;
+  font-weight: 300 500;
   font-display: swap;
   src: url("fonts/fraunces.woff2") format("woff2");
 }
@@ -21,7 +24,7 @@
 @font-face {
   font-family: "Fraunces";
   font-style: italic;
-  font-weight: 100 900;
+  font-weight: 300 500;
   font-display: swap;
   src: url("fonts/fraunces-italic.woff2") format("woff2");
 }
@@ -33,6 +36,80 @@
   font-display: swap;
   src: url("fonts/manrope.woff2") format("woff2");
 }
+
+/* Ersatzschriften bis zum Laden: Systemschriften auf die Maße von Manrope und
+   Fraunces gebracht, damit beim Wechsel nichts springt. Je Regel nur Schriften
+   mit gleichen Laufweiten. size-adjust: gemessene Breite der Webschrift im Text
+   der Seiten; Ober- und Unterlänge (Manrope 1,066/0,3 em, Fraunces 0,978/0,255 em)
+   geteilt durch size-adjust, weil der Browser sie mitskaliert. */
+@font-face {
+  font-family: "Manrope Ersatz";
+  font-weight: 200 500;
+  src: local("Arial"), local("Helvetica"), local("Liberation Sans"), local("Arimo");
+  size-adjust: 103.6%;
+  ascent-override: 102.9%;
+  descent-override: 29%;
+  line-gap-override: 0%;
+}
+
+@font-face {
+  font-family: "Manrope Ersatz";
+  font-weight: 550 800;
+  src: local("Arial Bold"), local("Helvetica Bold"), local("Liberation Sans Bold"), local("Arimo Bold");
+  size-adjust: 98.9%;
+  ascent-override: 107.8%;
+  descent-override: 30.3%;
+  line-gap-override: 0%;
+}
+
+/* Fraunces läuft je nach Größe (opsz) verschieden breit. Die Werte treffen die
+   Überschriften im ersten Bildschirm. Ziffern haben eine eigene Regel: Sie sind
+   in Fraunces breiter, und die Breite der 0 ist die Einheit ch, mit der viele
+   Überschriften ihre Zeilenlänge begrenzen. Große Überschriften (ab 75rem)
+   laufen in Fraunces schmaler, dort ist ch deshalb größer. */
+@font-face {
+  font-family: "Fraunces Ersatz";
+  font-style: normal;
+  src: local("Times New Roman"), local("Liberation Serif"), local("Tinos");
+  size-adjust: 106%;
+  ascent-override: 92.3%;
+  descent-override: 24.1%;
+  line-gap-override: 0%;
+}
+
+@font-face {
+  font-family: "Fraunces Ersatz";
+  font-style: italic;
+  src: local("Times New Roman Italic"), local("Liberation Serif Italic"), local("Tinos Italic");
+  size-adjust: 108%;
+  ascent-override: 90.6%;
+  descent-override: 23.6%;
+  line-gap-override: 0%;
+}
+
+@font-face {
+  font-family: "Fraunces Ersatz";
+  font-style: normal;
+  src: local("Times New Roman"), local("Liberation Serif"), local("Tinos");
+  unicode-range: U+30-39;
+  size-adjust: 119%;
+  ascent-override: 82.2%;
+  descent-override: 21.4%;
+  line-gap-override: 0%;
+}
+
+@media (min-width: 75rem) {
+  @font-face {
+    font-family: "Fraunces Ersatz";
+    font-style: normal;
+    src: local("Times New Roman"), local("Liberation Serif"), local("Tinos");
+    unicode-range: U+30-39;
+    size-adjust: 131%;
+    ascent-override: 74.7%;
+    descent-override: 19.5%;
+    line-gap-override: 0%;
+  }
+}
 /* @font-face:end */
 
 /* --------------------------------------------------------------------------
@@ -41,32 +118,34 @@
 :root {
   color-scheme: light;
 
-  /* Farben · Variante „Warm“ (Standard) */
-  --color-bg: #F5F1EA;               /* Papier */
-  --color-surface: #E8E0D2;          /* Sand: Karten, Flächen */
-  --color-surface-strong: #DDD3C2;   /* Sand, eine Stufe tiefer */
-  --color-text: #16201C;             /* Tinte */
-  --color-text-muted: #4B5550;       /* 6,9:1 auf Papier, 5,9:1 auf Sand */
-  --color-line: rgba(22, 32, 28, 0.16);  /* feine Trennlinien, rein dekorativ */
-  --color-line-strong: #77786F;      /* Formularränder, ≥ 3:1 auf Papier und Sand */
-  --color-dark: #1E3A31;             /* Tannengrün: dunkle Sektionen */
-  --color-on-dark: #F5F1EA;
-  --color-on-dark-muted: #C3CCC4;    /* 7,5:1 auf Tannengrün */
-  --color-line-on-dark: rgba(245, 241, 234, 0.22);
-  --color-accent: #D4552B;           /* Terrakotta: Motiv, Grafik, große Akzente */
-  --color-accent-text: #A8431F;      /* Terrakotta für kleine Schrift, ≥ 4,5:1 auf Papier und Sand */
-  --color-accent-fill: #B5481F;      /* Button-Fläche: Weiß darauf 5,4:1 (#D4552B schafft nur 4,1:1) */
-  --color-accent-fill-hover: #9E3E1A;
-  --color-accent-border: transparent;
+  /* Farben · „Nachtblau & Koralle“
+     Bild: der Himmel kurz vor Sonnenaufgang. Nachtblau trägt Schrift, Buttons und
+     dunkle Sektionen, heller Dunst die Flächen. Die Koralle gehört allein der
+     Sonne und ihren kleinen Echos (Punkt, Knoten, Ziffern, Linien). */
+  --color-bg: #FBF8F5;               /* Morgenweiß, ein Hauch Wärme */
+  --color-surface: #EDEEF1;          /* Dunst: Karten, Flächen */
+  --color-surface-strong: #E1E3E8;   /* Dunst, eine Stufe tiefer */
+  --color-text: #11182B;             /* Nachttinte, 16,7:1 auf Morgenweiß */
+  --color-text-muted: #4A5569;       /* 7,1:1 auf Morgenweiß, 6,5:1 auf Dunst */
+  --color-line: rgba(17, 24, 43, 0.14);  /* feine Trennlinien, rein dekorativ */
+  --color-line-strong: #737E92;      /* Formularränder, ≥ 3:1 auf Morgenweiß und Dunst */
+  --color-dark: #18203F;             /* Nachtblau: dunkle Sektionen, auch am Beamer noch blau */
+  --color-on-dark: #FBF8F5;          /* 15,1:1 auf Nachtblau */
+  --color-on-dark-muted: #B9C2D4;    /* 8,9:1 auf Nachtblau */
+  --color-line-on-dark: rgba(251, 248, 245, 0.2);
+  --color-accent: #E95739;           /* Koralle: Sonne, Grafik, große Ziffern, ≥ 3:1 auf Morgenweiß und Dunst */
+  --color-accent-text: #AE3F29;      /* Koralle für kleine Schrift, ≥ 4,5:1 auf allen hellen Flächen */
+  --color-accent-fill: #18203F;      /* Buttons in Nachtblau: die Sonne bleibt der einzige warme Punkt, Weiß darauf 15,9:1 */
+  --color-accent-fill-hover: #283258;
+  --color-accent-border: #FBF8F5;    /* auf Hell unsichtbar; im dunklen Footer wird der Button zur hellen Kontur */
   --color-on-accent: #FFFFFF;
-  --color-accent-line: #D4552B;      /* Linien und Marker auf Hell, ≥ 3:1 */
-  --color-error: #9F1D20;            /* Fehlermeldungen: röter als die Akzentschrift, 7,0:1 auf Papier */
-  --color-accent-on-dark: #EE8B63;   /* Terrakotta für Schrift auf Tannengrün, ≥ 4,5:1 */
-  --color-motif-on-dark: #D4552B;    /* Halbkreis auf Tannengrün (Grafik, ≥ 3:1) */
-  --color-field: #FBF9F5;            /* Eingabefelder */
-  --color-motif-stroke: transparent; /* Kontur des Halbkreises, nur nötig bei hellem Akzent */
-  --color-selection: rgba(212, 85, 43, 0.22);
-  --grain-opacity: 0.07;
+  --color-accent-line: #E95739;      /* Linien und Marker auf Hell, ≥ 3:1 */
+  --color-error: #9C1645;            /* Fehler: Beerenrot, deutlich von der Koralle getrennt, 7,6:1 */
+  --color-accent-on-dark: #FF8A70;   /* helle Koralle für Schrift auf Nachtblau, 6,9:1 */
+  --color-motif-on-dark: #E95739;    /* dieselbe Sonne auf Nachtblau, 4,5:1 */
+  --color-field: #FFFFFF;            /* Eingabefelder */
+  --color-selection: rgba(233, 87, 57, 0.2);
+  --grain-opacity: 0.03;
 
   /* Kontext-Tokens: werden in dunklen Sektionen umgeschaltet */
   --fg: var(--color-text);
@@ -77,12 +156,11 @@
   --accent-display: var(--color-accent);
   --accent-line: var(--color-accent-line);
   --accent-mark: var(--color-accent);
-  --accent-mark-stroke: 0 transparent;
   --focus: var(--color-accent-text);
 
   /* Schrift */
-  --font-display: "Fraunces", "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, "Times New Roman", serif;
-  --font-body: "Manrope", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --font-display: "Fraunces", "Fraunces Ersatz", "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, "Times New Roman", serif;
+  --font-body: "Manrope", "Manrope Ersatz", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
 
   --fs-display: clamp(2.75rem, min(1.25rem + 5vw, max(6vw, 4.5rem)), 5.5rem);
   --fs-h2: clamp(2rem, 3.8vw, 3.375rem);
@@ -127,70 +205,6 @@
   --dur-reveal: 600ms;
 }
 
-/* Variante „Klar“: kühles Weiß, Grafit, Kobaltblau */
-:root[data-palette="klar"] {
-  --color-bg: #FAFAF7;
-  --color-surface: #EDEDE8;
-  --color-surface-strong: #E1E1DB;
-  --color-text: #1B1B1F;
-  --color-text-muted: #50525A;
-  --color-line: rgba(27, 27, 31, 0.13);
-  --color-line-strong: #76777E;
-  --color-dark: #1C1F27;
-  --color-on-dark: #FAFAF7;
-  --color-on-dark-muted: #BEC2CC;
-  --color-line-on-dark: rgba(250, 250, 247, 0.2);
-  --color-accent: #2F5BEA;
-  --color-accent-text: #2F5BEA;
-  --color-accent-fill: #2F5BEA;
-  --color-accent-fill-hover: #2149C8;
-  --color-accent-border: transparent;
-  --color-on-accent: #FFFFFF;
-  --color-accent-line: #2F5BEA;
-  --color-error: #B3261E;
-  --color-accent-on-dark: #8CA5F7;
-  --color-motif-on-dark: #4C74F2;
-  --color-field: #FFFFFF;
-  --color-motif-stroke: transparent;
-  --color-selection: rgba(47, 91, 234, 0.18);
-  --grain-opacity: 0.035;
-}
-
-/* Variante „Frisch“: Salbeiweiß, Tiefgrün, Limette */
-:root[data-palette="frisch"] {
-  --color-bg: #F2F4F1;
-  --color-surface: #E1E7DF;
-  --color-surface-strong: #D4DCD1;
-  --color-text: #0F2A22;
-  --color-text-muted: #3D544A;
-  --color-line: rgba(15, 42, 34, 0.15);
-  --color-line-strong: #6A7E74;
-  --color-dark: #0F2A22;
-  --color-on-dark: #F2F4F1;
-  --color-on-dark-muted: #B9CAC0;
-  --color-line-on-dark: rgba(242, 244, 241, 0.2);
-  --color-accent: #C8F169;           /* Limette: auf Hell nur als Fläche mit Kontur */
-  --color-accent-text: #2E6A1E;      /* Tiefes Grün für Schrift, ≥ 4,5:1 */
-  --color-accent-fill: #C8F169;
-  --color-accent-fill-hover: #B4E04C;
-  --color-accent-border: #0F2A22;
-  --color-on-accent: #0F2A22;        /* 11,8:1 auf Limette */
-  --color-accent-line: #2E6A1E;      /* Limette wäre auf Hell unsichtbar */
-  --color-error: #B3261E;
-  --color-accent-on-dark: #C8F169;
-  --color-motif-on-dark: #C8F169;
-  --color-field: #FAFBF9;
-  --color-motif-stroke: #0F2A22;
-  --color-selection: rgba(200, 241, 105, 0.55);
-  --grain-opacity: 0.05;
-}
-
-:root[data-palette="frisch"] {
-  --accent-display: var(--color-accent-text);
-  --accent-mark: var(--color-accent);
-  --accent-mark-stroke: 1.5px var(--color-accent-border);
-}
-
 /* --------------------------------------------------------------------------
    2. Grundlagen
    -------------------------------------------------------------------------- */
@@ -206,8 +220,11 @@ html {
   scroll-padding-top: calc(var(--header-h) + 1.25rem);
 }
 
-html.has-palette {
-  scroll-padding-bottom: calc(6rem + env(safe-area-inset-bottom, 0px)); /* Platz für den Farbumschalter */
+/* Bedienelemente des Browsers in den Farben der Seite: Häkchen und Auswahl in
+   Nachtblau, Scrollbalken in gedämpfter Tinte auf Morgenweiß */
+html {
+  accent-color: var(--color-accent-fill);
+  scrollbar-color: color-mix(in srgb, var(--color-text) 35%, transparent) var(--color-bg);
 }
 
 /* sanftes Scrollen erst, wenn Schriften geladen sind (main.js setzt .is-ready) */
@@ -426,7 +443,6 @@ main:focus {
 
 .accent-mark {
   color: var(--accent-mark);
-  -webkit-text-stroke: var(--accent-mark-stroke);
 }
 
 .h2 {
@@ -451,7 +467,6 @@ main:focus {
 .case__label,
 .case__service,
 .field__label,
-.palette__label,
 .contact__direct dt {
   font-family: var(--font-body);
   font-size: var(--fs-label);
@@ -693,10 +708,6 @@ main:focus {
 
 .brand__logo .logo-accent {
   fill: var(--accent-graphic);
-  stroke: var(--color-motif-stroke);
-  stroke-width: 1.25px;
-  vector-effect: non-scaling-stroke;
-  paint-order: stroke;
 }
 
 /* Beim Laden löst sich die Sonne einmal von der Linie: von „aufliegend“ zur Fuge */
@@ -1006,7 +1017,6 @@ html.menu-open .site-header__cta,
   height: 0.625rem;
   border-radius: 50%;
   background: var(--accent-graphic);
-  box-shadow: 0 0 0 1px var(--color-motif-stroke);
 }
 
 .eyebrow {
@@ -1121,8 +1131,6 @@ html.menu-open .site-header__cta,
 
 .horizon__sun {
   fill: var(--accent-graphic);
-  stroke: var(--color-motif-stroke);
-  stroke-width: 1.5;
 }
 
 .horizon__sun-wrap {
@@ -1230,6 +1238,24 @@ html.menu-open .site-header__cta,
 @media (min-width: 75rem) {
   .hero__text {
     padding-bottom: calc(2.75rem - var(--space-xs) - 1.4 * var(--fs-small));
+  }
+}
+
+/* Niedrige Laptop-Fenster (Skalierung 125–150 %, Zoom): Titel nach der Höhe
+   begrenzen und Abstände straffen, damit Button und Sonne im ersten Bild
+   stehen. 1440 × 900 und größer bleiben unberührt. */
+@media (min-width: 60rem) and (max-height: 43.75rem) {
+  .hero {
+    padding-block: clamp(1.5rem, 5vh, 3.5rem) clamp(2rem, 5vh, 3.5rem);
+  }
+
+  .hero__title {
+    font-size: min(var(--fs-display), 10.5vh);
+    margin-bottom: var(--space-s);
+  }
+
+  .hero__lead {
+    margin-bottom: var(--space-m);
   }
 }
 
@@ -1601,7 +1627,6 @@ html.menu-open .site-header__cta,
   border: 0;
   border-radius: 1.75rem 1.75rem 0 0;
   background: var(--accent-graphic);
-  box-shadow: 0 0 0 1px var(--color-motif-stroke);
 }
 
 .step--last .step__marker::after {
@@ -1722,7 +1747,6 @@ html.menu-open .site-header__cta,
   --accent-display: var(--color-accent-on-dark);
   --accent-line: var(--color-motif-on-dark);
   --focus: var(--color-on-dark);
-  --color-motif-stroke: transparent;
   background-color: var(--color-dark);
   color: var(--fg);
   transition: background-color 400ms var(--ease-out);
@@ -2196,6 +2220,14 @@ html.menu-open .site-header__cta,
   resize: vertical;
 }
 
+/* Automatisch ausgefüllte Felder: Browser färben sie hellblau oder gelb.
+   Der Hintergrundwechsel wird auf unbestimmte Zeit verschoben, die Schrift
+   bleibt in der Seitenfarbe. :is() verzeiht Browsern, die eine Form nicht kennen. */
+.field__input:is(:autofill, :-webkit-autofill) {
+  -webkit-text-fill-color: var(--fg);
+  transition: background-color 0s 86400s, border-color var(--dur-calm) var(--ease-out), box-shadow var(--dur-calm) var(--ease-out);
+}
+
 .field__input[aria-invalid="true"] {
   border-color: var(--color-error);
   border-width: 2px;
@@ -2340,7 +2372,6 @@ html.menu-open .site-header__cta,
   --accent-type: var(--color-accent-on-dark);
   --accent-line: var(--color-motif-on-dark);
   --focus: var(--color-on-dark);
-  --color-motif-stroke: transparent;
   background-color: var(--color-dark);
   color: var(--fg);
   padding-block: var(--space-2xl) calc(var(--space-2xl) + env(safe-area-inset-bottom, 0px));
@@ -2406,6 +2437,10 @@ html.menu-open .site-header__cta,
 
 .site-footer__meta dd {
   margin: 0;
+}
+
+.site-footer__print {
+  display: none;
 }
 
 .site-footer__bottom {
@@ -2475,119 +2510,6 @@ html.menu-open .site-header__cta,
   .site-footer__inner > :nth-child(2) { grid-column: 6 / span 2; }
   .site-footer__inner > :nth-child(3) { grid-column: 8 / span 3; }
   .site-footer__inner > :nth-child(4) { grid-column: 11 / span 2; }
-}
-
-/* --------------------------------------------------------------------------
-   17. Farbvarianten-Umschalter (nur Prototyp)
-   Erscheint nur mit ?varianten in der Adresse (siehe _partials/kopf.html).
-   -------------------------------------------------------------------------- */
-html:not(.has-palette) .palette {
-  display: none;
-}
-
-html.has-palette .site-footer {
-  padding-bottom: calc(var(--space-2xl) + 4.5rem + env(safe-area-inset-bottom, 0px));
-}
-
-.palette {
-  position: fixed;
-  right: calc(env(safe-area-inset-right, 0px) + 0.75rem);
-  bottom: calc(env(safe-area-inset-bottom, 0px) + 0.75rem);
-  z-index: 90;
-  display: grid;
-  gap: 0.35rem;
-  padding: 0.5rem 0.55rem 0.55rem;
-  border: 1px solid var(--color-line);
-  border-radius: var(--radius-m);
-  background: color-mix(in srgb, var(--color-bg) 94%, transparent);
-  -webkit-backdrop-filter: blur(10px);
-  backdrop-filter: blur(10px);
-  box-shadow: 0 10px 30px -12px rgba(0, 0, 0, 0.28);
-  color: var(--color-text);
-  --focus: var(--color-accent-text);
-}
-
-.palette__label {
-  padding-inline: 0.3rem;
-  color: var(--color-text-muted);
-  font-size: 0.6875rem;
-}
-
-.palette__options {
-  display: flex;
-  gap: 0.25rem;
-}
-
-.palette__btn {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.4rem;
-  min-height: 2.5rem;
-  padding: 0.4rem 0.7rem 0.4rem 0.45rem;
-  border: 1px solid transparent;
-  border-radius: var(--radius-pill);
-  background: transparent;
-  font-size: 0.875rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: background-color var(--dur-calm) var(--ease-out), border-color var(--dur-calm) var(--ease-out);
-}
-
-.palette__btn:hover {
-  background: var(--color-surface);
-}
-
-.palette__btn[aria-pressed="true"] {
-  border-color: var(--color-text);
-  background: var(--color-surface);
-}
-
-.palette__swatch {
-  position: relative;
-  flex: none;
-  width: 1.25rem;
-  height: 1.25rem;
-  border-radius: 50%;
-  overflow: hidden;
-  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.25);
-}
-
-/* Mobil nur die Farbkreise; die Namen bleiben als zugänglicher Name erhalten */
-@media (max-width: 47.99rem) {
-  .palette {
-    padding: 0.3rem;
-  }
-
-  .palette__label {
-    position: absolute;
-    width: 1px;
-    height: 1px;
-    overflow: hidden;
-    clip: rect(0 0 0 0);
-    white-space: nowrap;
-  }
-
-  .palette__btn {
-    justify-content: center;
-    gap: 0;
-    min-width: 2.75rem;
-    min-height: 2.75rem;
-    padding: 0.6rem;
-    font-size: 0;
-  }
-}
-
-/* Jede Kachel zeigt die eigenen Farben der Variante: Hintergrund, Dunkelton, Akzent */
-.palette__swatch--warm {
-  background: conic-gradient(#F5F1EA 0 33%, #1E3A31 0 66%, #D4552B 0);
-}
-
-.palette__swatch--klar {
-  background: conic-gradient(#FAFAF7 0 33%, #1C1F27 0 66%, #2F5BEA 0);
-}
-
-.palette__swatch--frisch {
-  background: conic-gradient(#F2F4F1 0 33%, #0F2A22 0 66%, #C8F169 0);
 }
 
 /* --------------------------------------------------------------------------
@@ -2689,11 +2611,34 @@ html.has-palette .site-footer {
   margin-left: calc(var(--sun-d) / -2);
   border-radius: var(--sun-d) var(--sun-d) 0 0;
   background: var(--accent-graphic);
-  box-shadow: 0 0 0 1.5px var(--color-motif-stroke);
 }
 
 .page-head--small .page-head__horizon {
   --sun-d: clamp(5rem, 9vw, 7.5rem);
+}
+
+/* Fehlerseite: Die Sonne ist noch nicht aufgegangen. Nur ihr oberer Rand steht
+   über dem Horizont, mit derselben Fuge wie sonst. */
+.page-head__horizon--dawn {
+  height: calc(var(--sun-d) * 0.16 + var(--sun-gap) + 2.5rem); /* sichtbarer Rand 0,16 d */
+}
+
+.page-head__horizon--dawn .page-head__sun {
+  --sink: calc(var(--sun-d) * 0.34);
+  translate: 0 var(--sink);
+  clip-path: inset(0 0 var(--sink) 0);
+}
+
+/* Niedrige Laptop-Fenster: Seitenkopf straffen, damit Formular und
+   Sprungmarken früher kommen (wie beim Hero, 1440 × 900 bleibt unberührt) */
+@media (min-width: 60rem) and (max-height: 43.75rem) {
+  .page-head {
+    padding-top: clamp(1.5rem, 5vh, 3rem);
+  }
+
+  .page-head__inner {
+    padding-bottom: clamp(1.5rem, 3vh, 2rem);
+  }
 }
 
 .page-head--small .page-head__title {
@@ -2738,7 +2683,6 @@ html.has-palette .site-footer {
 
 .proof__icon .proof__icon-accent {
   fill: var(--accent-graphic);
-  stroke: var(--color-motif-stroke);
 }
 
 .proof__title {
@@ -3056,7 +3000,7 @@ html.has-palette .site-footer {
   left: 0;
   right: 0;
   bottom: clamp(1.5rem, 4vw, 2.5rem);
-  height: calc(var(--sun-d) / 2 + var(--sun-gap) + 3px); /* +2 px für die Kontur in Frisch */
+  height: calc(var(--sun-d) / 2 + var(--sun-gap) + 3px); /* 1 px Linie, 2 px Luft für die geglättete Kante */
   overflow: hidden;
   pointer-events: none;
 }
@@ -3079,7 +3023,6 @@ html.has-palette .site-footer {
   height: calc(var(--sun-d) / 2);
   border-radius: var(--sun-d) var(--sun-d) 0 0;
   background: var(--accent-graphic);
-  box-shadow: 0 0 0 1.5px var(--color-motif-stroke);
 }
 
 /* schmale Handys: mehr Breite, damit der Button einzeilig bleibt */
@@ -3438,7 +3381,6 @@ html.motion .subnav__link::after {
   --fg-muted: var(--color-on-dark-muted);
   --line: var(--color-line-on-dark);
   --accent-graphic: var(--color-motif-on-dark);
-  --color-motif-stroke: transparent;
   position: relative;
   padding: clamp(1.5rem, 3.5vw, 2.25rem);
   padding-right: clamp(5rem, 12vw, 7rem);
@@ -3458,6 +3400,39 @@ html.motion .subnav__link::after {
   font-weight: 380;
   line-height: 1.35;
   text-wrap: pretty;
+}
+
+/* Arbeitsergebnisse: kurze Liste mit Haarlinien wie die Checkliste */
+.offer__outputs {
+  margin-top: var(--space-l);
+}
+
+/* sehr schmal kein einzelnes Wort in der zweiten Zeile */
+.offer__outputs .offer__label {
+  text-wrap: balance;
+}
+
+.offer__outputs li {
+  padding-block: var(--space-xs);
+  border-top: 1px solid var(--line);
+  font-size: var(--fs-small);
+  line-height: 1.45;
+}
+
+/* keine Schlusslinie: unten rechts steht die Sonne auf ihrem Horizont */
+.offer__outputs li:last-child {
+  padding-bottom: 0;
+}
+
+/* schmal: volle Breite, Platz für die Sonne nur in der letzten Zeile */
+@media (max-width: 47.99rem) {
+  .offer__result {
+    padding-right: clamp(1.5rem, 3.5vw, 2.25rem);
+  }
+
+  .offer__outputs li:last-child {
+    padding-right: 4rem;
+  }
 }
 
 /* kleine Sonne in der Ecke */
@@ -3748,7 +3723,6 @@ html.motion .subnav__link::after {
   height: 0.5rem;
   border-radius: 50%;
   background: var(--accent-graphic);
-  box-shadow: 0 0 0 1px var(--color-motif-stroke);
 }
 
 .pd-window { fill: var(--color-bg); stroke: var(--line); }
@@ -3762,7 +3736,7 @@ html.motion .subnav__link::after {
 .pd-title { fill: color-mix(in srgb, var(--fg) 70%, transparent); }
 .pd-card { fill: var(--color-bg); stroke: var(--line); }
 .pd-card--done { stroke: var(--accent-line); stroke-width: 1.5; }
-.pd-sun { fill: var(--accent-graphic); stroke: var(--color-motif-stroke); }
+.pd-sun { fill: var(--accent-graphic); }
 .pd-horizon { fill: var(--fg); }
 .pd-button { fill: var(--color-accent-fill); stroke: var(--color-accent-border); }
 .pd-button-arrow { fill: none; stroke: var(--color-on-accent); stroke-width: 2.5; stroke-linecap: round; stroke-linejoin: round; }
@@ -3822,13 +3796,8 @@ html.motion .subnav__link::after {
 
 .talk-step:last-child .talk-step__num {
   border-color: var(--color-accent-fill);
-  background: var(--color-accent-fill); /* Weiß darauf 5,4:1, die Grafikfarbe schafft nur 4,1:1 */
+  background: var(--color-accent-fill); /* Nachtblau wie die Buttons, Weiß darauf 15,9:1 */
   color: var(--color-on-accent);
-  box-shadow: 0 0 0 1px var(--color-motif-stroke);
-}
-
-:root[data-palette="frisch"] .talk-step:last-child .talk-step__num {
-  border-color: var(--color-accent-border);
 }
 
 .talk-step p {
@@ -3979,7 +3948,6 @@ html.motion .subnav__link::after {
 
 .booking__icon .booking__icon-accent {
   fill: var(--accent-graphic);
-  stroke: var(--color-motif-stroke);
 }
 
 .booking__frame:focus {
@@ -4067,6 +4035,99 @@ html.motion .subnav__link::after {
   text-decoration-color: var(--accent-line);
 }
 
+/* Langtexte (Fallbeispiele, Fachbeiträge): Zwischentitel, Listen, Zitate und
+   Abbildungen im selben ruhigen Fluss. Bausteine mit eigener Klasse bleiben
+   unberührt. Listen bekommen role="list", weil ihr Zeichen fehlt. */
+.prose h3 {
+  margin: var(--space-l) 0 var(--space-2xs);
+  color: var(--fg);
+  font-size: var(--fs-body);
+  font-weight: 650;
+  line-height: var(--lh-snug);
+}
+
+.prose :is(ul, ol):not([class]) {
+  display: grid;
+  gap: var(--space-2xs);
+  margin-top: var(--space-s);
+  padding: 0;
+  list-style: none;
+  counter-reset: punkt;
+}
+
+.prose :is(ul, ol):not([class]) + p {
+  margin-top: var(--space-s);
+}
+
+.prose :is(ul, ol):not([class]) > li {
+  position: relative;
+  padding-left: 2rem;
+  color: var(--fg-muted);
+}
+
+/* kurzer Strich wie in den Leistungslisten, mittig zur ersten Zeile */
+.prose ul:not([class]) > li::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0.8em;
+  width: 0.75rem;
+  height: 1px;
+  background: var(--accent-line);
+}
+
+/* Fraunces-Ziffern wie in der Checkliste */
+.prose ol:not([class]) > li::before {
+  counter-increment: punkt;
+  content: counter(punkt, decimal-leading-zero);
+  position: absolute;
+  left: 0;
+  top: 0;
+  color: var(--accent-display);
+  font-family: var(--font-display);
+  font-variant-numeric: lining-nums tabular-nums;
+}
+
+.prose :is(blockquote, figure):not([class]) {
+  margin-block: var(--space-l);
+}
+
+/* Zitat im Text: kursiv an einer Akzentlinie, wie die Zitatkarten */
+.prose blockquote:not([class]) {
+  padding-left: var(--space-m);
+  border-left: 2px solid var(--accent-line);
+}
+
+.prose figure:not([class]) > blockquote {
+  margin-block: 0;
+}
+
+.prose blockquote:not([class]) p {
+  color: var(--fg);
+  font-family: var(--font-display);
+  font-size: 1.25rem;
+  font-style: italic;
+  font-weight: 360;
+  line-height: 1.45;
+}
+
+.prose figure:not([class]) img {
+  width: 100%;
+  height: auto;
+  border-radius: var(--radius-l);
+}
+
+.prose figcaption:not([class]) {
+  margin-top: var(--space-xs);
+  color: var(--fg-muted);
+  font-size: var(--fs-small);
+  line-height: 1.5;
+}
+
+.prose blockquote:not([class]) + figcaption:not([class]) {
+  padding-left: calc(var(--space-m) + 2px);
+}
+
 .legal-note {
   padding: 1rem 1.25rem;
   border-left: 3px solid var(--accent-line);
@@ -4083,9 +4144,310 @@ html.motion .subnav__link::after {
   font-size: var(--fs-small);
 }
 
+/* Datenschutz: Inhaltsverzeichnis, ab 960 px mitlaufend in der linken Spalte.
+   main.js markiert den Abschnitt, der gerade gelesen wird. */
+.legal__toc {
+  margin-bottom: var(--space-xl);
+}
+
+.legal__toc-title,
+.legal__toc-link,
+.legal-sheet h2 {
+  font-family: var(--font-body);
+  font-size: var(--fs-label);
+  font-weight: 650;
+  letter-spacing: 0.12em;
+  line-height: 1.4;
+  text-transform: uppercase;
+}
+
+.legal__toc-title {
+  margin-bottom: var(--space-xs);
+  color: var(--fg);
+}
+
+.legal__toc-list {
+  margin: 0;
+}
+
+.legal__toc-list li {
+  break-inside: avoid;
+}
+
+.legal__toc-link {
+  position: relative;
+  display: block;
+  padding: 0.5rem 0 0.5rem 1rem;
+  border-left: 1px solid var(--line);
+  color: var(--fg-muted);
+  text-decoration: none;
+  transition: color var(--dur-calm) var(--ease-out);
+}
+
+/* aktiver Abschnitt: Akzentstrich auf der Haarlinie, wie bei den Sprungmarken */
+.legal__toc-link::before {
+  content: "";
+  position: absolute;
+  left: -1px;
+  top: 0.25rem;
+  bottom: 0.25rem;
+  width: 2px;
+  background: var(--accent-line);
+  transform: scaleY(0);
+  transition: transform 300ms var(--ease-out);
+}
+
+.legal__toc-link:hover,
+.legal__toc-link[aria-current="true"] {
+  color: var(--fg);
+}
+
+.legal__toc-link[aria-current="true"]::before {
+  transform: none;
+}
+
+/* Auf einen Blick: die belegten Zusagen, jede auf ihrer Haarlinie */
+.legal-facts {
+  display: grid;
+  margin-block: var(--space-s) var(--space-m);
+}
+
+.legal-facts li {
+  position: relative;
+  padding: 0.6rem 0 0.85rem 1.75rem;
+  border-bottom: 1px solid var(--line);
+  color: var(--fg);
+  font-family: var(--font-display);
+  font-size: 1.25rem;
+  font-weight: 380;
+  line-height: 1.35;
+}
+
+/* kurzer Strich wie in den Leistungslisten, mittig zur ersten Zeile */
+.legal-facts li::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: calc(0.6rem + 0.675em);
+  width: 0.75rem;
+  height: 1px;
+  background: var(--accent-line);
+}
+
+/* Impressum als Datenblatt: kurze Angaben in Zeilen auf Haarlinien, die
+   Überschrift als Versal-Label auf der Achse des Seitenkopfs */
+.legal-sheet .legal-note {
+  margin-bottom: var(--space-l);
+}
+
+.legal-entry {
+  display: grid;
+  gap: var(--space-2xs);
+  padding-block: var(--space-s) var(--space-m);
+  border-top: 1px solid var(--line);
+}
+
+.legal-entry:last-child {
+  border-bottom: 1px solid var(--line);
+}
+
+.legal-sheet h2 {
+  margin: 0;
+  color: var(--fg);
+}
+
+/* mittlere Breiten: kompakt in zwei Spalten über dem Text */
+@media (min-width: 40rem) and (max-width: 59.99rem) {
+  .legal__toc-list {
+    columns: 2;
+    column-gap: var(--space-m);
+  }
+}
+
 @media (min-width: 60rem) {
   .prose {
     margin-left: calc((100% + var(--space-m)) / 12 * 3);
+  }
+
+  .legal__grid {
+    display: grid;
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+    column-gap: var(--space-m);
+    align-items: start;
+  }
+
+  .legal__toc {
+    grid-column: 1 / span 3;
+    margin-bottom: 0;
+    padding-right: var(--space-m);
+  }
+
+  .legal__grid > .prose {
+    grid-column: 4 / span 9;
+    margin-left: 0;
+  }
+
+  .legal-sheet {
+    margin-left: 0;
+    max-width: none;
+  }
+
+  .legal-sheet .legal-note {
+    max-width: 44rem;
+    margin-left: calc((100% + var(--space-m)) / 12 * 3);
+  }
+
+  .legal-entry {
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+    column-gap: var(--space-m);
+    padding-block: var(--space-m);
+  }
+
+  .legal-sheet h2 {
+    grid-column: 1 / span 3;
+    padding-top: 0.3rem;
+    padding-right: var(--space-m);
+  }
+
+  .legal-entry > :not(h2) {
+    grid-column: 4 / span 9;
+    max-width: 44rem;
+  }
+}
+
+/* mitlaufend nur, wenn das Verzeichnis sicher in den Bildschirm passt */
+@media (min-width: 60rem) and (min-height: 32rem) {
+  .legal__toc {
+    position: sticky;
+    top: calc(env(safe-area-inset-top, 0px) + var(--header-h) + var(--space-l));
+  }
+}
+
+@media (forced-colors: active) {
+  .legal__toc-link::before {
+    background: CanvasText;
+  }
+}
+
+/* --------------------------------------------------------------------------
+   18n. Fallbeispiel (Vorlage)
+   Aufbau wie die Rechtstexte: Überschrift als Versal-Label links, Inhalt auf
+   der Achse von Spalte 4. Sonst nur vorhandene Bausteine (.prose, .steps,
+   .offer__result, .quote-card, .photo).
+   -------------------------------------------------------------------------- */
+
+/* Startseite: Textlink zur Vorlage unter den Fallbeispiel-Karten */
+.cases__more {
+  margin-top: var(--space-l);
+}
+
+/* Platzhalter im Kicker in normaler Schreibung */
+.kicker .ph {
+  text-transform: none;
+}
+
+/* Faktenband: Versal-Labels auf einer Haarlinie, ab 768 px auf den Achsen 1/4/7/10 */
+.case-facts {
+  justify-self: stretch;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-m);
+  margin-top: var(--space-xs);
+  padding-top: var(--space-s);
+  border-top: 1px solid var(--line);
+}
+
+.case-facts dt,
+.case-part__title {
+  font-family: var(--font-body);
+  font-size: var(--fs-label);
+  font-weight: 650;
+  letter-spacing: 0.12em;
+  line-height: 1.4;
+  text-transform: uppercase;
+}
+
+.case-facts dt {
+  margin-bottom: 0.3rem;
+  color: var(--fg-muted);
+}
+
+.case-facts dd {
+  min-width: 0;
+}
+
+.case-section {
+  padding-top: var(--space-2xl);
+}
+
+.case-study {
+  display: grid;
+  gap: var(--space-2xl);
+}
+
+.case-part {
+  position: relative;
+  display: grid;
+  gap: var(--space-m);
+  padding-top: var(--space-m);
+  border-top: 1px solid var(--line);
+}
+
+/* Knotenpunkt auf der Zeitlinie wie in den Abschnittsköpfen */
+.case-part::before {
+  content: "";
+  position: absolute;
+  top: -0.3125rem;
+  left: 0;
+  width: 0.625rem;
+  height: 0.625rem;
+  border-radius: 50%;
+  background: var(--accent-graphic);
+}
+
+.case-part__title {
+  color: var(--fg);
+}
+
+.case-part__body {
+  min-width: 0;
+  max-width: 44rem;
+}
+
+.case-part__intro {
+  color: var(--fg-muted);
+  text-wrap: pretty;
+}
+
+.case-part__body > .quote-card {
+  margin-top: var(--space-l);
+}
+
+@media (min-width: 48rem) {
+  .case-facts {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+
+@media (min-width: 60rem) {
+  .case-part {
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+    gap: var(--space-xl) var(--space-m);
+  }
+
+  .case-part__title {
+    grid-column: 1 / span 3;
+    padding-top: 0.3rem;
+    padding-right: var(--space-m);
+  }
+
+  .case-part__body {
+    grid-column: 4 / span 9;
+    margin-left: 0;
+  }
+
+  .case-part > .steps {
+    grid-column: 1 / -1;
   }
 }
 
@@ -4152,7 +4514,6 @@ html.motion .subnav__link::after {
   height: 0.3125rem;
   border-radius: 0.625rem 0.625rem 0 0;
   background: var(--accent-graphic);
-  box-shadow: 0 0 0 1px var(--color-motif-stroke);
 }
 
 /* Navigation: ein Marker gleitet zum aktiven Punkt */
@@ -4381,7 +4742,7 @@ html.motion .step--last .step__marker {
 
 html.motion .step--last.is-reached .step__marker {
   background-size: 100% 100%;
-  box-shadow: 0 0 0 1px var(--color-motif-stroke);
+  box-shadow: inset 0 0 0 1px transparent;
 }
 
 /* Haltung: das Zitat steigt einmal Wort für Wort auf, die Sonne steigt beim Scrollen */
@@ -4486,10 +4847,6 @@ html.motion .stance__quote.is-pending .qw {
 @media (min-width: 48rem) {
   .footer-mark {
     grid-column: 1 / -1;
-  }
-
-  html.has-palette .site-footer {
-    padding-bottom: calc(var(--space-2xl) + 3rem + env(safe-area-inset-bottom, 0px));
   }
 }
 
@@ -4642,31 +4999,16 @@ html.motion .proto-demo.is-pending * {
   transform: translateY(0.75rem);
 }
 
-/* Farbvariante wechseln: neue Farben breiten sich kreisförmig vom Knopf aus */
-html.vt-palette *,
-html.vt-palette *::before,
-html.vt-palette *::after {
-  transition: none !important;
-}
-
+/* Seitenwechsel: eigene Animationen statt der Standard-Überblendung (19c) */
 ::view-transition-old(root),
 ::view-transition-new(root) {
   animation: none;
   mix-blend-mode: normal;
 }
 
-html.vt-palette::view-transition-new(root) {
-  animation: palette-reveal 750ms var(--ease-out) both;
-}
-
-@keyframes palette-reveal {
-  from { clip-path: circle(0 at var(--vt-x, 50%) var(--vt-y, 50%)); }
-  to { clip-path: circle(var(--vt-r, 150vmax) at var(--vt-x, 50%) var(--vt-y, 50%)); }
-}
-
 /* --------------------------------------------------------------------------
    19c. Seitenwechsel (View Transitions zwischen Dokumenten)
-   Kopfzeile und Farbumschalter bleiben stehen, der Inhalt blendet weich über,
+   Die Kopfzeile bleibt stehen, der Inhalt blendet weich über,
    die kleine Sonne gleitet zur Position der neuen Seite und der Marker in
    der Navigation zum neuen Menüpunkt. Bei reduzierter Bewegung: kein Übergang.
    -------------------------------------------------------------------------- */
@@ -4676,47 +5018,43 @@ html.vt-palette::view-transition-new(root) {
   }
 }
 
-html:not(.vt-palette) .site-header {
+html .site-header {
   view-transition-name: site-header;
 }
 
-html:not(.vt-palette) .palette {
-  view-transition-name: palette;
-}
-
-html:not(.vt-palette) .nav.has-current .nav__indicator {
+html .nav.has-current .nav__indicator {
   view-transition-name: nav-indicator;
 }
 
-html:not(.vt-palette) .page-head__sun {
+html .page-head__sun {
   view-transition-name: page-sun;
 }
 
-html:not(.vt-palette)::view-transition-old(root) {
+html::view-transition-old(root) {
   animation: page-out 200ms var(--ease-out) both;
 }
 
-html:not(.vt-palette)::view-transition-new(root) {
+html::view-transition-new(root) {
   animation: page-in 460ms var(--ease-out) 60ms both;
 }
 
-html:not(.vt-palette)::view-transition-group(page-sun) {
+html::view-transition-group(page-sun) {
   animation-duration: 900ms;
   animation-timing-function: var(--ease-sun);
 }
 
-html:not(.vt-palette)::view-transition-group(nav-indicator) {
+html::view-transition-group(nav-indicator) {
   animation-duration: 550ms;
   animation-timing-function: var(--ease-sun);
 }
 
 /* Ohne Gegenstück auf der neuen Seite (zurück zur Startseite) geht die kleine
    Sonne an ihrer Fuge unter, der Marker verschwindet rasch */
-html:not(.vt-palette)::view-transition-old(page-sun):only-child {
+html::view-transition-old(page-sun):only-child {
   animation: page-sun-set 200ms var(--ease-out) both; /* so schnell wie page-out */
 }
 
-html:not(.vt-palette)::view-transition-old(nav-indicator):only-child {
+html::view-transition-old(nav-indicator):only-child {
   animation-duration: 200ms;
 }
 
@@ -4727,7 +5065,7 @@ html:not(.vt-palette)::view-transition-old(nav-indicator):only-child {
 
 /* Start → Unterseite: Die neue Sonne geht im Übergangsbild hinter ihrer Fuge auf,
    statt unter der Linie zu stehen (das Bild wird nicht vom Horizont beschnitten) */
-html:not(.vt-palette)::view-transition-new(page-sun):only-child {
+html::view-transition-new(page-sun):only-child {
   animation: page-sun-rise-vt 900ms var(--ease-sun) both;
 }
 
@@ -4747,8 +5085,7 @@ html:not(.vt-palette)::view-transition-new(page-sun):only-child {
 /* --------------------------------------------------------------------------
    20. Ohne JavaScript, Kontrastmodus, Druck
    -------------------------------------------------------------------------- */
-html:not(.js) .menu-toggle,
-html:not(.js) .palette {
+html:not(.js) .menu-toggle {
   display: none !important;
 }
 
@@ -4763,10 +5100,6 @@ html:not(.js) .site-header__cta {
     background: CanvasText;
   }
 
-  .palette__swatch {
-    forced-color-adjust: none;
-  }
-
   .nav__indicator,
   .scroll-progress__fill {
     background: CanvasText;
@@ -4774,10 +5107,6 @@ html:not(.js) .site-header__cta {
 
   html.motion .stance__quote .qw {
     opacity: 1;
-  }
-
-  .palette__btn[aria-pressed="true"] {
-    border: 2px solid Highlight;
   }
 }
 
@@ -4825,7 +5154,6 @@ html:not(.js) .site-header__cta {
     display: none !important;
   }
 
-  .palette,
   .toast-region,
   .menu-toggle,
   .mobile-menu,
@@ -4839,6 +5167,146 @@ html:not(.js) .site-header__cta {
 
   body::after {
     display: none;
+  }
+}
+
+/* Papier: Druckdialoge lassen Hintergründe standardmäßig weg. Dunkle Flächen
+   werden deshalb hell gesetzt, Buttons zu Konturen; was nur am Bildschirm
+   etwas tut (Navigation, Formular, Kalender, Bildplatzhalter), entfällt.
+   Die Antworten der häufigen Fragen klappt main.js vor dem Druck auf. */
+@page {
+  size: A4;
+  margin: 16mm 15mm 18mm;
+}
+
+@media print {
+  :root {
+    --space-section: 2.75rem;
+    --space-2xl: 2rem;
+    --grain-opacity: 0;
+  }
+
+  body {
+    background: none;
+  }
+
+  .section--dark,
+  .offer__result,
+  .site-footer {
+    --fg: var(--color-text);
+    --fg-muted: var(--color-text-muted);
+    --line: var(--color-line);
+    --accent-graphic: var(--color-accent);
+    --accent-type: var(--color-accent-text);
+    --accent-display: var(--color-accent);
+    --accent-line: var(--color-accent-line);
+    background: none !important;
+    color: var(--fg);
+  }
+
+  .offer__result {
+    border: 1px solid var(--color-line-strong);
+  }
+
+  .btn {
+    border: 1px solid currentColor !important;
+    background: none !important;
+    color: var(--color-text) !important;
+  }
+
+  .site-header .nav,
+  .site-header__cta,
+  .subnav,
+  .hero .btn-row,
+  .people-band,
+  .photo,
+  .stance__horizon,
+  .proto-demo,
+  .cta-band,
+  .booking,
+  .form,
+  .legal__toc,
+  a[href="#termin"],
+  .site-footer__inner > :not(.site-footer__bottom),
+  .site-footer__legal {
+    display: none !important;
+  }
+
+  /* Sonnen, Knoten und Linien sind Hintergründe: für sie die Farben erzwingen */
+  .page-head__sun,
+  .page-head__horizon::after,
+  .section-head::before,
+  .step__marker,
+  .offer__result::before,
+  .legal-facts li::before,
+  .prose ul:not([class]) > li::before,
+  .case-part::before,
+  .talk-step:last-child .talk-step__num {
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  .site-footer {
+    padding-block: var(--space-m) 0;
+  }
+
+  /* Startseite: Titel und Sonne auf der ersten Seite, die Sonne kleiner */
+  .hero {
+    overflow: visible;
+  }
+
+  .hero__visual {
+    width: min(100%, 22rem);
+    margin-inline: auto;
+  }
+
+  /* Porträts und Fallbeispiel-Bilder sind Platzhalter auf Dunst, der nicht gedruckt wird */
+  .person__portrait,
+  .case__visual {
+    display: none !important;
+  }
+
+  /* Antworten stehen offen da, das Plus zum Aufklappen braucht es nicht */
+  .faq__question::after {
+    display: none;
+  }
+
+  .site-footer__print {
+    display: block !important;
+    flex-basis: 100%;
+    color: var(--color-text);
+    font-weight: 650;
+  }
+
+  .steps,
+  .case,
+  .quote-card,
+  .service__card,
+  .step,
+  .reason,
+  .offer__result,
+  .faq__item,
+  .person,
+  .profile,
+  .principle,
+  .talk-step,
+  .reg,
+  .legal-note,
+  .checklist li {
+    break-inside: avoid;
+  }
+
+  h1,
+  h2,
+  h3,
+  .section-head,
+  .offer__label {
+    break-after: avoid;
+  }
+
+  p {
+    orphans: 3;
+    widows: 3;
   }
 }
 
