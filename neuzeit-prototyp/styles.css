@@ -60,7 +60,7 @@
   --color-accent-border: transparent;
   --color-on-accent: #FFFFFF;
   --color-accent-line: #D4552B;      /* Linien und Marker auf Hell, ≥ 3:1 */
-  --color-error: #A8431F;            /* Fehlermeldungen */
+  --color-error: #9F1D20;            /* Fehlermeldungen: röter als die Akzentschrift, 7,0:1 auf Papier */
   --color-accent-on-dark: #EE8B63;   /* Terrakotta für Schrift auf Tannengrün, ≥ 4,5:1 */
   --color-motif-on-dark: #D4552B;    /* Halbkreis auf Tannengrün (Grafik, ≥ 3:1) */
   --color-field: #FBF9F5;            /* Eingabefelder */
@@ -528,6 +528,12 @@ main:focus {
   text-underline-offset: 0.45em;
 }
 
+/* Ring mit Abstand, damit er nicht auf der Unterstreichung liegt */
+.text-link:focus-visible {
+  outline-offset: 6px;
+  border-radius: var(--radius-s);
+}
+
 /* derselbe Pfeil wie in den Buttons, statt eines Zeichens aus der Systemschrift */
 .text-link__icon {
   display: inline-block;
@@ -582,6 +588,12 @@ main:focus {
 
 .btn:active {
   transform: translateY(1px) scale(0.985);
+}
+
+/* Ring in Tinte statt Akzent, sonst verschmilzt er mit der Button-Fläche.
+   In dunklen Sektionen wird --fg hell. */
+.btn:focus-visible {
+  outline-color: var(--fg);
 }
 
 .btn__icon {
@@ -747,6 +759,11 @@ html.vt-nav .site-header .brand__sun {
 .nav__link:hover::after,
 .nav__link[aria-current="page"]::after {
   transform: scaleX(1);
+}
+
+.nav__link:focus-visible {
+  outline-offset: 6px;
+  border-radius: var(--radius-s);
 }
 
 .nav__link[aria-current="page"]::after {
@@ -2044,6 +2061,7 @@ html.menu-open {
   border-radius: var(--radius-l);
   background: var(--color-bg);
   min-width: 0;
+  container-type: inline-size; /* Feldzeilen richten sich nach der Formularbreite */
 }
 
 .form__title {
@@ -2069,7 +2087,7 @@ html.menu-open {
 }
 
 .field__req {
-  color: var(--accent-type);
+  color: var(--fg-muted);
 }
 
 .field__input {
@@ -2089,10 +2107,13 @@ html.menu-open {
   border-color: var(--fg);
 }
 
+/* Doppelring statt Outline plus Rand. Die transparente Outline bleibt für den
+   Kontrastmodus, dort entfallen Schatten. */
 .field__input:focus-visible {
-  outline: 2px solid var(--focus);
+  outline: 2px solid transparent;
   outline-offset: 2px;
   border-color: var(--fg);
+  box-shadow: 0 0 0 1px var(--fg), 0 0 0 5px color-mix(in srgb, var(--focus) 22%, transparent);
 }
 
 .field__input--area {
@@ -2116,7 +2137,8 @@ html.menu-open {
   line-height: 1.45;
 }
 
-.field__error::before {
+.field__error::before,
+.form__status.is-error strong::before {
   content: "!";
   content: "!" / "";
   flex: none;
@@ -2168,10 +2190,42 @@ html.menu-open {
   clip-path: inset(50%);
 }
 
-.form__status strong {
+.form__status strong,
+.form__status h3 {
   font-family: var(--font-display);
   font-size: 1.25rem;
   font-weight: 450;
+}
+
+/* Nach dem Absenden bleiben nur Titel und Abschlusskarte */
+.form.is-sent > :not(.form__title, .form__status) {
+  display: none;
+}
+
+.form.is-sent .form__status {
+  gap: var(--space-xs);
+  padding: var(--space-m);
+  border-left: 0;
+}
+
+/* main.js fokussiert die Überschrift, damit Screenreader dort weiterlesen */
+.form__status h3:focus {
+  outline: none;
+}
+
+.form__status-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-xs) var(--space-m);
+  margin-top: var(--space-2xs);
+}
+
+.form__again {
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: pointer;
 }
 
 @media (min-width: 60rem) {
@@ -3652,7 +3706,7 @@ html.motion .subnav__link::after {
   gap: var(--space-m);
 }
 
-@media (min-width: 36rem) {
+@container (min-width: 32rem) {
   .field-row {
     grid-template-columns: repeat(2, minmax(0, 1fr));
     align-items: start;
@@ -3705,6 +3759,13 @@ html.motion .subnav__link::after {
 
 .form__status.is-error {
   border-left-color: var(--color-error);
+}
+
+/* dasselbe Zeichen wie bei den Feldfehlern */
+.form__status.is-error strong {
+  display: flex;
+  align-items: baseline;
+  gap: 0.5rem;
 }
 
 .booking {
@@ -4209,6 +4270,17 @@ html.motion .stance__quote.is-pending .qw {
 
 .btn--submit.is-loading {
   cursor: progress;
+}
+
+/* während des Versands kein Hover-Wechsel */
+.btn--primary[aria-disabled="true"],
+.btn--primary[aria-disabled="true"]:hover {
+  background: var(--color-accent-fill);
+  cursor: progress;
+}
+
+.btn[aria-disabled="true"]:active {
+  transform: none;
 }
 
 .btn--submit.is-loading .btn__spinner {

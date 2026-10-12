@@ -523,15 +523,16 @@
   var submitLabel = form && form.querySelector("[data-submit-label]");
   var endpoint = form ? (form.getAttribute("data-endpoint") || "").trim() : "";
 
-  function showStatus(kind, heading, message) {
+  /* Fehler meldet die Statusregion sofort (role="alert"), alles andere höflich */
+  function clearStatus(urgent) {
     status.textContent = "";
     status.classList.remove("is-success", "is-error");
-    if (kind === "success") {
-      var icon = document.createElement("span");
-      icon.className = "sunrise";
-      icon.setAttribute("aria-hidden", "true");
-      status.appendChild(icon);
-    }
+    status.setAttribute("role", urgent ? "alert" : "status");
+    status.setAttribute("aria-live", urgent ? "assertive" : "polite");
+  }
+
+  function showError(heading, message) {
+    clearStatus(true);
     var title = document.createElement("strong");
     title.textContent = heading;
     var text = document.createElement("span");
@@ -539,8 +540,49 @@
     status.appendChild(title);
     status.appendChild(text);
     void status.offsetWidth;
-    status.classList.add(kind === "success" ? "is-success" : "is-error");
+    status.classList.add("is-error");
     status.scrollIntoView({ block: "nearest", behavior: motionOK ? "smooth" : "auto" });
+  }
+
+  /* Abschlusskarte statt Formular, bis jemand eine weitere Anfrage beginnt */
+  function showSent(name, onAgain) {
+    clearStatus(false);
+    var title = document.createElement("h3");
+    title.tabIndex = -1;
+    title.textContent = "Danke, " + name + ".";
+    /* Ablauf wie unter „So läuft das Potenzialgespräch“, ohne neue Zusagen */
+    var text = document.createElement("p");
+    text.textContent = (endpoint ? "Ihre Anfrage ist bei uns angekommen. " : "") +
+      "Im Potenzialgespräch fragen wir nach und ordnen ein, danach entscheiden Sie in Ruhe, ob es weitergeht.";
+    status.appendChild(title);
+    status.appendChild(text);
+    if (!endpoint) {
+      var proto = document.createElement("p");
+      proto.className = "form__note form__note--proto";
+      proto.textContent = "Im fertigen Auftritt ginge Ihre Anfrage jetzt an Neuzeit. Dieser Prototyp versendet nichts.";
+      status.appendChild(proto);
+    }
+    var actions = document.createElement("div");
+    actions.className = "form__status-actions";
+    if (document.getElementById("termin")) {
+      var booking = document.createElement("a");
+      booking.className = "btn btn--ghost btn--small";
+      booking.href = "#termin";
+      booking.textContent = "Termin direkt wählen";
+      actions.appendChild(booking);
+    }
+    var again = document.createElement("button");
+    again.type = "button";
+    again.className = "text-link form__again";
+    again.textContent = "Weitere Anfrage";
+    again.addEventListener("click", onAgain);
+    actions.appendChild(again);
+    status.appendChild(actions);
+    form.classList.add("is-sent");
+    void status.offsetWidth;
+    status.classList.add("is-success");
+    form.scrollIntoView({ block: "nearest", behavior: motionOK ? "smooth" : "auto" });
+    title.focus({ preventScroll: true });
   }
 
   function send(data) {
@@ -576,6 +618,13 @@
       }
     }
 
+    /* „Weitere Anfrage“: zurück zum leeren Formular */
+    function restart() {
+      clearStatus(false);
+      form.classList.remove("is-sent");
+      fields[0].focus();
+    }
+
     fields.forEach(function (field) {
       field.addEventListener("input", function () {
         if (attempted || field.getAttribute("aria-invalid") === "true") validateField(field);
@@ -596,8 +645,7 @@
       });
 
       if (firstInvalid) {
-        status.textContent = "";
-        status.classList.remove("is-success", "is-error");
+        clearStatus(false);
         firstInvalid.focus();
         return;
       }
@@ -605,7 +653,7 @@
       var name = form.elements.name.value.trim();
       var data = new FormData(form);
       var isBot = form.elements.website && form.elements.website.value !== "";
-      status.textContent = "";
+      clearStatus(false);
 
       function setLoading(loading) {
         if (!submitButton) return;
@@ -617,17 +665,15 @@
 
       function done() {
         setLoading(false);
-        showStatus("success", "Danke, " + name + ".", endpoint
-          ? "Ihre Anfrage ist bei uns angekommen. Wir melden uns mit Terminvorschlägen."
-          : "Im fertigen Auftritt ginge Ihre Anfrage jetzt an Neuzeit. Dieser Prototyp versendet nichts.");
         form.reset();
         attempted = false;
         fields.forEach(function (field) { setError(field, false); });
+        showSent(name, restart);
       }
 
       function failed() {
         setLoading(false);
-        showStatus("error", "Das hat leider nicht geklappt.", "Bitte versuchen Sie es in einem Moment noch einmal oder schreiben Sie uns direkt per E-Mail. Ihre Eingaben sind noch da.");
+        showError("Das hat leider nicht geklappt.", "Bitte versuchen Sie es in einem Moment noch einmal oder schreiben Sie uns direkt per E-Mail. Ihre Eingaben sind noch da.");
       }
 
       /* Ladezustand auch ohne Bewegung: er verhindert doppeltes Absenden */
