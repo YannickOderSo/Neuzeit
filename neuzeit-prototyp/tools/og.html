@@ -1,0 +1,89 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8">
+  <meta name="robots" content="noindex">
+  <title>Vorschaubild (Vorlage)</title>
+  <link rel="stylesheet" href="../styles.css">
+  <style>
+    /* Bühne für tools/og.mjs: 1200 × 630 px. Logo, Kicker, Titel und die Lage
+       der Sonne setzt das Skript aus der jeweiligen Seite ein. Alles Übrige
+       kommt aus styles.css, damit Vorschau und Seite gleich aussehen. */
+    html,
+    body {
+      width: 1200px;
+      height: 630px;
+      overflow: hidden;
+    }
+
+    .og {
+      position: relative;
+      width: 1200px;
+      height: 630px;
+    }
+
+    .og__logo {
+      position: absolute;
+      left: 80px;
+      top: 60px;
+      width: 250px;
+      color: var(--color-text);
+    }
+
+    .og__logo .brand__logo {
+      width: 100%;
+      height: auto;
+    }
+
+    .og__text {
+      position: absolute;
+      left: 80px;
+      right: 80px;
+      top: 162px;
+      display: grid;
+      justify-items: start;
+      gap: 20px;
+    }
+
+    .og .kicker {
+      margin: 0;
+      font-size: 15px;
+    }
+
+    .og__title {
+      max-width: 1000px;
+      font-size: 80px; /* zwei Zeilen passen über die Sonne */
+    }
+
+    .og .page-head__horizon {
+      --sun-d: 260px;
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: 72px;
+      overflow: visible; /* die Skala unter der Linie bleibt sichtbar */
+    }
+
+    /* Neutral (Rechtliches, interne Seiten): nur Logo und Horizont */
+    .og--neutral .og__text,
+    .og--neutral .page-head__sun {
+      display: none;
+    }
+
+    .og--neutral .og__logo {
+      top: 218px;
+      width: 560px;
+    }
+  </style>
+</head>
+<body>
+  <div class="og" data-og>
+    <div class="og__logo" data-logo></div>
+    <div class="og__text">
+      <p class="kicker" data-kicker></p>
+      <p class="display og__title" data-titel></p>
+    </div>
+    <div class="page-head__horizon" aria-hidden="true"><span class="page-head__sun"></span></div>
+  </div>
+</body>
+</html>

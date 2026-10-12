@@ -46,6 +46,20 @@ Das Skript setzt die Teile in alle Seiten ein, schreibt Titel, Beschreibung und 
 - `neuzeit-prototyp/styleguide.html` zeigt dieselben Bausteine mit ihren echten Klassen. Neue Bausteine zuerst dort zeigen, dann in `DESIGN.md` festhalten.
 - Es gibt genau eine Palette, „Nachtblau & Koralle“. Die Koralle gehört allein der Sonne, Buttons sind Nachtblau.
 
+## Vorschaubilder, 404-Seite, Druck
+
+- **Vorschaubilder** (`neuzeit-prototyp/og/*.png`, 1200 × 630) erzeugt `tools/og.mjs` aus den echten Seiten: Kicker, Titel und Lage der Sonne kommen aus der jeweiligen Seite, Schrift und Farben aus `styles.css`. Nach einer Änderung an Titeln oder Farben neu erzeugen:
+
+  ```
+  cd neuzeit-prototyp
+  node tools/og.mjs
+  python3 tools/sync.py
+  ```
+
+  Das Skript braucht Playwright mit Chromium (`npm install playwright`, `npx playwright install chromium`). Es warnt, wenn ein Titel nicht mehr zum Alternativtext in `OG_SAETZE` passt. Impressum, Datenschutz und interne Seiten nutzen `og/neutral.png` mit Logo und Horizont.
+- **404-Seite:** `404.html` liegt im Hauptordner, weil GitHub Pages sie dort für jede unbekannte Adresse ausliefert. `tools/sync.py` füllt sie mit und setzt ein `<base>` mit dem Pfad aus `BASIS_URL`, damit Stile und Links in jeder Tiefe stimmen. Lokal lässt sie sich nur ansehen, wenn der Server eine Ebene über dem Repo startet und der Ordner `Neuzeit` heißt: http://localhost:8000/Neuzeit/404.html
+- **Druck und PDF:** Die Seiten drucken auf A4 ohne dunkle Flächen, Navigation, Formular und Kalender. Die häufigen Fragen klappen dafür von selbst auf.
+
 ## Vor dem Livegang
 
 1. **Formular:** In `kontakt.html` beim Formular `data-endpoint` mit der Adresse eines Formulardienstes füllen (z. B. Formspree oder Web3Forms; dort die Ziel-E-Mail hinterlegen). Für den Versand ohne JavaScript zusätzlich `action` und `method="post"` setzen. Solange das Feld leer ist, versendet das Formular nichts.

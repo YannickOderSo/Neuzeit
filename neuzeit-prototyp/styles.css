@@ -220,6 +220,13 @@ html {
   scroll-padding-top: calc(var(--header-h) + 1.25rem);
 }
 
+/* Bedienelemente des Browsers in den Farben der Seite: Häkchen und Auswahl in
+   Nachtblau, Scrollbalken in gedämpfter Tinte auf Morgenweiß */
+html {
+  accent-color: var(--color-accent-fill);
+  scrollbar-color: color-mix(in srgb, var(--color-text) 35%, transparent) var(--color-bg);
+}
+
 /* sanftes Scrollen erst, wenn Schriften geladen sind (main.js setzt .is-ready) */
 @media (prefers-reduced-motion: no-preference) {
   html.is-ready {
@@ -1234,6 +1241,24 @@ html.menu-open .site-header__cta,
   }
 }
 
+/* Niedrige Laptop-Fenster (Skalierung 125–150 %, Zoom): Titel nach der Höhe
+   begrenzen und Abstände straffen, damit Button und Sonne im ersten Bild
+   stehen. 1440 × 900 und größer bleiben unberührt. */
+@media (min-width: 60rem) and (max-height: 43.75rem) {
+  .hero {
+    padding-block: clamp(1.5rem, 5vh, 3.5rem) clamp(2rem, 5vh, 3.5rem);
+  }
+
+  .hero__title {
+    font-size: min(var(--fs-display), 10.5vh);
+    margin-bottom: var(--space-s);
+  }
+
+  .hero__lead {
+    margin-bottom: var(--space-m);
+  }
+}
+
 /* --------------------------------------------------------------------------
    9. Warum jetzt
    -------------------------------------------------------------------------- */
@@ -2195,6 +2220,14 @@ html.menu-open .site-header__cta,
   resize: vertical;
 }
 
+/* Automatisch ausgefüllte Felder: Browser färben sie hellblau oder gelb.
+   Der Hintergrundwechsel wird auf unbestimmte Zeit verschoben, die Schrift
+   bleibt in der Seitenfarbe. :is() verzeiht Browsern, die eine Form nicht kennen. */
+.field__input:is(:autofill, :-webkit-autofill) {
+  -webkit-text-fill-color: var(--fg);
+  transition: background-color 0s 86400s, border-color var(--dur-calm) var(--ease-out), box-shadow var(--dur-calm) var(--ease-out);
+}
+
 .field__input[aria-invalid="true"] {
   border-color: var(--color-error);
   border-width: 2px;
@@ -2582,6 +2615,30 @@ html.menu-open .site-header__cta,
 
 .page-head--small .page-head__horizon {
   --sun-d: clamp(5rem, 9vw, 7.5rem);
+}
+
+/* Fehlerseite: Die Sonne ist noch nicht aufgegangen. Nur ihr oberer Rand steht
+   über dem Horizont, mit derselben Fuge wie sonst. */
+.page-head__horizon--dawn {
+  height: calc(var(--sun-d) * 0.16 + var(--sun-gap) + 2.5rem); /* sichtbarer Rand 0,16 d */
+}
+
+.page-head__horizon--dawn .page-head__sun {
+  --sink: calc(var(--sun-d) * 0.34);
+  translate: 0 var(--sink);
+  clip-path: inset(0 0 var(--sink) 0);
+}
+
+/* Niedrige Laptop-Fenster: Seitenkopf straffen, damit Formular und
+   Sprungmarken früher kommen (wie beim Hero, 1440 × 900 bleibt unberührt) */
+@media (min-width: 60rem) and (max-height: 43.75rem) {
+  .page-head {
+    padding-top: clamp(1.5rem, 5vh, 3rem);
+  }
+
+  .page-head__inner {
+    padding-bottom: clamp(1.5rem, 3vh, 2rem);
+  }
 }
 
 .page-head--small .page-head__title {

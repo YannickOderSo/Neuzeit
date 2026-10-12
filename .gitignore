@@ -1,0 +1,4 @@
+# Werkzeuge wie Playwright für tools/og.mjs gehören nicht zur Website
+node_modules/
+package.json
+package-lock.json

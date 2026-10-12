@@ -223,6 +223,14 @@ Was fehlt, ist sichtbar markiert, damit nichts erfunden wirkt. Platzhalter bilde
 - **Erfolg:** `.form.is-sent` blendet die Felder aus. Die Statusbox wird zur ruhigen Abschlusskarte mit Überschrift (bekommt den Fokus), dem weiteren Ablauf, „Termin direkt wählen“ und „Weitere Anfrage“.
 - Zwei Felder nebeneinander erst ab 32rem Formularbreite. Auswahlfelder mit eigenem Winkel. Spam-Schutz über ein verstecktes Feld.
 
+## Ränder
+
+- **Fehlerseite** (`/404.html`): Seitenkopf mit `.page-head__horizon--dawn`. Die Sonne steht noch unter dem Horizont, nur ihr oberer Rand (0,16 d) ist zu sehen, die Fuge bleibt. Danach ein Button zur Startseite und die wichtigsten Ziele als Liste, kein CTA-Band.
+- **Vorschaubilder** (`og/*.png`, 1200 × 630): von `tools/og.mjs` aus den Seiten erzeugt, Titel 80 px, Sonne 260 px mit Fuge, Linie und Skala 72 px über dem unteren Rand. `og/neutral.png` zeigt nur Logo und Horizont.
+- **Druck:** A4 mit 16/15/18 mm Rand. Dunkle Flächen werden hell (Kontext-Tokens wie auf Morgenweiß), Buttons zu Konturen. Sonnen, Knoten und Marker behalten ihre Farbe (`print-color-adjust: exact`). Ohne Navigation, Formular, Kalender, Bildplatzhalter und Porträts, dafür mit Absenderzeile.
+- **Browser-Bedienelemente:** `accent-color` Nachtblau, Scrollbalken in gedämpfter Tinte, automatisch ausgefüllte Felder ohne Hellblau oder Gelb.
+- **Niedrige Laptop-Fenster** (ab 60rem Breite, bis 43.75rem Höhe): Hero-Titel höchstens `10.5vh`, Abstände von Hero und Seitenkopf gestrafft, damit Button und Sonne im ersten Bild stehen.
+
 ## Pflege
 
 - **Gemeinsame Teile** stehen nur in `_partials/`. Nach jeder Änderung `python3 tools/sync.py` im Ordner `neuzeit-prototyp` ausführen. Die eingesetzten Blöcke in den Seiten nie direkt bearbeiten.
