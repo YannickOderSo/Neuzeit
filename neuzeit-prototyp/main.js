@@ -243,6 +243,36 @@
     subnavList.addEventListener("scroll", function () { moveSubnavIndicator(currentSpy); }, { passive: true });
   }
 
+  /* Inhaltsverzeichnis der Rechtstexte: dieselbe Leselinie wie bei den
+     Sprungmarken, ein Viertel des Bildschirms unter der Kopfzeile */
+  var toc = document.querySelector("[data-toc]");
+  var tocLinks = toc ? Array.prototype.slice.call(toc.querySelectorAll("a[href^='#']")) : [];
+  var tocTargets = tocLinks.map(function (link) {
+    return document.getElementById(decodeURIComponent(link.hash.slice(1)));
+  });
+  var currentToc = null;
+
+  function updateToc() {
+    if (!toc) return;
+    var probe = (header ? header.getBoundingClientRect().bottom : 0) + window.innerHeight * 0.25;
+    var active = null;
+    tocTargets.forEach(function (target, i) {
+      if (target && target.getBoundingClientRect().top <= probe) active = tocLinks[i];
+    });
+    /* am Seitenende gilt der letzte Abschnitt */
+    var last = tocTargets[tocTargets.length - 1];
+    if (last && window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 2 &&
+        last.getBoundingClientRect().top < window.innerHeight) {
+      active = tocLinks[tocLinks.length - 1];
+    }
+    if (active === currentToc) return;
+    currentToc = active;
+    tocLinks.forEach(function (link) {
+      if (link === active) link.setAttribute("aria-current", "true");
+      else link.removeAttribute("aria-current");
+    });
+  }
+
   /* ------------------------------------------------------------------------
      Bewegung beim Scrollen: Werte von 0 bis 1 als Custom Properties.
      Erst alle Maße lesen, dann schreiben, damit nichts ruckelt.
@@ -328,6 +358,7 @@
     window.requestAnimationFrame(function () {
       updateHeader();
       updateSpy();
+      updateToc();
       if (motionOK) updateMotion();
       scrollTicking = false;
     });
@@ -348,6 +379,7 @@
     updateMotion();
   }
   updateSpy();
+  updateToc();
   resetNavIndicator();
   if (document.fonts && document.fonts.ready) {
     document.fonts.ready.then(onResize);

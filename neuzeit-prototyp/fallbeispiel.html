@@ -93,13 +93,117 @@
   <!-- /@kopfzeile -->
 
   <main id="inhalt" tabindex="-1">
-    <!-- Grundgerüst, wird ausgebaut -->
     <section class="page-head page-head--small" aria-labelledby="page-title">
-      <div class="container">
-        <p class="kicker">Fallbeispiel · Vorlage</p>
+      <div class="container page-head__inner">
+        <p class="kicker"><span>Fallbeispiel · Leistung <span class="ph">[Platzhalter]</span></span></p>
         <h1 class="display page-head__title" id="page-title">[Projekttitel: Branche und Aufgabe in einem Satz]</h1>
+        <dl class="case-facts">
+          <div><dt>Branche</dt><dd><span class="ph">[Platzhalter]</span></dd></div>
+          <div><dt>Mitarbeitende</dt><dd><span class="ph">[Platzhalter]</span></dd></div>
+          <div><dt>Zeitraum</dt><dd><span class="ph">[Platzhalter]</span></dd></div>
+          <div><dt>Leistung</dt><dd><span class="ph">[Platzhalter: 01, 02 oder 03]</span></dd></div>
+        </dl>
+      </div>
+      <div class="page-head__horizon" aria-hidden="true" style="--sun-x: 62%"><span class="page-head__sun"></span></div>
+    </section>
+
+    <div class="section case-section">
+      <div class="container case-study">
+        <section class="case-part" aria-labelledby="ausgangslage-title" data-reveal>
+          <h2 class="case-part__title" id="ausgangslage-title">Ausgangslage</h2>
+          <div class="case-part__body prose">
+            <p><span class="ph">[Platzhalter]</span> Was war die Frage des Kunden? Zwei bis drei Sätze, erst nach Freigabe.</p>
+            <h3>[Zwischentitel, falls nötig]</h3>
+            <ul role="list">
+              <li><span class="ph">[Platzhalter]</span> Was sollte sich ändern?</li>
+              <li><span class="ph">[Platzhalter]</span> Wen betraf es?</li>
+              <li><span class="ph">[Platzhalter]</span> Was stand im Weg?</li>
+            </ul>
+          </div>
+        </section>
+
+        <figure class="photo photo--wide" data-reveal>
+          <div class="photo__frame" aria-hidden="true"></div>
+          <figcaption class="photo__caption"><span class="ph"><span class="visually-hidden">Platzhalter für ein Foto:</span><span aria-hidden="true">Foto · 3:1, mobil 3:2</span></span> <span class="photo__brief">[Briefing: Motiv aus dem Projekt, nur mit Freigabe des Kunden]</span></figcaption>
+        </figure>
+
+        <section class="case-part" aria-labelledby="vorgehen-title" data-reveal>
+          <h2 class="case-part__title" id="vorgehen-title">Vorgehen</h2>
+          <div class="case-part__body">
+            <p class="case-part__intro"><span class="ph">[Platzhalter]</span> Wie lief das Projekt ab? Für jeden Schritt ein Satz: Was ist konkret passiert?</p>
+          </div>
+          <ol class="steps" role="list">
+            <li class="step">
+              <span class="step__marker" aria-hidden="true"></span>
+              <p class="step__num">Schritt 1</p>
+              <h3 class="step__title">Zuhören</h3>
+              <p class="step__text"><span class="ph">[Platzhalter]</span> Mit wem haben wir gesprochen, was war zu hören?</p>
+            </li>
+            <li class="step">
+              <span class="step__marker" aria-hidden="true"></span>
+              <p class="step__num">Schritt 2</p>
+              <h3 class="step__title">Verstehen</h3>
+              <p class="step__text"><span class="ph">[Platzhalter]</span> Welches Bild der Lage ist entstanden?</p>
+            </li>
+            <li class="step">
+              <span class="step__marker" aria-hidden="true"></span>
+              <p class="step__num">Schritt 3</p>
+              <h3 class="step__title">Gestalten</h3>
+              <p class="step__text"><span class="ph">[Platzhalter]</span> Welche Maßnahmen, Botschaften oder Prototypen sind entstanden?</p>
+            </li>
+            <li class="step step--last">
+              <span class="step__marker" aria-hidden="true"></span>
+              <p class="step__num">Schritt 4</p>
+              <h3 class="step__title">Verankern</h3>
+              <p class="step__text"><span class="ph">[Platzhalter]</span> Wie ist das Neue im Alltag angekommen?</p>
+            </li>
+          </ol>
+        </section>
+
+        <section class="case-part" aria-labelledby="ergebnis-title">
+          <h2 class="case-part__title" id="ergebnis-title">Ergebnis</h2>
+          <div class="case-part__body">
+            <div class="offer__result" data-reveal>
+              <p><span class="ph">[Platzhalter]</span> Ein konkretes, belegbares Ergebnis, nur mit Freigabe des Kunden.</p>
+              <div class="offer__outputs">
+                <h3 class="offer__label">Was der Kunde danach in der Hand hat</h3>
+                <ul role="list">
+                  <li><span class="ph">[Platzhalter]</span></li>
+                  <li><span class="ph">[Platzhalter]</span></li>
+                  <li><span class="ph">[Platzhalter]</span></li>
+                </ul>
+              </div>
+            </div>
+            <div class="quote-card" data-reveal>
+              <figure>
+                <span class="ph ph--strong quote-card__ph">[Platzhalter]</span>
+                <blockquote class="quote-card__text"><p>Zitat einer Kundin oder eines Kunden: Was hat sich durch das Projekt im Alltag verändert? Zwei bis drei Sätze, erst nach Freigabe.</p></blockquote>
+                <figcaption class="quote-card__by"><span class="quote-card__avatar" aria-hidden="true"></span><span><span class="quote-card__name">Name, Funktion</span> <span class="ph">[Platzhalter]</span><br><span class="quote-card__org">Unternehmen, Branche</span></span></figcaption>
+              </figure>
+            </div>
+          </div>
+        </section>
+      </div>
+    </div>
+
+    <!-- @cta -->
+    <section class="cta-band" aria-labelledby="cta-title">
+      <div class="container">
+        <div class="cta-band__inner" data-reveal>
+          <div class="cta-band__text">
+            <p class="eyebrow">Nächster Schritt</p>
+            <h2 class="h2 cta-band__title" id="cta-title">Wo steht Ihr Unternehmen im Wandel?</h2>
+            <p class="cta-band__lead">Im unverbindlichen Potenzialgespräch schauen wir gemeinsam auf Ihr Vorhaben. Sie erfahren, wo wir ansetzen würden und ob wir die Richtigen dafür sind.</p>
+          </div>
+          <div class="cta-band__actions">
+            <a class="btn btn--primary" href="kontakt.html#anfrage">Potenzialgespräch vereinbaren <svg class="btn__icon" viewBox="0 0 16 16" aria-hidden="true" focusable="false"><path d="M3 8h9.5M8.5 4 12.5 8l-4 4"/></svg></a>
+            <a class="text-link" href="kontakt.html#termin">Oder direkt einen Termin <span class="nowrap">wählen<svg class="text-link__icon" viewBox="0 0 16 16" aria-hidden="true" focusable="false"><path d="M3 8h9.5M8.5 4 12.5 8l-4 4"/></svg></span></a>
+          </div>
+          <div class="cta-band__horizon" aria-hidden="true"><span class="cta-band__sun"></span></div>
+        </div>
       </div>
     </section>
+    <!-- /@cta -->
   </main>
 
   <!-- @fusszeile -->

@@ -102,14 +102,32 @@
     </section>
 
     <section class="section legal" aria-label="Datenschutzhinweise">
-      <div class="container">
+      <div class="container legal__grid">
+        <nav class="legal__toc" aria-labelledby="toc-title" data-toc>
+          <p class="legal__toc-title" id="toc-title">Inhalt</p>
+          <ol class="legal__toc-list" role="list">
+            <li><a class="legal__toc-link" href="#auf-einen-blick">Auf einen Blick</a></li>
+            <li><a class="legal__toc-link" href="#verantwortlich">Verantwortlich</a></li>
+            <li><a class="legal__toc-link" href="#hosting">Hosting und Server-Protokolle</a></li>
+            <li><a class="legal__toc-link" href="#kontaktformular">Kontaktformular und E-Mail</a></li>
+            <li><a class="legal__toc-link" href="#calendly">Terminbuchung über Calendly</a></li>
+            <li><a class="legal__toc-link" href="#rechte">Ihre Rechte</a></li>
+          </ol>
+        </nav>
+
         <div class="prose">
           <p class="legal-note"><strong>Vorlage.</strong> Diese Seite ist ein Entwurf mit Platzhaltern. Vor der Veröffentlichung ergänzen, an Hosting und Formulardienst anpassen und rechtlich prüfen lassen.</p>
 
-          <h2>Auf einen Blick</h2>
+          <h2 id="auf-einen-blick">Auf einen Blick</h2>
+          <ul class="legal-facts" role="list">
+            <li>Keine Cookies</li>
+            <li>Kein Tracking</li>
+            <li>Schriften vom eigenen Server</li>
+            <li>Daten nur, wenn Sie uns schreiben oder den Kalender laden</li>
+          </ul>
           <p>Diese Website setzt keine Cookies und nutzt keine Analyse- oder Trackingdienste. Die Schriften liegen auf unserem eigenen Server, beim Laden werden dafür keine Daten an Dritte übertragen. Personenbezogene Daten verarbeiten wir nur, wenn Sie uns schreiben oder den Buchungskalender aktiv laden.</p>
 
-          <h2>Verantwortlich</h2>
+          <h2 id="verantwortlich">Verantwortlich</h2>
           <p>Verantwortlich für die Datenverarbeitung auf dieser Website ist: <span class="ph">[Platzhalter: Name, Anschrift, E-Mail, wie im Impressum]</span></p>
 
           <h2 id="hosting">Hosting und Server-Protokolle</h2>
@@ -124,10 +142,7 @@
           <p>Auf der Kontaktseite können Sie einen Termin über Calendly buchen, einen Dienst der Calendly LLC in den USA. Der Kalender lädt erst, wenn Sie auf „Kalender laden“ klicken. Erst dann werden Daten an Calendly übertragen, darunter Ihre IP-Adresse; Calendly kann dabei Cookies setzen. Buchen Sie einen Termin, verarbeitet Calendly auch die Angaben, die Sie dort eingeben.</p>
           <p>Rechtsgrundlage ist Ihre Einwilligung nach Art.&nbsp;6 Abs.&nbsp;1 lit.&nbsp;a DSGVO und §&nbsp;25 Abs.&nbsp;1 TDDDG, die Sie mit dem Klick erteilen. Sie können sie jederzeit für die Zukunft widerrufen. <span class="ph">[Platzhalter: Übermittlung in die USA und deren Grundlage prüfen, z. B. EU-US Data Privacy Framework]</span></p>
 
-          <h2>Speicherung im Browser</h2>
-          <p>Nur im Prototyp: Die gewählte Farbvariante speichern wir im lokalen Speicher Ihres Browsers, damit sie beim nächsten Aufruf erhalten bleibt. Dabei werden keine Daten an uns übertragen. Grundlage ist §&nbsp;25 Abs.&nbsp;2 Nr.&nbsp;2 TDDDG, weil Sie diese Funktion selbst auswählen.</p>
-
-          <h2>Ihre Rechte</h2>
+          <h2 id="rechte">Ihre Rechte</h2>
           <p>Sie haben das Recht auf Auskunft (Art.&nbsp;15 DSGVO), Berichtigung (Art.&nbsp;16), Löschung (Art.&nbsp;17), Einschränkung der Verarbeitung (Art.&nbsp;18), Datenübertragbarkeit (Art.&nbsp;20) und Widerspruch (Art.&nbsp;21). Eine Einwilligung können Sie jederzeit mit Wirkung für die Zukunft widerrufen (Art.&nbsp;7 Abs.&nbsp;3). Außerdem können Sie sich bei einer Datenschutz-Aufsichtsbehörde beschweren (Art.&nbsp;77), zum Beispiel bei <span class="ph">[Platzhalter: zuständige Landesbehörde]</span>.</p>
 
           <p class="legal-date">Stand: <span class="ph">[Platzhalter: Datum]</span></p>

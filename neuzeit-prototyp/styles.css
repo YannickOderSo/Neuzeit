@@ -3917,6 +3917,99 @@ html.motion .subnav__link::after {
   text-decoration-color: var(--accent-line);
 }
 
+/* Langtexte (Fallbeispiele, Fachbeiträge): Zwischentitel, Listen, Zitate und
+   Abbildungen im selben ruhigen Fluss. Bausteine mit eigener Klasse bleiben
+   unberührt. Listen bekommen role="list", weil ihr Zeichen fehlt. */
+.prose h3 {
+  margin: var(--space-l) 0 var(--space-2xs);
+  color: var(--fg);
+  font-size: var(--fs-body);
+  font-weight: 650;
+  line-height: var(--lh-snug);
+}
+
+.prose :is(ul, ol):not([class]) {
+  display: grid;
+  gap: var(--space-2xs);
+  margin-top: var(--space-s);
+  padding: 0;
+  list-style: none;
+  counter-reset: punkt;
+}
+
+.prose :is(ul, ol):not([class]) + p {
+  margin-top: var(--space-s);
+}
+
+.prose :is(ul, ol):not([class]) > li {
+  position: relative;
+  padding-left: 2rem;
+  color: var(--fg-muted);
+}
+
+/* kurzer Strich wie in den Leistungslisten, mittig zur ersten Zeile */
+.prose ul:not([class]) > li::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0.8em;
+  width: 0.75rem;
+  height: 1px;
+  background: var(--accent-line);
+}
+
+/* Fraunces-Ziffern wie in der Checkliste */
+.prose ol:not([class]) > li::before {
+  counter-increment: punkt;
+  content: counter(punkt, decimal-leading-zero);
+  position: absolute;
+  left: 0;
+  top: 0;
+  color: var(--accent-display);
+  font-family: var(--font-display);
+  font-variant-numeric: lining-nums tabular-nums;
+}
+
+.prose :is(blockquote, figure):not([class]) {
+  margin-block: var(--space-l);
+}
+
+/* Zitat im Text: kursiv an einer Akzentlinie, wie die Zitatkarten */
+.prose blockquote:not([class]) {
+  padding-left: var(--space-m);
+  border-left: 2px solid var(--accent-line);
+}
+
+.prose figure:not([class]) > blockquote {
+  margin-block: 0;
+}
+
+.prose blockquote:not([class]) p {
+  color: var(--fg);
+  font-family: var(--font-display);
+  font-size: 1.25rem;
+  font-style: italic;
+  font-weight: 360;
+  line-height: 1.45;
+}
+
+.prose figure:not([class]) img {
+  width: 100%;
+  height: auto;
+  border-radius: var(--radius-l);
+}
+
+.prose figcaption:not([class]) {
+  margin-top: var(--space-xs);
+  color: var(--fg-muted);
+  font-size: var(--fs-small);
+  line-height: 1.5;
+}
+
+.prose blockquote:not([class]) + figcaption:not([class]) {
+  padding-left: calc(var(--space-m) + 2px);
+}
+
 .legal-note {
   padding: 1rem 1.25rem;
   border-left: 3px solid var(--accent-line);
@@ -3933,9 +4026,311 @@ html.motion .subnav__link::after {
   font-size: var(--fs-small);
 }
 
+/* Datenschutz: Inhaltsverzeichnis, ab 960 px mitlaufend in der linken Spalte.
+   main.js markiert den Abschnitt, der gerade gelesen wird. */
+.legal__toc {
+  margin-bottom: var(--space-xl);
+}
+
+.legal__toc-title,
+.legal__toc-link,
+.legal-sheet h2 {
+  font-family: var(--font-body);
+  font-size: var(--fs-label);
+  font-weight: 650;
+  letter-spacing: 0.12em;
+  line-height: 1.4;
+  text-transform: uppercase;
+}
+
+.legal__toc-title {
+  margin-bottom: var(--space-xs);
+  color: var(--fg);
+}
+
+.legal__toc-list {
+  margin: 0;
+}
+
+.legal__toc-list li {
+  break-inside: avoid;
+}
+
+.legal__toc-link {
+  position: relative;
+  display: block;
+  padding: 0.5rem 0 0.5rem 1rem;
+  border-left: 1px solid var(--line);
+  color: var(--fg-muted);
+  text-decoration: none;
+  transition: color var(--dur-calm) var(--ease-out);
+}
+
+/* aktiver Abschnitt: Akzentstrich auf der Haarlinie, wie bei den Sprungmarken */
+.legal__toc-link::before {
+  content: "";
+  position: absolute;
+  left: -1px;
+  top: 0.25rem;
+  bottom: 0.25rem;
+  width: 2px;
+  background: var(--accent-line);
+  transform: scaleY(0);
+  transition: transform 300ms var(--ease-out);
+}
+
+.legal__toc-link:hover,
+.legal__toc-link[aria-current="true"] {
+  color: var(--fg);
+}
+
+.legal__toc-link[aria-current="true"]::before {
+  transform: none;
+}
+
+/* Auf einen Blick: die belegten Zusagen, jede auf ihrer Haarlinie */
+.legal-facts {
+  display: grid;
+  margin-block: var(--space-s) var(--space-m);
+}
+
+.legal-facts li {
+  position: relative;
+  padding: 0.6rem 0 0.85rem 1.75rem;
+  border-bottom: 1px solid var(--line);
+  color: var(--fg);
+  font-family: var(--font-display);
+  font-size: 1.25rem;
+  font-weight: 380;
+  line-height: 1.35;
+}
+
+/* kurzer Strich wie in den Leistungslisten, mittig zur ersten Zeile */
+.legal-facts li::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: calc(0.6rem + 0.675em);
+  width: 0.75rem;
+  height: 1px;
+  background: var(--accent-line);
+}
+
+/* Impressum als Datenblatt: kurze Angaben in Zeilen auf Haarlinien, die
+   Überschrift als Versal-Label auf der Achse des Seitenkopfs */
+.legal-sheet .legal-note {
+  margin-bottom: var(--space-l);
+}
+
+.legal-entry {
+  display: grid;
+  gap: var(--space-2xs);
+  padding-block: var(--space-s) var(--space-m);
+  border-top: 1px solid var(--line);
+}
+
+.legal-entry:last-child {
+  border-bottom: 1px solid var(--line);
+}
+
+.legal-sheet h2 {
+  margin: 0;
+  color: var(--fg);
+}
+
+/* mittlere Breiten: kompakt in zwei Spalten über dem Text */
+@media (min-width: 40rem) and (max-width: 59.99rem) {
+  .legal__toc-list {
+    columns: 2;
+    column-gap: var(--space-m);
+  }
+}
+
 @media (min-width: 60rem) {
   .prose {
     margin-left: calc((100% + var(--space-m)) / 12 * 3);
+  }
+
+  .legal__grid {
+    display: grid;
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+    column-gap: var(--space-m);
+    align-items: start;
+  }
+
+  .legal__toc {
+    grid-column: 1 / span 3;
+    margin-bottom: 0;
+    padding-right: var(--space-m);
+  }
+
+  .legal__grid > .prose {
+    grid-column: 4 / span 9;
+    margin-left: 0;
+  }
+
+  .legal-sheet {
+    margin-left: 0;
+    max-width: none;
+  }
+
+  .legal-sheet .legal-note {
+    max-width: 44rem;
+    margin-left: calc((100% + var(--space-m)) / 12 * 3);
+  }
+
+  .legal-entry {
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+    column-gap: var(--space-m);
+    padding-block: var(--space-m);
+  }
+
+  .legal-sheet h2 {
+    grid-column: 1 / span 3;
+    padding-top: 0.3rem;
+    padding-right: var(--space-m);
+  }
+
+  .legal-entry > :not(h2) {
+    grid-column: 4 / span 9;
+    max-width: 44rem;
+  }
+}
+
+/* mitlaufend nur, wenn das Verzeichnis sicher in den Bildschirm passt */
+@media (min-width: 60rem) and (min-height: 32rem) {
+  .legal__toc {
+    position: sticky;
+    top: calc(env(safe-area-inset-top, 0px) + var(--header-h) + var(--space-l));
+  }
+}
+
+@media (forced-colors: active) {
+  .legal__toc-link::before {
+    background: CanvasText;
+  }
+}
+
+/* --------------------------------------------------------------------------
+   18n. Fallbeispiel (Vorlage)
+   Aufbau wie die Rechtstexte: Überschrift als Versal-Label links, Inhalt auf
+   der Achse von Spalte 4. Sonst nur vorhandene Bausteine (.prose, .steps,
+   .offer__result, .quote-card, .photo).
+   -------------------------------------------------------------------------- */
+
+/* Startseite: Textlink zur Vorlage unter den Fallbeispiel-Karten */
+.cases__more {
+  margin-top: var(--space-l);
+}
+
+/* Platzhalter im Kicker in normaler Schreibung */
+.kicker .ph {
+  text-transform: none;
+}
+
+/* Faktenband: Versal-Labels auf einer Haarlinie, ab 768 px auf den Achsen 1/4/7/10 */
+.case-facts {
+  justify-self: stretch;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-m);
+  margin-top: var(--space-xs);
+  padding-top: var(--space-s);
+  border-top: 1px solid var(--line);
+}
+
+.case-facts dt,
+.case-part__title {
+  font-family: var(--font-body);
+  font-size: var(--fs-label);
+  font-weight: 650;
+  letter-spacing: 0.12em;
+  line-height: 1.4;
+  text-transform: uppercase;
+}
+
+.case-facts dt {
+  margin-bottom: 0.3rem;
+  color: var(--fg-muted);
+}
+
+.case-facts dd {
+  min-width: 0;
+}
+
+.case-section {
+  padding-top: var(--space-2xl);
+}
+
+.case-study {
+  display: grid;
+  gap: var(--space-2xl);
+}
+
+.case-part {
+  position: relative;
+  display: grid;
+  gap: var(--space-m);
+  padding-top: var(--space-m);
+  border-top: 1px solid var(--line);
+}
+
+/* Knotenpunkt auf der Zeitlinie wie in den Abschnittsköpfen */
+.case-part::before {
+  content: "";
+  position: absolute;
+  top: -0.3125rem;
+  left: 0;
+  width: 0.625rem;
+  height: 0.625rem;
+  border-radius: 50%;
+  background: var(--accent-graphic);
+  box-shadow: 0 0 0 1px var(--color-motif-stroke);
+}
+
+.case-part__title {
+  color: var(--fg);
+}
+
+.case-part__body {
+  min-width: 0;
+  max-width: 44rem;
+}
+
+.case-part__intro {
+  color: var(--fg-muted);
+  text-wrap: pretty;
+}
+
+.case-part__body > .quote-card {
+  margin-top: var(--space-l);
+}
+
+@media (min-width: 48rem) {
+  .case-facts {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+
+@media (min-width: 60rem) {
+  .case-part {
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+    gap: var(--space-xl) var(--space-m);
+  }
+
+  .case-part__title {
+    grid-column: 1 / span 3;
+    padding-top: 0.3rem;
+    padding-right: var(--space-m);
+  }
+
+  .case-part__body {
+    grid-column: 4 / span 9;
+    margin-left: 0;
+  }
+
+  .case-part > .steps {
+    grid-column: 1 / -1;
   }
 }
 
