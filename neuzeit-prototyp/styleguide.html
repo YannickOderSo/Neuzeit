@@ -93,11 +93,420 @@
   <!-- /@kopfzeile -->
 
   <main id="inhalt" tabindex="-1">
-    <!-- Grundgerüst, wird ausgebaut -->
+    <!-- Eigene Stile nur für diese interne Seite. Hier statt im <head>, weil tools/sync.py den <head> überschreibt. -->
+    <link rel="stylesheet" href="styleguide.css">
+
     <section class="page-head page-head--small" aria-labelledby="page-title">
-      <div class="container">
+      <div class="container page-head__inner">
         <p class="kicker">Intern</p>
-        <h1 class="display page-head__title" id="page-title">Gestaltungssystem</h1>
+        <h1 class="display page-head__title" id="page-title">Gestaltungssystem<span class="accent-mark">.</span></h1>
+        <p class="lead page-head__lead">Die Bausteine dieser Website mit ihren echten Klassen. Was hier steht, sieht auf allen Seiten gleich aus. Die Regeln dahinter stehen in <code class="sg-code">DESIGN.md</code>, die für das Logo in <code class="sg-code">logo/LOGO.md</code>.</p>
+      </div>
+      <div class="page-head__horizon" aria-hidden="true" style="--sun-x: 72%"><span class="page-head__sun"></span></div>
+    </section>
+
+    <nav class="subnav" aria-label="Inhalte dieser Seite" data-subnav>
+      <div class="container subnav__inner">
+        <ul class="subnav__list" role="list">
+          <li><a class="subnav__link" href="#farben"><span class="subnav__num" aria-hidden="true">01</span>Farben</a></li>
+          <li><a class="subnav__link" href="#schrift"><span class="subnav__num" aria-hidden="true">02</span>Schrift</a></li>
+          <li><a class="subnav__link" href="#logo"><span class="subnav__num" aria-hidden="true">03</span>Logo und Sonne</a></li>
+          <li><a class="subnav__link" href="#bedienung"><span class="subnav__num" aria-hidden="true">04</span>Bedienung</a></li>
+          <li><a class="subnav__link" href="#platzhalter"><span class="subnav__num" aria-hidden="true">05</span>Platzhalter</a></li>
+          <li><a class="subnav__link" href="#bausteine"><span class="subnav__num" aria-hidden="true">06</span>Bausteine</a></li>
+          <li><a class="subnav__link" href="#masse"><span class="subnav__num" aria-hidden="true">07</span>Maße</a></li>
+        </ul>
+        <span class="subnav__indicator" aria-hidden="true"></span>
+      </div>
+    </nav>
+
+    <!-- ============ Farben ============ -->
+    <section class="section" id="farben" aria-labelledby="farben-title">
+      <div class="container">
+        <header class="section-head">
+          <p class="eyebrow">Farben</p>
+          <div class="section-head__main">
+            <h2 class="h2 section-head__title" id="farben-title">Eine Palette: Nachtblau und Koralle.</h2>
+            <p class="section-head__intro">Der Himmel kurz vor Sonnenaufgang. Nachtblau trägt Schrift, Buttons und dunkle Abschnitte, heller Dunst die Flächen. Die Koralle gehört allein der Sonne.</p>
+          </div>
+        </header>
+
+        <div class="sg-body">
+          <h3 class="sg-title">Grund und Flächen</h3>
+          <ul class="sg-swatches" role="list">
+            <li class="sg-swatch" style="--sg-color: var(--color-bg)"><span class="sg-swatch__chip" aria-hidden="true"></span><span class="sg-swatch__name">Morgenweiß</span><code class="sg-code">--color-bg</code><span class="sg-swatch__meta">#FBF8F5 · Seitengrund</span></li>
+            <li class="sg-swatch" style="--sg-color: var(--color-surface)"><span class="sg-swatch__chip" aria-hidden="true"></span><span class="sg-swatch__name">Dunst</span><code class="sg-code">--color-surface</code><span class="sg-swatch__meta">#EDEEF1 · Karten, getönte Abschnitte</span></li>
+            <li class="sg-swatch" style="--sg-color: var(--color-surface-strong)"><span class="sg-swatch__chip" aria-hidden="true"></span><span class="sg-swatch__name">Dunst tief</span><code class="sg-code">--color-surface-strong</code><span class="sg-swatch__meta">#E1E3E8 · Platzhalter, Fläche auf Dunst</span></li>
+            <li class="sg-swatch" style="--sg-color: var(--color-field)"><span class="sg-swatch__chip" aria-hidden="true"></span><span class="sg-swatch__name">Feld</span><code class="sg-code">--color-field</code><span class="sg-swatch__meta">#FFFFFF · Eingabefelder</span></li>
+          </ul>
+
+          <h3 class="sg-title">Schrift und Linien</h3>
+          <ul class="sg-swatches" role="list">
+            <li class="sg-swatch" style="--sg-color: var(--color-text)"><span class="sg-swatch__chip" aria-hidden="true"></span><span class="sg-swatch__name">Nachttinte</span><code class="sg-code">--color-text</code><span class="sg-swatch__meta">#11182B · Text, 16,7 : 1</span></li>
+            <li class="sg-swatch" style="--sg-color: var(--color-text-muted)"><span class="sg-swatch__chip" aria-hidden="true"></span><span class="sg-swatch__name">Nebentext</span><code class="sg-code">--color-text-muted</code><span class="sg-swatch__meta">#4A5569 · 7,1 : 1</span></li>
+            <li class="sg-swatch" style="--sg-color: var(--color-line-strong)"><span class="sg-swatch__chip" aria-hidden="true"></span><span class="sg-swatch__name">Linie kräftig</span><code class="sg-code">--color-line-strong</code><span class="sg-swatch__meta">#737E92 · Feldränder, 3,9 : 1</span></li>
+            <li class="sg-swatch" style="--sg-color: var(--color-error)"><span class="sg-swatch__chip" aria-hidden="true"></span><span class="sg-swatch__name">Beerenrot</span><code class="sg-code">--color-error</code><span class="sg-swatch__meta">#9C1645 · nur Fehler, 7,6 : 1</span></li>
+          </ul>
+
+          <h3 class="sg-title">Nachtblau</h3>
+          <ul class="sg-swatches" role="list">
+            <li class="sg-swatch" style="--sg-color: var(--color-dark)"><span class="sg-swatch__chip" aria-hidden="true"></span><span class="sg-swatch__name">Nachtblau</span><code class="sg-code">--color-dark</code><span class="sg-swatch__meta">#18203F · dunkle Abschnitte, Buttons</span></li>
+            <li class="sg-swatch" style="--sg-color: var(--color-accent-fill-hover)"><span class="sg-swatch__chip" aria-hidden="true"></span><span class="sg-swatch__name">Nachtblau hell</span><code class="sg-code">--color-accent-fill-hover</code><span class="sg-swatch__meta">#283258 · Button beim Hover</span></li>
+            <li class="sg-swatch" style="--sg-color: var(--color-on-dark-muted)"><span class="sg-swatch__chip" aria-hidden="true"></span><span class="sg-swatch__name">Nebentext auf Nachtblau</span><code class="sg-code">--color-on-dark-muted</code><span class="sg-swatch__meta">#B9C2D4 · 8,9 : 1</span></li>
+          </ul>
+
+          <h3 class="sg-title">Koralle</h3>
+          <ul class="sg-swatches" role="list">
+            <li class="sg-swatch" style="--sg-color: var(--color-accent)"><span class="sg-swatch__chip" aria-hidden="true"></span><span class="sg-swatch__name">Koralle</span><code class="sg-code">--color-accent</code><span class="sg-swatch__meta">#E95739 · Sonne und Grafik, nie Schrift</span></li>
+            <li class="sg-swatch" style="--sg-color: var(--color-accent-text)"><span class="sg-swatch__chip" aria-hidden="true"></span><span class="sg-swatch__name">Koralle für Schrift</span><code class="sg-code">--color-accent-text</code><span class="sg-swatch__meta">#AE3F29 · kleine Schrift auf Hell, 5,6 : 1</span></li>
+            <li class="sg-swatch" style="--sg-color: var(--color-accent-on-dark)"><span class="sg-swatch__chip" aria-hidden="true"></span><span class="sg-swatch__name">Helle Koralle</span><code class="sg-code">--color-accent-on-dark</code><span class="sg-swatch__meta">#FF8A70 · Schrift auf Nachtblau, 6,9 : 1</span></li>
+          </ul>
+
+          <div class="prose sg-rules">
+            <ul>
+              <li><strong>Koralle nur für die Sonne</strong> und ihre kleinen Echos: Punkt am Titel, Knoten der Zeitlinie, große Ziffern, Unterstriche. Nie als Fläche, nie für Buttons, nie für Fließtext.</li>
+              <li><strong>Sonne und Button haben nie dieselbe Farbe.</strong> Buttons sind Nachtblau, damit die Sonne der einzige warme Punkt bleibt.</li>
+              <li><strong>Bausteine färben über Kontext-Tokens</strong> (<code class="sg-code">--fg</code>, <code class="sg-code">--line</code>, <code class="sg-code">--accent-graphic</code> …). So funktioniert derselbe Baustein auf Hell und auf Nachtblau.</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ Schrift ============ -->
+    <section class="section" id="schrift" aria-labelledby="schrift-title">
+      <div class="container">
+        <header class="section-head">
+          <p class="eyebrow">Schrift</p>
+          <div class="section-head__main">
+            <h2 class="h2 section-head__title" id="schrift-title">Zwei Schriften, klare Rollen.</h2>
+            <p class="section-head__intro">Fraunces spricht, Manrope erklärt. Beide liegen auf dem eigenen Server, beim Laden halten maßgleiche Systemschriften die Zeilen an ihrem Platz.</p>
+          </div>
+        </header>
+
+        <div class="sg-body">
+          <div class="sg-fonts">
+            <div class="sg-font sg-font--display">
+              <p class="sg-font__sample" aria-hidden="true">Aa</p>
+              <p class="sg-font__name">Fraunces</p>
+              <p class="sg-font__text">Titel, Überschriften, Zitate, große Ziffern. Gewichte 330 bis 450, festgelegt auf SOFT 30 und WONK 0 wie in der Wortmarke.</p>
+            </div>
+            <div class="sg-font">
+              <p class="sg-font__sample" aria-hidden="true">Aa</p>
+              <p class="sg-font__name">Manrope</p>
+              <p class="sg-font__text">Fließtext 450, Navigation 550, Labels und Buttons 650.</p>
+            </div>
+          </div>
+
+          <dl class="sg-specimens">
+            <div class="sg-row">
+              <dt class="sg-meta"><code class="sg-code">.display</code> Fraunces 380, 44–88 px</dt>
+              <dd><p class="display">Wandel, den Ihre Leute mittragen<span class="accent-mark">.</span></p></dd>
+            </div>
+            <div class="sg-row">
+              <dt class="sg-meta"><code class="sg-code">.h2</code> Fraunces 400, 32–54 px</dt>
+              <dd><p class="h2">Drei Wege durch den Wandel.</p></dd>
+            </div>
+            <div class="sg-row">
+              <dt class="sg-meta"><code class="sg-code">--fs-h3</code> Fraunces 400, 22–28 px, z.&nbsp;B. <code class="sg-code">.form__title</code></dt>
+              <dd><p class="form__title">Erzählen Sie uns, was ansteht.</p></dd>
+            </div>
+            <div class="sg-row">
+              <dt class="sg-meta">Zitat im Text, Fraunces kursiv 360</dt>
+              <dd class="prose"><blockquote><p>„Neuzeit heißt nicht, alles neu zu machen. Sondern das Richtige zur richtigen Zeit.“</p></blockquote></dd>
+            </div>
+            <div class="sg-row">
+              <dt class="sg-meta"><code class="sg-code">.lead</code> Manrope 450, 18–21 px</dt>
+              <dd><p class="lead">Wir begleiten mittelständische Unternehmen durch digitalen und strukturellen Wandel. So, dass Ihre Mitarbeitenden verstehen, was sich ändert.</p></dd>
+            </div>
+            <div class="sg-row">
+              <dt class="sg-meta">Fließtext, Manrope 450, 17 px, Zeilenhöhe 1,6</dt>
+              <dd><p class="sg-measure">Veränderung gelingt, wenn Menschen sie verstehen und mittragen. Daran arbeiten wir mit Ihnen, vom ersten Gespräch bis zum Alltag danach. Absätze, Listen und Zitate brechen mit <code class="sg-code">text-wrap: pretty</code> um, Überschriften mit <code class="sg-code">balance</code>.</p></dd>
+            </div>
+            <div class="sg-row">
+              <dt class="sg-meta"><code class="sg-code">--fs-small</code> 15 px</dt>
+              <dd><p class="sg-small">Hinweise, Quellen und Fehlermeldungen.</p></dd>
+            </div>
+            <div class="sg-row">
+              <dt class="sg-meta">Versal-Labels, Manrope 650, 12,5 px</dt>
+              <dd class="sg-labels"><p class="kicker">Kicker über Seitentiteln</p><p class="eyebrow">Eyebrow über der Zeitlinie</p><p class="field__label">Feldbeschriftung</p></dd>
+            </div>
+          </dl>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ Logo und Sonne ============ -->
+    <section class="section" id="logo" aria-labelledby="logo-title">
+      <div class="container">
+        <header class="section-head">
+          <p class="eyebrow">Logo und Sonne</p>
+          <div class="section-head__main">
+            <h2 class="h2 section-head__title" id="logo-title">Die Sonne ist Signet, keine Dekoration.</h2>
+            <p class="section-head__intro">Ein Halbkreis über dem Horizont, mit einer schmalen Fuge dazwischen. Sie bedeutet Ankunft und Neubeginn und erscheint deshalb sparsam.</p>
+          </div>
+        </header>
+
+        <div class="sg-body">
+          <ul class="sg-logos" role="list">
+            <li class="sg-logo">
+              <div class="sg-logo__stage"><img src="logo/neuzeit-logo.svg" alt="neuzeit-Logo, große Fassung" width="443" height="68"></div>
+              <p class="sg-logo__caption"><code class="sg-code">neuzeit-logo.svg</code> ab etwa 48 px Höhe</p>
+            </li>
+            <li class="sg-logo">
+              <div class="sg-logo__stage"><img src="logo/neuzeit-logo-klein.svg" alt="neuzeit-Logo, kleine Fassung" width="447" height="70"></div>
+              <p class="sg-logo__caption"><code class="sg-code">neuzeit-logo-klein.svg</code> Kopfzeile, Signatur</p>
+            </li>
+            <li class="sg-logo">
+              <div class="sg-logo__stage"><img src="logo/neuzeit-logo-claim.svg" alt="neuzeit-Logo mit Unterzeile" width="443" height="107"></div>
+              <p class="sg-logo__caption"><code class="sg-code">neuzeit-logo-claim.svg</code> mit Unterzeile</p>
+            </li>
+            <li class="sg-logo">
+              <div class="sg-logo__stage sg-logo__stage--dark"><img src="logo/neuzeit-logo-invers.svg" alt="neuzeit-Logo, invers" width="443" height="68"></div>
+              <p class="sg-logo__caption"><code class="sg-code">neuzeit-logo-invers.svg</code> auf Nachtblau</p>
+            </li>
+            <li class="sg-logo">
+              <div class="sg-logo__stage"><img src="logo/neuzeit-logo-einfarbig.svg" alt="neuzeit-Logo, einfarbig" width="441" height="70"></div>
+              <p class="sg-logo__caption"><code class="sg-code">neuzeit-logo-einfarbig.svg</code> Stempel, Gravur</p>
+            </li>
+            <li class="sg-logo">
+              <div class="sg-logo__stage"><img class="sg-logo__mark" src="logo/neuzeit-zeichen.svg" alt="neuzeit-Zeichen" width="32" height="32"></div>
+              <p class="sg-logo__caption"><code class="sg-code">neuzeit-zeichen.svg</code> Zeichen allein</p>
+            </li>
+          </ul>
+
+          <div class="prose sg-rules">
+            <ul>
+              <li><strong>Höchstens drei große Sonnen pro Seite:</strong> oben als Signatur, in der Mitte nur wo nötig, am Schluss im CTA-Band.</li>
+              <li><strong>Immer mit Fuge:</strong> Zwischen Sonne und Horizont bleiben 7&nbsp;% des Durchmessers frei, im CSS <code class="sg-code">--sun-gap: calc(var(--sun-d) * 0.07)</code>.</li>
+              <li><strong>Kleine Sonnen nur, wo etwas ankommt:</strong> Logo, Lesefortschritt, letzter Schritt im Vorgehen, Ergebnis-Karte.</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ Bedienung ============ -->
+    <section class="section" id="bedienung" aria-labelledby="bedienung-title">
+      <div class="container">
+        <header class="section-head">
+          <p class="eyebrow">Bedienung</p>
+          <div class="section-head__main">
+            <h2 class="h2 section-head__title" id="bedienung-title">Buttons, Links und Felder.</h2>
+            <p class="section-head__intro">Die Haupthandlung heißt überall „Potenzialgespräch vereinbaren“. Fokus ist immer sichtbar, ein Ring mit Abstand.</p>
+          </div>
+        </header>
+
+        <div class="sg-body">
+          <dl class="sg-specimens">
+            <div class="sg-row">
+              <dt class="sg-meta"><code class="sg-code">.btn--primary</code>, <code class="sg-code">.btn--ghost</code></dt>
+              <dd>
+                <div class="btn-row">
+                  <a class="btn btn--primary" href="kontakt.html#anfrage">Potenzialgespräch vereinbaren <svg class="btn__icon" viewBox="0 0 16 16" aria-hidden="true" focusable="false"><path d="M3 8h9.5M8.5 4 12.5 8l-4 4"/></svg></a>
+                  <a class="btn btn--ghost" href="leistungen.html">Leistungen ansehen</a>
+                  <p class="btn-row__meta">Zusagen stehen daneben, nicht im Button.</p>
+                </div>
+              </dd>
+            </div>
+            <div class="sg-row">
+              <dt class="sg-meta"><code class="sg-code">.btn--small</code> in der Kopfzeile</dt>
+              <dd><a class="btn btn--primary btn--small" href="kontakt.html#anfrage">Potenzialgespräch</a></dd>
+            </div>
+            <div class="sg-row">
+              <dt class="sg-meta"><code class="sg-code">.text-link</code>, Pfeil mit dem letzten Wort in <code class="sg-code">.nowrap</code></dt>
+              <dd><a class="text-link" href="leistungen.html">Alle Leistungen im <span class="nowrap">Detail<svg class="text-link__icon" viewBox="0 0 16 16" aria-hidden="true" focusable="false"><path d="M3 8h9.5M8.5 4 12.5 8l-4 4"/></svg></span></a></dd>
+            </div>
+            <div class="sg-row">
+              <dt class="sg-meta">Auf Nachtblau: <code class="sg-code">.section--dark</code> schaltet die Kontext-Tokens um</dt>
+              <dd>
+                <div class="section--dark sg-dark">
+                  <p class="eyebrow">Haltung</p>
+                  <p class="sg-dark__text">Derselbe Baustein, andere Umgebung. Schrift, Linien und Akzente wechseln von selbst.</p>
+                  <a class="text-link" href="ueber-uns.html">Mehr über unsere <span class="nowrap">Arbeitsweise<svg class="text-link__icon" viewBox="0 0 16 16" aria-hidden="true" focusable="false"><path d="M3 8h9.5M8.5 4 12.5 8l-4 4"/></svg></span></a>
+                </div>
+              </dd>
+            </div>
+            <div class="sg-row">
+              <dt class="sg-meta">Formularfelder: Ruhe, Fehler, Auswahl. Fehler erscheinen erst nach dem ersten Absenden.</dt>
+              <dd>
+                <div class="sg-stage">
+                  <div class="form sg-form">
+                    <div class="field">
+                      <label class="field__label" for="sg-name">Name <span class="field__req" aria-hidden="true">*</span></label>
+                      <input class="field__input" id="sg-name" type="text" autocomplete="off">
+                    </div>
+                    <div class="field">
+                      <label class="field__label" for="sg-email">E-Mail <span class="field__req" aria-hidden="true">*</span></label>
+                      <input class="field__input" id="sg-email" type="email" value="name@firma" aria-invalid="true" aria-describedby="sg-email-error" autocomplete="off">
+                      <p class="field__error" id="sg-email-error">Bitte prüfen Sie die E-Mail-Adresse (z.&nbsp;B. name@firma.de).</p>
+                    </div>
+                    <div class="field">
+                      <label class="field__label" for="sg-thema">Thema</label>
+                      <div class="field__select">
+                        <select class="field__input" id="sg-thema">
+                          <option value="">Bitte wählen (optional)</option>
+                          <option>Digitaler Wandel &amp; Nutzerakzeptanz</option>
+                          <option>Strukturelle Transformation</option>
+                          <option>Compliance als Change-Prozess</option>
+                        </select>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </dd>
+            </div>
+          </dl>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ Platzhalter ============ -->
+    <section class="section" id="platzhalter" aria-labelledby="platzhalter-title">
+      <div class="container">
+        <header class="section-head">
+          <p class="eyebrow">Platzhalter</p>
+          <div class="section-head__main">
+            <h2 class="h2 section-head__title" id="platzhalter-title">Was fehlt, ist sichtbar markiert.</h2>
+            <p class="section-head__intro">Platzhalter bilden eine eigene Anmerkungsebene außerhalb der Markenfarben. So wirkt nichts erfunden.</p>
+          </div>
+        </header>
+
+        <div class="sg-body">
+          <dl class="sg-specimens">
+            <div class="sg-row">
+              <dt class="sg-meta"><code class="sg-code">.ph</code> im Text, <code class="sg-code">.ph--strong</code> für ganze Karten</dt>
+              <dd><p>Dauer des Gesprächs: <span class="ph">[Platzhalter]</span> · Ansprechperson: <span class="ph">[Platzhalter: Name und Rolle]</span> · <span class="ph ph--strong">[Platzhalter] Kundenstimme, nur mit Freigabe</span></p></dd>
+            </div>
+            <div class="sg-row">
+              <dt class="sg-meta">Platzhalter-Link mit <code class="sg-code">data-placeholder</code> zeigt einen Hinweis</dt>
+              <dd><a class="text-link" href="#" data-placeholder="Das Fallbeispiel">Fallbeispiel <span class="nowrap">lesen<svg class="text-link__icon" viewBox="0 0 16 16" aria-hidden="true" focusable="false"><path d="M3 8h9.5M8.5 4 12.5 8l-4 4"/></svg></span></a></dd>
+            </div>
+            <div class="sg-row">
+              <dt class="sg-meta"><code class="sg-code">.photo</code>: Format, Schnittmarken und ein Briefing, wer was wo tut</dt>
+              <dd>
+                <figure class="photo sg-photo">
+                  <div class="photo__frame" aria-hidden="true"></div>
+                  <figcaption class="photo__caption"><span class="ph"><span class="visually-hidden">Platzhalter für ein Foto:</span><span aria-hidden="true">Foto · 4:3</span></span> <span class="photo__brief">Teamworkshop: Mitarbeitende ordnen ihre Abläufe auf einer Prozesslandkarte.</span></figcaption>
+                </figure>
+              </dd>
+            </div>
+          </dl>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ Bausteine ============ -->
+    <section class="section" id="bausteine" aria-labelledby="bausteine-title">
+      <div class="container">
+        <header class="section-head">
+          <p class="eyebrow">Bausteine</p>
+          <div class="section-head__main">
+            <h2 class="h2 section-head__title" id="bausteine-title">Linien statt Kästen.</h2>
+            <p class="section-head__intro">Listen trennen Haarlinien, Karten liegen auf Dunst. Jeder Abschnitt beginnt mit einer Zeitlinie und ihrem Knoten, so wie hier.</p>
+          </div>
+        </header>
+
+        <div class="sg-body">
+          <dl class="sg-specimens">
+            <div class="sg-row">
+              <dt class="sg-meta"><code class="sg-code">.checklist</code> mit Nummern, <code class="sg-code">--plain</code> mit Strich</dt>
+              <dd class="sg-pair">
+                <ol class="checklist" role="list">
+                  <li><strong>Zuhören.</strong> Wer ist betroffen, was verunsichert?</li>
+                  <li><strong>Verstehen.</strong> Welches Bild der Lage entsteht?</li>
+                </ol>
+                <ul class="checklist checklist--plain" role="list">
+                  <li>Verständliche Abläufe und kurze Leitfäden</li>
+                  <li>Schulungsnachweise für Geschäftsleitung und Team</li>
+                </ul>
+              </dd>
+            </div>
+            <div class="sg-row">
+              <dt class="sg-meta"><code class="sg-code">.reg</code> und <code class="sg-code">.legal-note</code>: Dunst mit Akzentkante</dt>
+              <dd class="sg-pair">
+                <ul class="regs" role="list">
+                  <li class="reg">
+                    <h3 class="reg__title">EU AI Act</h3>
+                    <p class="reg__text">Wer KI einsetzt, muss die KI-Kompetenz seiner Mitarbeitenden fördern.</p>
+                    <p class="reg__source">Art.&nbsp;4 KI-Verordnung (EU)&nbsp;2024/1689</p>
+                  </li>
+                </ul>
+                <p class="legal-note"><strong>Vorlage.</strong> Diese Seite ist ein Entwurf mit Platzhaltern.</p>
+              </dd>
+            </div>
+            <div class="sg-row">
+              <dt class="sg-meta"><code class="sg-code">.faq</code>: aufklappbar, nur eine Antwort zugleich</dt>
+              <dd>
+                <div class="faq">
+                  <details class="faq__item" name="sg-faq">
+                    <summary class="faq__question">Was passiert im Potenzialgespräch?</summary>
+                    <div class="faq__answer">
+                      <p>Sie schildern, was in Ihrem Unternehmen ansteht. Wir fragen nach, ordnen ein und sagen Ihnen ehrlich, wo wir ansetzen würden.</p>
+                    </div>
+                  </details>
+                  <details class="faq__item" name="sg-faq">
+                    <summary class="faq__question">Ersetzen Sie eine Rechtsberatung?</summary>
+                    <div class="faq__answer">
+                      <p>Nein. Die rechtliche Bewertung übernimmt Ihre Kanzlei oder eine Partnerkanzlei <span class="ph">[Platzhalter]</span>.</p>
+                    </div>
+                  </details>
+                </div>
+              </dd>
+            </div>
+          </dl>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ Maße ============ -->
+    <section class="section" id="masse" aria-labelledby="masse-title">
+      <div class="container">
+        <header class="section-head">
+          <p class="eyebrow">Maße</p>
+          <div class="section-head__main">
+            <h2 class="h2 section-head__title" id="masse-title">Abstände, Radien, Bewegung.</h2>
+            <p class="section-head__intro">Ein 12-Spalten-Raster ab 960&nbsp;px, darunter eine Spalte. Bewegung ist Zusatz: Bei reduzierter Bewegung steht sofort die ruhige Endfassung.</p>
+          </div>
+        </header>
+
+        <div class="sg-body">
+          <h3 class="sg-title">Abstände</h3>
+          <ul class="sg-spaces" role="list">
+            <li style="--sg-space: var(--space-3xs)"><code class="sg-code">--space-3xs</code><span class="sg-spaces__bar" aria-hidden="true"></span><span class="sg-spaces__value">4 px</span></li>
+            <li style="--sg-space: var(--space-2xs)"><code class="sg-code">--space-2xs</code><span class="sg-spaces__bar" aria-hidden="true"></span><span class="sg-spaces__value">8 px</span></li>
+            <li style="--sg-space: var(--space-xs)"><code class="sg-code">--space-xs</code><span class="sg-spaces__bar" aria-hidden="true"></span><span class="sg-spaces__value">12 px</span></li>
+            <li style="--sg-space: var(--space-s)"><code class="sg-code">--space-s</code><span class="sg-spaces__bar" aria-hidden="true"></span><span class="sg-spaces__value">16 px</span></li>
+            <li style="--sg-space: var(--space-m)"><code class="sg-code">--space-m</code><span class="sg-spaces__bar" aria-hidden="true"></span><span class="sg-spaces__value">24 px</span></li>
+            <li style="--sg-space: var(--space-l)"><code class="sg-code">--space-l</code><span class="sg-spaces__bar" aria-hidden="true"></span><span class="sg-spaces__value">36 px</span></li>
+            <li style="--sg-space: var(--space-xl)"><code class="sg-code">--space-xl</code><span class="sg-spaces__bar" aria-hidden="true"></span><span class="sg-spaces__value">56 px</span></li>
+            <li style="--sg-space: var(--space-2xl)"><code class="sg-code">--space-2xl</code><span class="sg-spaces__bar" aria-hidden="true"></span><span class="sg-spaces__value">56–96 px</span></li>
+            <li style="--sg-space: var(--space-section)"><code class="sg-code">--space-section</code><span class="sg-spaces__bar" aria-hidden="true"></span><span class="sg-spaces__value">80–152 px</span></li>
+          </ul>
+
+          <h3 class="sg-title">Radien</h3>
+          <ul class="sg-radii" role="list">
+            <li style="--sg-radius: var(--radius-s)"><span class="sg-radii__shape" aria-hidden="true"></span><code class="sg-code">--radius-s</code><span class="sg-swatch__meta">6 px · Felder, Platzhalter</span></li>
+            <li style="--sg-radius: var(--radius-m)"><span class="sg-radii__shape" aria-hidden="true"></span><code class="sg-code">--radius-m</code><span class="sg-swatch__meta">14 px · Hinweise, Toast</span></li>
+            <li style="--sg-radius: var(--radius-l)"><span class="sg-radii__shape" aria-hidden="true"></span><code class="sg-code">--radius-l</code><span class="sg-swatch__meta">24 px · Karten, Formular</span></li>
+            <li style="--sg-radius: var(--radius-pill)"><span class="sg-radii__shape" aria-hidden="true"></span><code class="sg-code">--radius-pill</code><span class="sg-swatch__meta">Buttons, Chips</span></li>
+          </ul>
+
+          <h3 class="sg-title">Bewegung</h3>
+          <div class="sg-table-wrap">
+            <table class="sg-table">
+              <thead>
+                <tr><th scope="col">Token</th><th scope="col">Wert</th><th scope="col">Einsatz</th></tr>
+              </thead>
+              <tbody>
+                <tr><td><code class="sg-code">--ease-out</code></td><td>cubic-bezier(0.22, 0.61, 0.36, 1)</td><td>Einblenden, Linien, Hover</td></tr>
+                <tr><td><code class="sg-code">--ease-sun</code></td><td>cubic-bezier(0.16, 0.84, 0.3, 1)</td><td>Sonnen, Marker, aufsteigende Wörter</td></tr>
+                <tr><td><code class="sg-code">--dur-calm</code></td><td>220 ms</td><td>Farb- und Randwechsel bei Hover und Fokus</td></tr>
+                <tr><td><code class="sg-code">--dur-reveal</code></td><td>600 ms</td><td>Einblenden beim Scrollen</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
       </div>
     </section>
   </main>

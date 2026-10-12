@@ -13,6 +13,8 @@ Klickbarer Website-Prototyp für **Neuzeit**, eine geplante Beratung für Change
 | `ueber-uns.html` | Yannick und Aurel, Arbeitsweise, Prototyping als Methode |
 | `kontakt.html` | Ablauf des Potenzialgesprächs, Formular, Terminbuchung per Calendly |
 | `impressum.html`, `datenschutz.html` | Vorlagen mit Platzhaltern, vor dem Livegang rechtlich prüfen lassen |
+| `styleguide.html` | intern: Gestaltungssystem mit Farben, Schrift, Logo und allen Bausteinen |
+| `fallbeispiel.html` | intern: Vorlage für Fallbeispiele, erst mit Freigabe des Kunden füllen |
 
 Alle Dateien liegen in `neuzeit-prototyp/`. Es gibt kein Framework und keinen Build-Schritt.
 
@@ -36,7 +38,13 @@ cd neuzeit-prototyp
 python3 tools/sync.py
 ```
 
-Das Skript setzt die Teile in alle Seiten ein, schreibt Titel, Beschreibung und Vorschaubild jeder Seite und erneuert `sitemap.xml`. Seitentitel und Beschreibungen stehen oben in `tools/sync.py`.
+Das Skript setzt die Teile in alle Seiten ein, schreibt Titel, Beschreibung und Vorschaubild jeder Seite und erneuert `sitemap.xml`. Seitentitel und Beschreibungen stehen oben in `tools/sync.py`. Interne Seiten (`"intern": True`) bleiben aus Navigation und Sitemap und sind nie für Suchmaschinen freigegeben.
+
+## Gestaltungssystem
+
+- `neuzeit-prototyp/DESIGN.md` hält fest, was der Code tut: Farben mit Kontrasten, Schrift, Raster und Abstände, die Regeln für die Sonne, Bausteine, Bewegung und Platzhalter.
+- `neuzeit-prototyp/styleguide.html` zeigt dieselben Bausteine mit ihren echten Klassen. Neue Bausteine zuerst dort zeigen, dann in `DESIGN.md` festhalten.
+- Es gibt genau eine Palette, „Nachtblau & Koralle“. Die Koralle gehört allein der Sonne, Buttons sind Nachtblau.
 
 ## Vor dem Livegang
 
