@@ -42,7 +42,7 @@ Das Skript setzt die Teile in alle Seiten ein, schreibt Titel, Beschreibung und 
 
 1. **Formular:** In `kontakt.html` beim Formular `data-endpoint` mit der Adresse eines Formulardienstes füllen (z. B. Formspree oder Web3Forms; dort die Ziel-E-Mail hinterlegen). Für den Versand ohne JavaScript zusätzlich `action` und `method="post"` setzen. Solange das Feld leer ist, versendet das Formular nichts.
 2. **Terminbuchung:** In `kontakt.html` `data-calendly-url` mit dem eigenen Calendly-Link füllen. Der Kalender lädt erst nach einem Klick (Zwei-Klick-Lösung); vorher fließen keine Daten zu Calendly.
-3. **Cookie-Banner:** Die Seite setzt keine Cookies und hat kein Tracking, deshalb gibt es keinen Banner. Kommt Analytics oder ein anderer Dienst dazu, wird einer nötig.
+3. **Cookie-Banner:** Die Seite setzt keine eigenen Cookies und hat kein Tracking, deshalb gibt es keinen Banner. Calendly kann Cookies setzen, lädt aber erst nach einem Klick mit Hinweis und Einwilligung. Kommt Analytics oder ein anderer Dienst dazu, wird ein Banner nötig.
 4. **Rechtstexte:** Impressum und Datenschutzerklärung ergänzen und von einer Kanzlei prüfen lassen, ebenso die Aussagen zu EU AI Act, NIS2 und DSGVO.
 5. **Suchmaschinen:** In `tools/sync.py` `INDEXIERBAR = True` setzen und das Skript ausführen. Bei eigener Domain auch `BASIS_URL` anpassen.
 6. **Inhalte:** Alle [Platzhalter] ersetzen: Nachnamen, Porträts, Fotos, Kontaktdaten, Kundenstimmen und Fallbeispiele (nur mit Freigabe).

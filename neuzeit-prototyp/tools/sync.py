@@ -88,8 +88,8 @@ SEITEN = {
         "pfad": "datenschutz.html",
         "titel": "Datenschutzerklärung · Neuzeit",
         "og_titel": "Datenschutzerklärung",
-        "beschreibung": "Wie Neuzeit mit Ihren Daten umgeht: keine Cookies, kein Tracking, "
-                        "Kontaktformular und Terminbuchung nur auf Ihren Wunsch.",
+        "beschreibung": "Wie Neuzeit mit Ihren Daten umgeht: kein Tracking, keine eigenen Cookies. "
+                        "Kontaktformular und Terminkalender nur auf Ihren Wunsch.",
         "og": "start",
     },
     # Interne Seiten: nicht in Navigation und Sitemap, nie indexierbar
