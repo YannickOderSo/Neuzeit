@@ -452,6 +452,31 @@
   });
 
   /* ------------------------------------------------------------------------
+     Druck: alle Antworten der häufigen Fragen aufklappen, danach wie vorher.
+     name="faq" lässt nur eine offene Antwort zu, deshalb kurz entfernen.
+     ------------------------------------------------------------------------ */
+  var printedDetails = null;
+
+  window.addEventListener("beforeprint", function () {
+    if (printedDetails) return;
+    printedDetails = Array.prototype.slice.call(document.querySelectorAll("details.faq__item")).map(function (item) {
+      var state = { item: item, open: item.open, name: item.getAttribute("name") };
+      item.removeAttribute("name");
+      item.open = true;
+      return state;
+    });
+  });
+
+  window.addEventListener("afterprint", function () {
+    if (!printedDetails) return;
+    printedDetails.forEach(function (state) {
+      state.item.open = state.open;
+      if (state.name !== null) state.item.setAttribute("name", state.name);
+    });
+    printedDetails = null;
+  });
+
+  /* ------------------------------------------------------------------------
      Hinweis-Toast für Platzhalter-Links
      ------------------------------------------------------------------------ */
   var toast = document.querySelector("[data-toast]");

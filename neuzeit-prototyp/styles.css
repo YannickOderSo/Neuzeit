@@ -2406,6 +2406,10 @@ html.menu-open .site-header__cta,
   margin: 0;
 }
 
+.site-footer__print {
+  display: none;
+}
+
 .site-footer__bottom {
   display: flex;
   flex-wrap: wrap;
@@ -5106,6 +5110,144 @@ html:not(.js) .site-header__cta {
 
   body::after {
     display: none;
+  }
+}
+
+/* Papier: Druckdialoge lassen Hintergründe standardmäßig weg. Dunkle Flächen
+   werden deshalb hell gesetzt, Buttons zu Konturen; was nur am Bildschirm
+   etwas tut (Navigation, Formular, Kalender, Bildplatzhalter), entfällt.
+   Die Antworten der häufigen Fragen klappt main.js vor dem Druck auf. */
+@page {
+  size: A4;
+  margin: 16mm 15mm 18mm;
+}
+
+@media print {
+  :root {
+    --space-section: 2.75rem;
+    --space-2xl: 2rem;
+    --grain-opacity: 0;
+  }
+
+  body {
+    background: none;
+  }
+
+  .section--dark,
+  .offer__result,
+  .site-footer {
+    --fg: var(--color-text);
+    --fg-muted: var(--color-text-muted);
+    --line: var(--color-line);
+    --accent-graphic: var(--color-accent);
+    --accent-type: var(--color-accent-text);
+    --accent-display: var(--color-accent);
+    --accent-line: var(--color-accent-line);
+    background: none !important;
+    color: var(--fg);
+  }
+
+  .offer__result {
+    border: 1px solid var(--color-line-strong);
+  }
+
+  .btn {
+    border: 1px solid currentColor !important;
+    background: none !important;
+    color: var(--color-text) !important;
+  }
+
+  .site-header .nav,
+  .site-header__cta,
+  .subnav,
+  .hero .btn-row,
+  .people-band,
+  .photo,
+  .stance__horizon,
+  .proto-demo,
+  .cta-band,
+  .booking,
+  .form,
+  .legal__toc,
+  a[href="#termin"],
+  .site-footer__inner > :not(.site-footer__bottom),
+  .site-footer__legal {
+    display: none !important;
+  }
+
+  /* Sonnen, Knoten und Linien sind Hintergründe: für sie die Farben erzwingen */
+  .page-head__sun,
+  .page-head__horizon::after,
+  .section-head::before,
+  .step__marker,
+  .offer__result::before,
+  .legal-facts li::before,
+  .talk-step:last-child .talk-step__num {
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  .site-footer {
+    padding-block: var(--space-m) 0;
+  }
+
+  /* Startseite: Titel und Sonne auf der ersten Seite, die Sonne kleiner */
+  .hero {
+    overflow: visible;
+  }
+
+  .hero__visual {
+    width: min(100%, 22rem);
+    margin-inline: auto;
+  }
+
+  /* Porträts und Fallbeispiel-Bilder sind Platzhalter auf Dunst, der nicht gedruckt wird */
+  .person__portrait,
+  .case__visual {
+    display: none !important;
+  }
+
+  /* Antworten stehen offen da, das Plus zum Aufklappen braucht es nicht */
+  .faq__question::after {
+    display: none;
+  }
+
+  .site-footer__print {
+    display: block !important;
+    flex-basis: 100%;
+    color: var(--color-text);
+    font-weight: 650;
+  }
+
+  .steps,
+  .case,
+  .quote-card,
+  .service__card,
+  .step,
+  .reason,
+  .offer__result,
+  .faq__item,
+  .person,
+  .profile,
+  .principle,
+  .talk-step,
+  .reg,
+  .legal-note,
+  .checklist li {
+    break-inside: avoid;
+  }
+
+  h1,
+  h2,
+  h3,
+  .section-head,
+  .offer__label {
+    break-after: avoid;
+  }
+
+  p {
+    orphans: 3;
+    widows: 3;
   }
 }
 
