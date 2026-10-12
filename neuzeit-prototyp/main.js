@@ -8,7 +8,7 @@
 
   var root = document.documentElement;
   var reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
-  var desktopNav = window.matchMedia("(min-width: 60rem)");
+  var desktopNav = window.matchMedia("(min-width: 40rem)");
   var wideLayout = window.matchMedia("(min-width: 48rem)");
 
   /* Bewegung nur, wenn niemand reduzierte Bewegung eingestellt hat.
@@ -52,7 +52,26 @@
     return [menuToggle].concat(Array.prototype.slice.call(menu.querySelectorAll("a[href], button")));
   }
 
+  /* Schließen mit Bewegung: erst ausblenden (.is-closing), dann hidden */
+  var closingTimer = null;
+
+  function stopClosing() {
+    window.clearTimeout(closingTimer);
+    menu.removeEventListener("animationend", onClosingEnd);
+    menu.classList.remove("is-closing");
+  }
+
+  function finishClosing() {
+    stopClosing();
+    menu.hidden = true;
+  }
+
+  function onClosingEnd(event) {
+    if (event.target === menu) finishClosing();
+  }
+
   function openMenu() {
+    stopClosing();
     menu.hidden = false;
     menuToggle.setAttribute("aria-expanded", "true");
     if (menuLabel) menuLabel.textContent = "Schließen";
@@ -64,8 +83,14 @@
   }
 
   function closeMenu(returnFocus) {
-    if (menu.hidden) return;
-    menu.hidden = true;
+    if (menu.hidden || menu.classList.contains("is-closing")) return;
+    if (motionOK && !desktopNav.matches) {
+      menu.classList.add("is-closing");
+      menu.addEventListener("animationend", onClosingEnd);
+      closingTimer = window.setTimeout(finishClosing, 400); /* falls animationend ausbleibt */
+    } else {
+      menu.hidden = true;
+    }
     menuToggle.setAttribute("aria-expanded", "false");
     if (menuLabel) menuLabel.textContent = "Menü";
     root.classList.remove("menu-open");
@@ -97,7 +122,7 @@
 
   if (menuToggle && menu) {
     menuToggle.addEventListener("click", function () {
-      if (menu.hidden) openMenu();
+      if (menu.hidden || menu.classList.contains("is-closing")) openMenu();
       else closeMenu(false);
     });
 
@@ -194,7 +219,10 @@
     if (active && subnavList && subnavList.scrollWidth > subnavList.clientWidth) {
       var listRect = subnavList.getBoundingClientRect();
       var linkRect = active.getBoundingClientRect();
-      if (linkRect.left < listRect.left || linkRect.right > listRect.right) {
+      /* im Verlauf an den Kanten (Innenabstand) gilt ein Punkt als verdeckt */
+      var listStyle = getComputedStyle(subnavList);
+      if (linkRect.left < listRect.left + parseFloat(listStyle.paddingLeft) ||
+          linkRect.right > listRect.right - parseFloat(listStyle.paddingRight)) {
         subnavList.scrollTo({
           left: subnavList.scrollLeft + linkRect.left - listRect.left - 16,
           behavior: motionOK ? "smooth" : "auto"

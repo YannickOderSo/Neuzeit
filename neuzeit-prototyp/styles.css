@@ -84,7 +84,7 @@
   --font-display: "Fraunces", "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, "Times New Roman", serif;
   --font-body: "Manrope", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
 
-  --fs-display: clamp(2.75rem, 6vw, 5.5rem);
+  --fs-display: clamp(2.75rem, 1.25rem + 5vw, 5.5rem);
   --fs-h2: clamp(2rem, 3.8vw, 3.375rem);
   --fs-h3: clamp(1.375rem, 1.9vw, 1.75rem);
   --fs-quote: clamp(2rem, 4.6vw, 4.25rem);
@@ -562,6 +562,14 @@ main:focus {
   gap: var(--space-xs);
 }
 
+/* kurze Zusage unter den Buttons, eigene Zeile in der Reihe (Abstand: gap 0,75rem) */
+.btn-row__meta {
+  flex-basis: 100%;
+  color: var(--fg-muted);
+  font-size: var(--fs-small);
+  line-height: 1.4;
+}
+
 .btn {
   display: inline-flex;
   align-items: center;
@@ -577,6 +585,7 @@ main:focus {
   line-height: 1.2;
   letter-spacing: 0.005em;
   text-align: center;
+  text-wrap: balance;
   text-decoration: none;
   cursor: pointer;
   transition: background-color var(--dur-calm) var(--ease-out),
@@ -584,6 +593,18 @@ main:focus {
               border-color var(--dur-calm) var(--ease-out),
               background-size 450ms var(--ease-out),
               transform 160ms var(--ease-out);
+}
+
+/* schmale Handys: Haupt-Buttons bleiben einzeilig, gestapelt gleich breit
+   (.btn--small steht weiter unten und behält sein Maß) */
+@media (max-width: 29.99rem) {
+  .btn {
+    padding-inline: 1.25rem;
+  }
+
+  .btn-row > .btn {
+    flex: 1 1 100%;
+  }
 }
 
 .btn:active {
@@ -740,6 +761,7 @@ html.vt-nav .site-header .brand__sun {
   font-size: 0.9875rem;
   font-weight: 550;
   text-decoration: none;
+  white-space: nowrap;
   color: var(--fg);
 }
 
@@ -857,6 +879,12 @@ html.vt-nav .site-header .brand__sun {
   text-decoration: none;
 }
 
+/* aktuelle Seite; beim Tippen dieselbe Farbe als Rückmeldung */
+.mobile-menu__link[aria-current="page"],
+.mobile-menu__link:active {
+  color: var(--accent-type);
+}
+
 .mobile-menu__num {
   min-width: 1.75em;
   font-variant-numeric: tabular-nums;
@@ -876,8 +904,24 @@ html.vt-nav .site-header .brand__sun {
   to { opacity: 1; transform: none; }
 }
 
+/* Schließen spiegelt das Öffnen; main.js setzt danach hidden */
+.mobile-menu.is-closing {
+  pointer-events: none;
+  animation: menu-out 180ms var(--ease-out) both;
+}
+
+@keyframes menu-out {
+  from { opacity: 1; transform: none; }
+  to { opacity: 0; transform: translateY(-0.5rem); }
+}
+
 html.menu-open {
   overflow: hidden;
+}
+
+/* nur ein CTA: im offenen Menü steht er unten */
+html.menu-open .site-header__cta {
+  visibility: hidden;
 }
 
 @media (min-width: 30rem) {
@@ -886,7 +930,7 @@ html.menu-open {
   }
 }
 
-@media (min-width: 60rem) {
+@media (min-width: 40rem) {
   .nav {
     display: block;
   }
@@ -902,6 +946,18 @@ html.menu-open {
 
   .site-header__cta {
     margin-left: var(--space-s);
+  }
+}
+
+/* 480 bis 767 px: engere Abstände, damit das Logo nicht gestaucht wird und
+   Logo, Navigation bzw. Menü und CTA in eine Zeile passen */
+@media (min-width: 30rem) and (max-width: 47.99rem) {
+  .site-header__inner {
+    gap: var(--space-s);
+  }
+
+  .site-header__cta {
+    margin-left: 0;
   }
 }
 
@@ -1156,10 +1212,11 @@ html.menu-open {
   }
 }
 
-/* Die Horizontlinie verlängert die Button-Reihe nach rechts */
+/* Die Horizontlinie verlängert die Button-Reihe nach rechts
+   (abzüglich der Zeile .btn-row__meta: Abstand plus Zeilenhöhe) */
 @media (min-width: 75rem) {
   .hero__text {
-    padding-bottom: 2.75rem;
+    padding-bottom: calc(2.75rem - var(--space-xs) - 1.4 * var(--fs-small));
   }
 }
 
@@ -2011,6 +2068,7 @@ html.menu-open {
    15. Kontakt
    -------------------------------------------------------------------------- */
 .contact {
+  padding-top: var(--space-xl); /* Formular im ersten Bildschirm */
   background-color: var(--color-surface);
   transition: background-color 400ms var(--ease-out);
 }
@@ -2559,7 +2617,7 @@ html.has-palette .site-footer {
 
 .page-head__title {
   max-width: 16ch;
-  font-size: clamp(2.5rem, 5.2vw, 4.75rem);
+  font-size: clamp(2.5rem, 1.25rem + 4.2vw, 4.75rem);
 }
 
 .page-head__lead {
@@ -2615,6 +2673,7 @@ html.has-palette .site-footer {
 }
 
 .page-head--small .page-head__title {
+  max-width: 20ch; /* kleinere Schrift läuft breiter: Kontakt bleibt einzeilig */
   font-size: clamp(2.25rem, 4.4vw, 3.75rem);
 }
 
@@ -2993,6 +3052,19 @@ html.has-palette .site-footer {
   box-shadow: 0 0 0 1.5px var(--color-motif-stroke);
 }
 
+/* schmale Handys: mehr Breite, damit der Button einzeilig bleibt */
+@media (max-width: 29.99rem) {
+  .cta-band__inner {
+    padding-inline: 1.25rem;
+  }
+
+  /* volle Breite: das Innenmaß ist nur noch Mindestabstand, so passt es ab 375 px */
+  .cta-band__actions > .btn {
+    flex: 1 1 100%;
+    padding-inline: 1rem;
+  }
+}
+
 @media (min-width: 60rem) {
   .cta-band__text,
   .cta-band__actions {
@@ -3034,6 +3106,24 @@ html:has(.subnav) {
 
 .subnav__list::-webkit-scrollbar {
   display: none;
+}
+
+/* schmal: weiche Kanten zeigen, dass die Leiste weitergeht; Einträge rasten
+   am linken Rand ein (passt zum Versatz von 16 px in main.js). Rechts so viel
+   Innenabstand wie Verlauf, damit der letzte Eintrag am Ende ganz sichtbar ist. */
+@media (max-width: 59.99rem) {
+  .subnav__list {
+    margin-inline: -1rem;
+    padding-inline: 1rem 2rem;
+    -webkit-mask-image: linear-gradient(to right, transparent, #000 1rem, #000 calc(100% - 2rem), transparent);
+    mask-image: linear-gradient(to right, transparent, #000 1rem, #000 calc(100% - 2rem), transparent);
+    scroll-snap-type: x proximity;
+    scroll-padding-inline: 1rem;
+  }
+
+  .subnav__link {
+    scroll-snap-align: start;
+  }
 }
 
 .subnav__link {
@@ -3186,6 +3276,39 @@ html.motion .subnav__link::after {
   background: color-mix(in srgb, var(--color-bg) 60%, transparent);
   font-size: 0.875rem;
   line-height: 1.4;
+}
+
+/* schmal: ruhige Liste mit Haarlinien statt Pillen, die wie Filter wirken */
+@media (max-width: 47.99rem) {
+  .chips {
+    display: grid;
+    gap: 0;
+  }
+
+  .chips li {
+    position: relative;
+    padding: 0.6rem 0 0.6rem 1.5rem;
+    border: 0;
+    border-top: 1px solid var(--line);
+    border-radius: 0;
+    background: none;
+    font-size: var(--fs-small);
+  }
+
+  .chips li:last-child {
+    border-bottom: 1px solid var(--line);
+  }
+
+  /* kurzer Strich als Aufzählungszeichen, Mitte der ersten Zeile */
+  .chips li::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: calc(0.6rem + 0.75em);
+    width: 0.75rem;
+    height: 1px;
+    background: var(--fg-muted);
+  }
 }
 
 .offer__body {
