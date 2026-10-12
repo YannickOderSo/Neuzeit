@@ -505,7 +505,8 @@
 
   /* ------------------------------------------------------------------------
      Kontaktformular: Prüfung im Browser, Versand an einen Formulardienst
-     Ohne Eintrag in data-endpoint bleibt es bei der Vorschau ohne Versand.
+     Die Adresse steht in data-endpoint oder, für den Versand ohne JavaScript,
+     in action mit method="post". Ohne Adresse bleibt es bei der Vorschau.
      ------------------------------------------------------------------------ */
   var form = document.querySelector("[data-form]");
   var status = document.querySelector("[data-form-status]");
@@ -542,7 +543,14 @@
 
   var submitButton = form && form.querySelector(".btn--submit");
   var submitLabel = form && form.querySelector("[data-submit-label]");
-  var endpoint = form ? (form.getAttribute("data-endpoint") || "").trim() : "";
+  var endpoint = "";
+  if (form) {
+    endpoint = (form.getAttribute("data-endpoint") || "").trim();
+    if (!endpoint && /^post$/i.test(form.getAttribute("method") || "")) {
+      endpoint = (form.getAttribute("action") || "").trim();
+    }
+    if (!/^https:\/\//.test(endpoint)) endpoint = "";
+  }
 
   /* Fehler meldet die Statusregion sofort (role="alert"), alles andere höflich */
   function clearStatus(urgent) {
@@ -610,6 +618,15 @@
   }
 
   function send(data) {
+    /* Betreff für die E-Mail im Postfach; das Spam-Feld geht nicht mit */
+    var subject = "Neue Anfrage über die Website: Potenzialgespräch";
+    data.delete("website");
+    if (/web3forms\.com/.test(endpoint)) {
+      data.set("subject", subject);
+      data.set("from_name", "Website Neuzeit");
+    } else if (/formspree\.io/.test(endpoint)) {
+      data.set("_subject", subject);
+    }
     /* Formspree, Web3Forms und ähnliche Dienste antworten mit JSON */
     return window.fetch(endpoint, {
       method: "POST",
@@ -714,8 +731,30 @@
      Terminbuchung mit Zwei-Klick-Lösung: Der Kalender von Calendly lädt erst,
      wenn jemand ihn aktiv anfordert. Vorher fließen keine Daten in die USA.
      ------------------------------------------------------------------------ */
+  /* Farben passend zur Seite. Calendly übernimmt sie nur in Tarifen, die
+     eigene Farben erlauben; sonst erscheint der Kalender in Calendly-Blau. */
+  var CALENDLY_PARAMS = {
+    hide_gdpr_banner: "1",
+    background_color: "fbf8f5",
+    text_color: "11182b",
+    primary_color: "18203f"
+  };
+
+  function calendlyUrl(raw) {
+    try {
+      var url = new URL(raw);
+      if (url.protocol !== "https:" || url.hostname !== "calendly.com" || url.pathname.length < 2) return null;
+      Object.keys(CALENDLY_PARAMS).forEach(function (key) {
+        url.searchParams.set(key, CALENDLY_PARAMS[key]);
+      });
+      return url.href;
+    } catch (e) {
+      return null;
+    }
+  }
+
   document.querySelectorAll("[data-calendly]").forEach(function (box) {
-    var url = (box.getAttribute("data-calendly-url") || "").trim();
+    var url = calendlyUrl((box.getAttribute("data-calendly-url") || "").trim());
     var loadButton = box.querySelector("[data-calendly-load]");
     var consent = box.querySelector("[data-calendly-consent]");
     var frame = box.querySelector("[data-calendly-frame]");
@@ -733,11 +772,19 @@
 
     loadButton.addEventListener("click", function () {
       frame.textContent = "";
-      if (/^https:\/\/calendly\.com\/[\w-]/.test(url)) {
+      if (url) {
         var iframe = document.createElement("iframe");
-        iframe.src = url + (url.indexOf("?") === -1 ? "?" : "&") + "hide_gdpr_banner=1";
+        iframe.src = url;
         iframe.title = "Terminbuchung über Calendly";
         frame.appendChild(iframe);
+        /* Kalender wieder entfernen: danach fließen keine weiteren Daten */
+        var close = document.createElement("button");
+        close.type = "button";
+        close.className = "btn btn--ghost btn--small booking__close";
+        close.style.marginTop = "var(--space-s, 1rem)";
+        close.textContent = "Kalender wieder schließen";
+        close.addEventListener("click", showConsent);
+        frame.appendChild(close);
       } else {
         /* Prototyp: noch kein Calendly-Link hinterlegt */
         var box2 = document.createElement("div");

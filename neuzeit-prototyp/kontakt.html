@@ -132,9 +132,11 @@
           <a class="text-link" href="#termin">Lieber direkt einen Termin <span class="nowrap">wählen<svg class="text-link__icon" viewBox="0 0 16 16" aria-hidden="true" focusable="false"><path d="M3 8h9.5M8.5 4 12.5 8l-4 4"/></svg></span></a>
         </div>
 
-        <!-- Versand: In data-endpoint die Adresse eines Formulardienstes eintragen
-             (z. B. Formspree oder Web3Forms). Für den Versand ohne JavaScript
-             zusätzlich action="…" und method="post" setzen. Leer = Vorschau ohne Versand. -->
+        <!-- Versand freischalten (ohne Adresse bleibt es bei der Vorschau):
+             Formspree: method="post" action="https://formspree.io/f/IHRE-ID" setzen.
+             Web3Forms: method="post" action="https://api.web3forms.com/submit" setzen und
+             im Formular <input type="hidden" name="access_key" value="IHR-SCHLÜSSEL"> ergänzen.
+             So funktioniert der Versand auch ohne JavaScript. Nur https-Adressen werden genutzt. -->
         <form class="form" id="anfrage" method="dialog" aria-labelledby="form-title" data-form data-endpoint="" data-reveal>
           <h2 class="form__title" id="form-title">Potenzialgespräch anfragen</h2>
           <p class="form__hint">Wir melden uns innerhalb von <span class="ph">[Platzhalter: Antwortzeit]</span> mit Terminvorschlägen. Felder mit <span aria-hidden="true">*</span><span class="visually-hidden">Sternchen</span> sind Pflichtfelder.</p>
@@ -201,7 +203,8 @@
 
     <!-- ============ Termin direkt buchen (Zwei-Klick-Lösung) ============ -->
     <!-- Calendly: In data-calendly-url den eigenen Link eintragen, z. B.
-         https://calendly.com/name/potenzialgespraech. Der Kalender lädt erst nach Klick. -->
+         https://calendly.com/name/potenzialgespraech. Der Kalender lädt erst nach Klick;
+         die Farben der Seite setzt main.js (CALENDLY_PARAMS). -->
     <section class="section booking-section" id="termin" aria-labelledby="termin-title">
       <div class="container">
         <div class="booking" data-calendly data-calendly-url="">
