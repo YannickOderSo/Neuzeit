@@ -92,6 +92,33 @@ SEITEN = {
                         "Kontaktformular und Terminbuchung nur auf Ihren Wunsch.",
         "og": "start",
     },
+    # Interne Seiten: nicht in Navigation und Sitemap, nie indexierbar
+    "styleguide.html": {
+        "seite": "styleguide",
+        "pfad": "styleguide.html",
+        "titel": "Gestaltungssystem · Neuzeit",
+        "og_titel": "Gestaltungssystem",
+        "beschreibung": "Farben, Schrift, Bausteine und Regeln des Neuzeit-Auftritts auf einen Blick.",
+        "og": "start",
+        "intern": True,
+    },
+    "fallbeispiel.html": {
+        "seite": "fallbeispiel",
+        "pfad": "fallbeispiel.html",
+        "titel": "Fallbeispiel (Vorlage) · Neuzeit",
+        "og_titel": "Fallbeispiel",
+        "beschreibung": "Vorlage für Fallbeispiele von Neuzeit: Ausgangslage, Vorgehen und Ergebnis.",
+        "og": "start",
+        "intern": True,
+    },
+}
+
+# Satz auf dem jeweiligen Vorschaubild (og/<name>.png), für den Alternativtext
+OG_SAETZE = {
+    "start": "Wandel, den Ihre Leute mittragen.",
+    "leistungen": "Drei Wege durch den Wandel.",
+    "ueber-uns": "Zwei Blickwinkel. Ein gemeinsamer Weg.",
+    "kontakt": "Lassen Sie uns sprechen.",
 }
 
 BEREICHE = {
@@ -127,8 +154,8 @@ def werte(seite):
         "url": BASIS_URL + seite["pfad"],
         "basis": BASIS_URL,
         "og": seite["og"],
-        "og_alt": escape("neuzeit-Logo mit dem Satz: " + seite["og_titel"]),
-        "robots": "index, follow" if INDEXIERBAR else "noindex",
+        "og_alt": escape("neuzeit-Logo mit dem Satz: " + OG_SAETZE.get(seite["og"], seite["og_titel"])),
+        "robots": "index, follow" if INDEXIERBAR and not seite.get("intern") else "noindex",
         "jsonld": jsonld(seite),
     }
 
@@ -177,7 +204,7 @@ def seite_aktualisieren(datei, seite):
 
 def sitemap():
     eintraege = "\n".join(
-        f"  <url><loc>{BASIS_URL + s['pfad']}</loc></url>" for s in SEITEN.values()
+        f"  <url><loc>{BASIS_URL + s['pfad']}</loc></url>" for s in SEITEN.values() if not s.get("intern")
     )
     (ORDNER / "sitemap.xml").write_text(
         '<?xml version="1.0" encoding="UTF-8"?>\n'
