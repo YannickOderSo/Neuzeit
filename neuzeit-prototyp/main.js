@@ -8,7 +8,7 @@
 
   var root = document.documentElement;
   var reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
-  var desktopNav = window.matchMedia("(min-width: 60rem)");
+  var desktopNav = window.matchMedia("(min-width: 40rem)");
   var wideLayout = window.matchMedia("(min-width: 48rem)");
 
   /* Bewegung nur, wenn niemand reduzierte Bewegung eingestellt hat.
@@ -52,7 +52,27 @@
     return [menuToggle].concat(Array.prototype.slice.call(menu.querySelectorAll("a[href], button")));
   }
 
+  /* Schließen mit Bewegung: erst ausblenden (.is-closing), dann hidden */
+  var closingTimer = null;
+
+  function stopClosing() {
+    window.clearTimeout(closingTimer);
+    menu.removeEventListener("animationend", onClosingEnd);
+    menu.classList.remove("is-closing");
+    menu.inert = false;
+  }
+
+  function finishClosing() {
+    stopClosing();
+    menu.hidden = true;
+  }
+
+  function onClosingEnd(event) {
+    if (event.target === menu) finishClosing();
+  }
+
   function openMenu() {
+    stopClosing();
     menu.hidden = false;
     menuToggle.setAttribute("aria-expanded", "true");
     if (menuLabel) menuLabel.textContent = "Schließen";
@@ -64,8 +84,15 @@
   }
 
   function closeMenu(returnFocus) {
-    if (menu.hidden) return;
-    menu.hidden = true;
+    if (menu.hidden || menu.classList.contains("is-closing")) return;
+    if (motionOK && !desktopNav.matches) {
+      menu.classList.add("is-closing");
+      menu.inert = true; /* beim Ausblenden nicht mehr erreichbar */
+      menu.addEventListener("animationend", onClosingEnd);
+      closingTimer = window.setTimeout(finishClosing, 400); /* falls animationend ausbleibt */
+    } else {
+      menu.hidden = true;
+    }
     menuToggle.setAttribute("aria-expanded", "false");
     if (menuLabel) menuLabel.textContent = "Menü";
     root.classList.remove("menu-open");
@@ -97,12 +124,17 @@
 
   if (menuToggle && menu) {
     menuToggle.addEventListener("click", function () {
-      if (menu.hidden) openMenu();
+      if (menu.hidden || menu.classList.contains("is-closing")) openMenu();
       else closeMenu(false);
     });
 
     menu.addEventListener("click", function (event) {
       if (event.target.closest("a[href]")) closeMenu(false);
+    });
+
+    /* Seitenwechsel: das ausblendende Menü darf nicht ins Übergangsbild geraten */
+    window.addEventListener("pageswap", function () {
+      if (menu.classList.contains("is-closing")) finishClosing();
     });
 
     var onBreakpointChange = function (mq) {
@@ -194,7 +226,10 @@
     if (active && subnavList && subnavList.scrollWidth > subnavList.clientWidth) {
       var listRect = subnavList.getBoundingClientRect();
       var linkRect = active.getBoundingClientRect();
-      if (linkRect.left < listRect.left || linkRect.right > listRect.right) {
+      /* im Verlauf an den Kanten (Innenabstand) gilt ein Punkt als verdeckt */
+      var listStyle = getComputedStyle(subnavList);
+      if (linkRect.left < listRect.left + parseFloat(listStyle.paddingLeft) ||
+          linkRect.right > listRect.right - parseFloat(listStyle.paddingRight)) {
         subnavList.scrollTo({
           left: subnavList.scrollLeft + linkRect.left - listRect.left - 16,
           behavior: motionOK ? "smooth" : "auto"
@@ -221,9 +256,6 @@
   var stance = document.querySelector(".stance");
   var stanceRise = stance && stance.querySelector(".stance__rise");
   var quote = document.querySelector(".stance__quote blockquote");
-  var footerMark = document.querySelector(".footer-mark");
-  var footerRise = footerMark && footerMark.querySelector(".footer-mark__rise");
-  var FOOTER_LINE = 0.866; /* Lage der Horizontlinie im Schlusslogo (Anteil der Höhe) */
 
   /* Position jedes Schritt-Markers entlang der Linie (0 bis 1) */
   function measureSteps() {
@@ -245,7 +277,6 @@
     var heroBox = hero && hero.getBoundingClientRect();
     var stepsBox = steps && steps.getBoundingClientRect();
     var stanceBox = stanceRise && stance.getBoundingClientRect();
-    var markBox = footerRise && footerMark.getBoundingClientRect();
 
     if (progressBar) progressBar.style.setProperty("--page-p", (maxScroll > 0 ? clamp01(window.scrollY / maxScroll) : 0).toFixed(4));
     if (heroBox) {
@@ -261,12 +292,6 @@
       });
     }
     if (stanceBox) stanceRise.style.setProperty("--sp", clamp01((vh - stanceBox.bottom) / (vh * 0.45)).toFixed(4));
-    if (markBox) {
-      /* Die Sonne geht auf, sobald die Horizontlinie im Bild ist, und steht am Seitenende */
-      var lineIn = vh - (markBox.top + markBox.height * FOOTER_LINE);
-      var remaining = Math.max(0, maxScroll - window.scrollY);
-      footerRise.style.setProperty("--fm", (lineIn <= 0 ? 0 : clamp01(lineIn / (lineIn + remaining))).toFixed(4));
-    }
   }
 
   /* Zitat in Wörter teilen; Screenreader lesen weiter den ganzen Satz */
@@ -342,8 +367,8 @@
         .forEach(function (entry, i) {
           var el = entry.target;
           if (i > 0) {
-            el.style.transitionDelay = Math.min(i * 90, 450) + "ms";
-            window.setTimeout(function () { el.style.transitionDelay = ""; }, 1600);
+            el.style.transitionDelay = Math.min(i * 70, 210) + "ms";
+            window.setTimeout(function () { el.style.transitionDelay = ""; }, 1000);
           }
           el.classList.remove("is-pending");
           revealObserver.unobserve(el);
@@ -533,15 +558,16 @@
   var submitLabel = form && form.querySelector("[data-submit-label]");
   var endpoint = form ? (form.getAttribute("data-endpoint") || "").trim() : "";
 
-  function showStatus(kind, heading, message) {
+  /* Fehler meldet die Statusregion sofort (role="alert"), alles andere höflich */
+  function clearStatus(urgent) {
     status.textContent = "";
     status.classList.remove("is-success", "is-error");
-    if (kind === "success") {
-      var icon = document.createElement("span");
-      icon.className = "sunrise";
-      icon.setAttribute("aria-hidden", "true");
-      status.appendChild(icon);
-    }
+    status.setAttribute("role", urgent ? "alert" : "status");
+    status.setAttribute("aria-live", urgent ? "assertive" : "polite");
+  }
+
+  function showError(heading, message) {
+    clearStatus(true);
     var title = document.createElement("strong");
     title.textContent = heading;
     var text = document.createElement("span");
@@ -549,8 +575,52 @@
     status.appendChild(title);
     status.appendChild(text);
     void status.offsetWidth;
-    status.classList.add(kind === "success" ? "is-success" : "is-error");
+    status.classList.add("is-error");
     status.scrollIntoView({ block: "nearest", behavior: motionOK ? "smooth" : "auto" });
+  }
+
+  /* Abschlusskarte statt Formular, bis jemand eine weitere Anfrage beginnt */
+  function showSent(name, onAgain) {
+    clearStatus(false);
+    /* Der Fokus auf der Überschrift sagt die Karte an, die Live-Region schweigt */
+    status.removeAttribute("role");
+    status.setAttribute("aria-live", "off");
+    var title = document.createElement("h3");
+    title.tabIndex = -1;
+    title.textContent = "Danke, " + name + ".";
+    /* Ablauf wie unter „So läuft das Potenzialgespräch“, ohne neue Zusagen */
+    var text = document.createElement("p");
+    text.textContent = (endpoint ? "Ihre Anfrage ist bei uns angekommen. Wir melden uns mit Terminvorschlägen. " : "") +
+      "Im Potenzialgespräch fragen wir nach und ordnen ein, danach entscheiden Sie in Ruhe, ob es weitergeht.";
+    status.appendChild(title);
+    status.appendChild(text);
+    if (!endpoint) {
+      var proto = document.createElement("p");
+      proto.className = "form__note form__note--proto";
+      proto.textContent = "Im fertigen Auftritt ginge Ihre Anfrage jetzt an Neuzeit. Dieser Prototyp versendet nichts.";
+      status.appendChild(proto);
+    }
+    var actions = document.createElement("div");
+    actions.className = "form__status-actions";
+    if (document.getElementById("termin")) {
+      var booking = document.createElement("a");
+      booking.className = "btn btn--ghost btn--small";
+      booking.href = "#termin";
+      booking.textContent = "Termin direkt wählen";
+      actions.appendChild(booking);
+    }
+    var again = document.createElement("button");
+    again.type = "button";
+    again.className = "text-link form__again";
+    again.textContent = "Weitere Anfrage";
+    again.addEventListener("click", onAgain);
+    actions.appendChild(again);
+    status.appendChild(actions);
+    form.classList.add("is-sent");
+    void status.offsetWidth;
+    status.classList.add("is-success");
+    form.scrollIntoView({ block: "nearest", behavior: motionOK ? "smooth" : "auto" });
+    title.focus({ preventScroll: true });
   }
 
   function send(data) {
@@ -586,6 +656,13 @@
       }
     }
 
+    /* „Weitere Anfrage“: zurück zum leeren Formular */
+    function restart() {
+      clearStatus(false);
+      form.classList.remove("is-sent");
+      fields[0].focus();
+    }
+
     fields.forEach(function (field) {
       field.addEventListener("input", function () {
         if (attempted || field.getAttribute("aria-invalid") === "true") validateField(field);
@@ -606,8 +683,7 @@
       });
 
       if (firstInvalid) {
-        status.textContent = "";
-        status.classList.remove("is-success", "is-error");
+        clearStatus(false);
         firstInvalid.focus();
         return;
       }
@@ -615,7 +691,7 @@
       var name = form.elements.name.value.trim();
       var data = new FormData(form);
       var isBot = form.elements.website && form.elements.website.value !== "";
-      status.textContent = "";
+      clearStatus(false);
 
       function setLoading(loading) {
         if (!submitButton) return;
@@ -627,17 +703,15 @@
 
       function done() {
         setLoading(false);
-        showStatus("success", "Danke, " + name + ".", endpoint
-          ? "Ihre Anfrage ist bei uns angekommen. Wir melden uns mit Terminvorschlägen."
-          : "Im fertigen Auftritt ginge Ihre Anfrage jetzt an Neuzeit. Dieser Prototyp versendet nichts.");
         form.reset();
         attempted = false;
         fields.forEach(function (field) { setError(field, false); });
+        showSent(name, restart);
       }
 
       function failed() {
         setLoading(false);
-        showStatus("error", "Das hat leider nicht geklappt.", "Bitte versuchen Sie es in einem Moment noch einmal oder schreiben Sie uns direkt per E-Mail. Ihre Eingaben sind noch da.");
+        showError("Das hat leider nicht geklappt.", "Bitte versuchen Sie es in einem Moment noch einmal oder schreiben Sie uns direkt per E-Mail. Ihre Eingaben sind noch da.");
       }
 
       /* Ladezustand auch ohne Bewegung: er verhindert doppeltes Absenden */
@@ -682,9 +756,6 @@
         /* Prototyp: noch kein Calendly-Link hinterlegt */
         var box2 = document.createElement("div");
         box2.className = "booking__placeholder";
-        var icon = document.createElement("span");
-        icon.className = "sunrise";
-        icon.setAttribute("aria-hidden", "true");
         var title = document.createElement("strong");
         title.textContent = "Hier erscheint der Buchungskalender.";
         var text = document.createElement("p");
@@ -698,7 +769,6 @@
         back.className = "btn btn--ghost btn--small";
         back.textContent = "Zurück";
         back.addEventListener("click", showConsent);
-        box2.appendChild(icon);
         box2.appendChild(title);
         box2.appendChild(text);
         box2.appendChild(back);

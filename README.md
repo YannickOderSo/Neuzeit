@@ -27,6 +27,10 @@ python3 -m http.server 8000
 
 Dann http://localhost:8000 aufrufen.
 
+## Farbvarianten vergleichen
+
+Standard ist die Variante „Warm“. Zum Abstimmen lässt sich der Umschalter mit `?varianten` an der Adresse einblenden, zum Beispiel `index.html?varianten`. Er bleibt dann für die Sitzung sichtbar, `?varianten=aus` blendet ihn wieder aus. Ohne den Umschalter gilt immer „Warm“, auch wenn vorher eine andere Variante gewählt war.
+
 ## Gemeinsame Teile ändern
 
 Kopfbereich, Navigation, Footer und der Aufruf „Nächster Schritt“ stehen nur einmal in `neuzeit-prototyp/_partials/`. Nach einer Änderung dort:
@@ -52,4 +56,3 @@ Das Skript setzt die Teile in alle Seiten ein, schreibt Titel, Beschreibung und 
 - `neuzeit-prototyp/logo/`: Logo in allen Varianten, Favicon, Profilbild und `LOGO.md` mit den Regeln
 - `neuzeit-prototyp/fonts/`: Fraunces und Manrope, selbst ausgeliefert (SIL Open Font License)
 - `neuzeit-prototyp/og/`: Vorschaubilder für geteilte Links (1200 × 630)
-- `neuzeit-prototyp/tools/szenen.py`: erzeugt die abstrakten Personen-Szenen, die bis zu echten Fotos als Bildplatzhalter dienen

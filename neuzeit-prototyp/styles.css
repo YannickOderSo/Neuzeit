@@ -60,7 +60,7 @@
   --color-accent-border: transparent;
   --color-on-accent: #FFFFFF;
   --color-accent-line: #D4552B;      /* Linien und Marker auf Hell, ≥ 3:1 */
-  --color-error: #A8431F;            /* Fehlermeldungen */
+  --color-error: #9F1D20;            /* Fehlermeldungen: röter als die Akzentschrift, 7,0:1 auf Papier */
   --color-accent-on-dark: #EE8B63;   /* Terrakotta für Schrift auf Tannengrün, ≥ 4,5:1 */
   --color-motif-on-dark: #D4552B;    /* Halbkreis auf Tannengrün (Grafik, ≥ 3:1) */
   --color-field: #FBF9F5;            /* Eingabefelder */
@@ -84,7 +84,7 @@
   --font-display: "Fraunces", "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, "Times New Roman", serif;
   --font-body: "Manrope", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
 
-  --fs-display: clamp(2.75rem, 6vw, 5.5rem);
+  --fs-display: clamp(2.75rem, min(1.25rem + 5vw, max(6vw, 4.5rem)), 5.5rem);
   --fs-h2: clamp(2rem, 3.8vw, 3.375rem);
   --fs-h3: clamp(1.375rem, 1.9vw, 1.75rem);
   --fs-quote: clamp(2rem, 4.6vw, 4.25rem);
@@ -124,7 +124,7 @@
   --ease-out: cubic-bezier(0.22, 0.61, 0.36, 1);
   --ease-sun: cubic-bezier(0.16, 0.84, 0.3, 1);
   --dur-calm: 220ms;
-  --dur-reveal: 900ms;
+  --dur-reveal: 600ms;
 }
 
 /* Variante „Klar“: kühles Weiß, Grafit, Kobaltblau */
@@ -204,6 +204,9 @@ html {
   -webkit-text-size-adjust: 100%;
   text-size-adjust: 100%;
   scroll-padding-top: calc(var(--header-h) + 1.25rem);
+}
+
+html.has-palette {
   scroll-padding-bottom: calc(6rem + env(safe-area-inset-bottom, 0px)); /* Platz für den Farbumschalter */
 }
 
@@ -224,6 +227,9 @@ body {
   line-height: var(--lh-body);
   font-weight: 450;
   font-feature-settings: "kern", "liga";
+  /* Fraunces wie die Wortmarke (LOGO.md): weiche Kanten, ruhige Formen ohne
+     eingerollte h, m, n. Manrope hat diese Achsen nicht und bleibt unberührt. */
+  font-variation-settings: "SOFT" 30, "WONK" 0;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   overflow-x: clip;
@@ -258,6 +264,11 @@ h1, h2, h3, h4, p, ul, ol, dl, dd, figure, blockquote {
   margin: 0;
 }
 
+/* keine einzelnen Wörter allein in der letzten Zeile */
+p, li, dd, figcaption, blockquote {
+  text-wrap: pretty;
+}
+
 :where(ul, ol)[role="list"] {
   list-style: none;
   padding: 0;
@@ -271,6 +282,7 @@ a {
 
 button,
 input,
+select,
 textarea {
   font: inherit;
   color: inherit;
@@ -292,6 +304,38 @@ main:focus {
 
 .nowrap {
   white-space: nowrap;
+}
+
+/* Silbentrennung in schmalen Spalten, mobil im ganzen Fließtext.
+   Überschriften, Zitate, Labels und Navigation bleiben ungetrennt.
+   Die -webkit-Grenzen gelten für Safari, das hyphenate-limit-chars nicht kennt. */
+.reason__text,
+.service__list li,
+.step__text,
+.case__story dd,
+.proof__text,
+.principle__text {
+  -webkit-hyphens: auto;
+  hyphens: auto;
+  hyphenate-limit-chars: 10 4 4;
+  -webkit-hyphenate-limit-before: 4;
+  -webkit-hyphenate-limit-after: 4;
+}
+
+@media (max-width: 47.99rem) {
+  main :is(p, li):not(blockquote p, nav li, .offer__result p, .proof__title, .chips li, .kicker, .eyebrow, .reason__tag, .person__role) {
+    -webkit-hyphens: auto;
+    hyphens: auto;
+    hyphenate-limit-chars: 10 4 4;
+    -webkit-hyphenate-limit-before: 4;
+    -webkit-hyphenate-limit-after: 4;
+  }
+
+  /* erben sonst die Trennung von einem umgebenden li */
+  main :is(h1, h2, h3, h4, blockquote, nav, .proof__title, .chips li, .kicker, .eyebrow, .reason__tag, .person__role) {
+    -webkit-hyphens: manual;
+    hyphens: manual;
+  }
 }
 
 .visually-hidden {
@@ -341,7 +385,13 @@ main:focus {
 .step__title,
 .person__name,
 .case__title,
-.form__title {
+.form__title,
+.proof__title,
+.faq__question,
+.reg__title,
+.principle__title,
+.contact__heading,
+.prose h2 {
   font-family: var(--font-display);
   font-optical-sizing: auto;
   font-weight: 400;
@@ -359,6 +409,19 @@ main:focus {
 .display em {
   font-style: italic;
   font-weight: 340;
+}
+
+/* Sinnzeilen: Eine Zeile bricht nur innen um, wenn sie allein nicht passt.
+   .ln-keep hält Wortgruppen zusammen, damit kein Wort allein am Ende steht.
+   Unter 360 px wäre das zu breit, dort bricht der Titel frei um. */
+@media (min-width: 22.5rem) {
+  .display .ln {
+    display: inline-block;
+  }
+
+  .display .ln-keep {
+    white-space: nowrap;
+  }
 }
 
 .accent-mark {
@@ -389,7 +452,6 @@ main:focus {
 .case__service,
 .field__label,
 .palette__label,
-.site-footer__meta dt,
 .contact__direct dt {
   font-family: var(--font-body);
   font-size: var(--fs-label);
@@ -405,35 +467,49 @@ main:focus {
   gap: 0.75rem;
   color: var(--fg-muted);
   margin-bottom: var(--space-m);
+  text-wrap: balance;
 }
 
 .kicker::before {
   content: "";
+  flex: none;
+  align-self: flex-start;
   width: 2rem;
   height: 1px;
+  margin-top: 0.7em;
   background: currentColor;
 }
 
-/* Platzhalter: sichtbar markiert, damit nichts erfunden wirkt */
+/* Platzhalter: sichtbar markiert, damit nichts erfunden wirkt.
+   Eigene Anmerkungsebene außerhalb der Markenfarben, in Systemschrift */
 .ph {
   display: inline;
   -webkit-box-decoration-break: clone;
   box-decoration-break: clone;
   padding: 0.05em 0.45em;
-  border: 1px dashed currentColor;
+  border: 1px dashed var(--color-line-strong);
   border-radius: var(--radius-s);
-  color: var(--accent-type);
-  font-family: var(--font-body);
-  font-size: 0.8125rem;
+  background: color-mix(in srgb, var(--color-surface-strong) 45%, transparent);
+  color: var(--fg-muted);
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;
+  font-size: 0.75rem;
   font-style: normal;
-  font-weight: 600;
-  letter-spacing: 0.02em;
+  font-weight: 500;
+  letter-spacing: 0;
   line-height: 1.5;
   vertical-align: 0.1em;
 }
 
 .ph--strong {
   border-style: solid;
+}
+
+/* auf dunklem Grund */
+.site-footer .ph,
+.section--dark .ph,
+.offer__result .ph {
+  border-color: var(--line);
+  background: color-mix(in srgb, var(--fg) 6%, transparent);
 }
 
 .text-link {
@@ -452,6 +528,31 @@ main:focus {
   text-underline-offset: 0.45em;
 }
 
+/* Ring mit Abstand, damit er nicht auf der Unterstreichung liegt */
+.text-link:focus-visible {
+  outline-offset: 6px;
+  border-radius: var(--radius-s);
+}
+
+/* derselbe Pfeil wie in den Buttons, statt eines Zeichens aus der Systemschrift */
+.text-link__icon {
+  display: inline-block;
+  width: 0.95em;
+  height: 0.95em;
+  margin-left: 0.3em;
+  vertical-align: -0.1em;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.7;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  transition: transform 350ms var(--ease-out);
+}
+
+.text-link:hover .text-link__icon {
+  transform: translateX(3px);
+}
+
 /* --------------------------------------------------------------------------
    4. Buttons
    -------------------------------------------------------------------------- */
@@ -459,6 +560,14 @@ main:focus {
   display: flex;
   flex-wrap: wrap;
   gap: var(--space-xs);
+}
+
+/* kurze Zusage unter den Buttons, eigene Zeile in der Reihe (Abstand: gap 0,75rem) */
+.btn-row__meta {
+  flex-basis: 100%;
+  color: var(--fg-muted);
+  font-size: var(--fs-small);
+  line-height: 1.4;
 }
 
 .btn {
@@ -476,6 +585,7 @@ main:focus {
   line-height: 1.2;
   letter-spacing: 0.005em;
   text-align: center;
+  text-wrap: balance;
   text-decoration: none;
   cursor: pointer;
   transition: background-color var(--dur-calm) var(--ease-out),
@@ -485,8 +595,26 @@ main:focus {
               transform 160ms var(--ease-out);
 }
 
+/* schmale Handys: Haupt-Buttons bleiben einzeilig, gestapelt gleich breit
+   (.btn--small steht weiter unten und behält sein Maß) */
+@media (max-width: 29.99rem) {
+  .btn {
+    padding-inline: 1.25rem;
+  }
+
+  .btn-row > .btn {
+    flex: 1 1 100%;
+  }
+}
+
 .btn:active {
   transform: translateY(1px) scale(0.985);
+}
+
+/* Ring in Tinte statt Akzent, sonst verschmilzt er mit der Button-Fläche.
+   In dunklen Sektionen wird --fg hell. */
+.btn:focus-visible {
+  outline-color: var(--fg);
 }
 
 .btn__icon {
@@ -573,7 +701,11 @@ main:focus {
 
 /* Beim Laden löst sich die Sonne einmal von der Linie: von „aufliegend“ zur Fuge */
 [data-page="start"] .site-header .brand__sun {
-  animation: logo-lift 0.9s var(--ease-sun) 3.1s both; /* Echo, wenn die große Sonne steht */
+  animation: logo-lift 0.8s var(--ease-sun) 1.25s both; /* Echo, wenn die große Sonne ankommt */
+}
+
+[data-page="start"]:has(.hero__visual.is-waiting) .site-header .brand__sun {
+  animation-play-state: paused;
 }
 
 html.vt-nav .site-header .brand__sun {
@@ -633,6 +765,7 @@ html.vt-nav .site-header .brand__sun {
   font-size: 0.9875rem;
   font-weight: 550;
   text-decoration: none;
+  white-space: nowrap;
   color: var(--fg);
 }
 
@@ -652,6 +785,11 @@ html.vt-nav .site-header .brand__sun {
 .nav__link:hover::after,
 .nav__link[aria-current="page"]::after {
   transform: scaleX(1);
+}
+
+.nav__link:focus-visible {
+  outline-offset: 6px;
+  border-radius: var(--radius-s);
 }
 
 .nav__link[aria-current="page"]::after {
@@ -745,6 +883,20 @@ html.vt-nav .site-header .brand__sun {
   text-decoration: none;
 }
 
+/* aktuelle Seite; beim Tippen dieselbe Farbe als Rückmeldung */
+.mobile-menu__link[aria-current="page"],
+.mobile-menu__link:active {
+  color: var(--accent-type);
+}
+
+/* Fokus: die Trennlinie wird zur Fokuslinie, statt parallel daneben zu laufen */
+.mobile-menu__link:focus-visible {
+  outline: 2px solid transparent; /* bleibt im Kontrastmodus sichtbar */
+  outline-offset: -2px;
+  border-bottom-color: var(--focus);
+  box-shadow: inset 0 -1px var(--focus);
+}
+
 .mobile-menu__num {
   min-width: 1.75em;
   font-variant-numeric: tabular-nums;
@@ -764,8 +916,25 @@ html.vt-nav .site-header .brand__sun {
   to { opacity: 1; transform: none; }
 }
 
+/* Schließen spiegelt das Öffnen; main.js setzt danach hidden */
+.mobile-menu.is-closing {
+  pointer-events: none;
+  animation: menu-out 180ms var(--ease-out) both;
+}
+
+@keyframes menu-out {
+  from { opacity: 1; transform: none; }
+  to { opacity: 0; transform: translateY(-0.5rem); }
+}
+
 html.menu-open {
   overflow: hidden;
+}
+
+/* nur ein CTA: im offenen Menü steht er unten */
+html.menu-open .site-header__cta,
+.site-header:has(.mobile-menu.is-closing) .site-header__cta {
+  visibility: hidden;
 }
 
 @media (min-width: 30rem) {
@@ -774,7 +943,7 @@ html.menu-open {
   }
 }
 
-@media (min-width: 60rem) {
+@media (min-width: 40rem) {
   .nav {
     display: block;
   }
@@ -793,12 +962,29 @@ html.menu-open {
   }
 }
 
+/* 480 bis 767 px: engere Abstände, damit das Logo nicht gestaucht wird und
+   Logo, Navigation bzw. Menü und CTA in eine Zeile passen */
+@media (min-width: 30rem) and (max-width: 47.99rem) {
+  .site-header__inner {
+    gap: var(--space-s);
+  }
+
+  .site-header__cta {
+    margin-left: 0;
+  }
+}
+
 /* --------------------------------------------------------------------------
    7. Sektionen: gemeinsames Gerüst mit Zeitlinie
    -------------------------------------------------------------------------- */
 .section {
   position: relative;
   padding-block: var(--space-section);
+}
+
+/* Zwei Abschnitte auf demselben Grund: Abstand nicht verdoppeln */
+.section:not(.section--dark, .offer--tint, .contact) + .section:not(.section--dark, .offer--tint, .contact) {
+  padding-top: calc(var(--space-section) * 0.4);
 }
 
 .section-head {
@@ -930,7 +1116,7 @@ html.menu-open {
   stroke-width: 1.25;
   stroke-dasharray: 1;
   stroke-dashoffset: 0;
-  animation: draw-line 1.4s var(--ease-out) 0.35s both;
+  animation: draw-line 0.9s var(--ease-out) 0.2s both;
 }
 
 .horizon__sun {
@@ -940,7 +1126,7 @@ html.menu-open {
 }
 
 .horizon__sun-wrap {
-  animation: sun-rise 2.4s cubic-bezier(0.4, 0, 0.15, 1) 1.05s both;
+  animation: sun-rise 1.4s cubic-bezier(0.4, 0, 0.15, 1) 0.45s both;
 }
 
 .horizon__rings circle {
@@ -957,8 +1143,8 @@ html.menu-open {
 
 .horizon__rings {
   transform-box: view-box;
-  transform-origin: 280px 320px;
-  animation: rings-in 1.8s var(--ease-out) 2.1s both;
+  transform-origin: 280px 300px;
+  animation: rings-in 1s var(--ease-out) 0.9s both;
 }
 
 .horizon__tick {
@@ -967,12 +1153,12 @@ html.menu-open {
 
 .horizon__scale {
   opacity: 0.55;
-  animation: fade-in 1.2s var(--ease-out) 1.1s both;
+  animation: fade-in 0.7s var(--ease-out) 1.1s both;
 }
 
 .horizon__tick--now,
 .horizon__label {
-  animation: fade-in 0.9s var(--ease-out) 2.7s both;
+  animation: fade-in 0.6s var(--ease-out) 1.3s both;
 }
 
 .horizon__label {
@@ -995,7 +1181,7 @@ html.menu-open {
 }
 
 @keyframes sun-rise {
-  from { transform: translateY(150px); }
+  from { transform: translateY(190px); } /* ganz verborgen, auch wenn die Seite schon gescrollt lädt */
   to { transform: translateY(0); }
 }
 
@@ -1033,16 +1219,17 @@ html.menu-open {
   }
 
   .hero__visual {
-    grid-column: 7 / span 6;
+    grid-column: 8 / span 5;
     grid-row: 1;
     width: 100%;
-    margin-right: calc(var(--gutter) * -0.25);
   }
 }
 
-@media (min-width: 60rem) and (max-width: 79.99rem) {
-  .hero__visual {
-    grid-column: 8 / span 5;
+/* Die Horizontlinie verlängert die Button-Reihe nach rechts
+   (abzüglich der Zeile .btn-row__meta: Abstand plus Zeilenhöhe) */
+@media (min-width: 75rem) {
+  .hero__text {
+    padding-bottom: calc(2.75rem - var(--space-xs) - 1.4 * var(--fs-small));
   }
 }
 
@@ -1230,27 +1417,15 @@ html.menu-open {
   line-height: 1.5;
 }
 
-/* kleiner Horizont als Aufzählungszeichen */
+/* kurzer Strich als Aufzählungszeichen, die Sonne bleibt der Marke vorbehalten */
 .service__list li::before {
   content: "";
   position: absolute;
   left: 0;
-  top: 1.15rem;
-  width: 0.875rem;
-  height: 0.4375rem;
-  border-radius: 0.875rem 0.875rem 0 0;
-  background: var(--accent-graphic);
-  box-shadow: 0 0 0 1px var(--color-motif-stroke);
-}
-
-.service__list li::after {
-  content: "";
-  position: absolute;
-  left: -0.1875rem;
-  top: calc(1.15rem + 0.4375rem + 2px); /* Fuge wie im Logo */
-  width: 1.25rem;
+  top: calc(0.7rem + 0.75em); /* Mitte der ersten Zeile */
+  width: 0.75rem;
   height: 1px;
-  background: var(--fg);
+  background: var(--fg-muted);
 }
 
 .service__note {
@@ -1310,12 +1485,6 @@ html.menu-open {
     display: block;
     margin-bottom: 0.65rem;
   }
-
-  .service__list li::after {
-    left: -0.1875rem;
-    top: calc(var(--space-s) + 0.4375rem + 2px);
-    width: 1.25rem;
-  }
 }
 
 @media (min-width: 60rem) {
@@ -1364,13 +1533,6 @@ html.menu-open {
     width: auto;
     margin-top: 0;
   }
-}
-
-/* breite Fenster: gleich breite Karten, diagonal versetzt wie Stufen zum Horizont */
-@media (min-width: 75rem) {
-  .service:nth-child(1) .service__card { margin-right: 4rem; }
-  .service:nth-child(2) .service__card { margin-inline: 2rem; }
-  .service:nth-child(3) .service__card { margin-left: 4rem; }
 }
 
 /* --------------------------------------------------------------------------
@@ -1624,7 +1786,7 @@ html.menu-open {
   right: 0;
   bottom: 0;
   width: 100%;
-  height: clamp(8.5rem, 23vw, 22rem);
+  height: clamp(8.5rem, 23vw, 26rem); /* hoch genug, dass die Sonne auf breiten Schirmen ganz bleibt */
   pointer-events: none;
 }
 
@@ -1855,10 +2017,10 @@ html.menu-open {
 
 .case__service {
   color: var(--fg-muted);
-  letter-spacing: 0.06em;
+  letter-spacing: 0;
   text-transform: none;
   font-size: var(--fs-small);
-  font-weight: 600;
+  font-weight: 500;
 }
 
 .case__title {
@@ -1904,11 +2066,6 @@ html.menu-open {
   margin-right: 0.35rem;
 }
 
-/* in den Fallkarten bleibt nur das Kopf-Badge farbig, der Rest ist neutral markiert */
-.case__body .ph:not(.ph--strong) {
-  color: var(--fg-muted);
-}
-
 @media (min-width: 60rem) {
   .cases {
     grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -1918,16 +2075,13 @@ html.menu-open {
   .case__service {
     min-height: 2.8em;
   }
-
-  .case:nth-child(2) {
-    margin-top: var(--space-xl);
-  }
 }
 
 /* --------------------------------------------------------------------------
    15. Kontakt
    -------------------------------------------------------------------------- */
 .contact {
+  padding-top: var(--space-xl); /* Formular im ersten Bildschirm */
   background-color: var(--color-surface);
   transition: background-color 400ms var(--ease-out);
 }
@@ -1978,11 +2132,16 @@ html.menu-open {
   border-radius: var(--radius-l);
   background: var(--color-bg);
   min-width: 0;
+  container-type: inline-size; /* Feldzeilen richten sich nach der Formularbreite */
 }
 
 .form__title {
   font-size: var(--fs-h3);
   line-height: var(--lh-snug);
+}
+
+.form__hint .ph {
+  white-space: nowrap;
 }
 
 .form__hint {
@@ -2003,7 +2162,7 @@ html.menu-open {
 }
 
 .field__req {
-  color: var(--accent-type);
+  color: var(--fg-muted);
 }
 
 .field__input {
@@ -2023,10 +2182,13 @@ html.menu-open {
   border-color: var(--fg);
 }
 
+/* Doppelring statt Outline plus Rand. Die transparente Outline bleibt für den
+   Kontrastmodus, dort entfallen Schatten. */
 .field__input:focus-visible {
-  outline: 2px solid var(--focus);
+  outline: 2px solid transparent;
   outline-offset: 2px;
   border-color: var(--fg);
+  box-shadow: 0 0 0 1px var(--fg), 0 0 0 5px color-mix(in srgb, var(--focus) 22%, transparent);
 }
 
 .field__input--area {
@@ -2040,6 +2202,10 @@ html.menu-open {
   padding: calc(0.75rem - 1px) calc(0.95rem - 1px);
 }
 
+.field__input[aria-invalid="true"]:focus-visible {
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--color-error) 20%, transparent);
+}
+
 .field__error {
   display: flex;
   align-items: flex-start;
@@ -2050,7 +2216,8 @@ html.menu-open {
   line-height: 1.45;
 }
 
-.field__error::before {
+.field__error::before,
+.form__status.is-error strong::before {
   content: "!";
   content: "!" / "";
   flex: none;
@@ -2102,10 +2269,46 @@ html.menu-open {
   clip-path: inset(50%);
 }
 
-.form__status strong {
+.form__status strong,
+.form__status h3 {
   font-family: var(--font-display);
   font-size: 1.25rem;
   font-weight: 450;
+}
+
+/* Nach dem Absenden bleiben nur Titel und Abschlusskarte */
+.form.is-sent > :not(.form__title, .form__status) {
+  display: none;
+}
+
+.form.is-sent .form__status {
+  gap: var(--space-xs);
+  padding: var(--space-m);
+  border-left: 0;
+}
+
+/* main.js fokussiert die Überschrift, damit Screenreader dort weiterlesen */
+.form__status h3:focus {
+  outline: none;
+}
+
+.form__status-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-xs) var(--space-m);
+  margin-top: var(--space-2xs);
+}
+
+.form__status-actions .btn--ghost {
+  background-image: linear-gradient(var(--color-surface-strong), var(--color-surface-strong));
+}
+
+.form__again {
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: pointer;
 }
 
 @media (min-width: 60rem) {
@@ -2123,7 +2326,6 @@ html.menu-open {
 
   .form {
     grid-column: 8 / span 5;
-    margin-top: var(--space-l);
   }
 }
 
@@ -2141,7 +2343,7 @@ html.menu-open {
   --color-motif-stroke: transparent;
   background-color: var(--color-dark);
   color: var(--fg);
-  padding-block: var(--space-2xl) calc(var(--space-2xl) + 4.5rem + env(safe-area-inset-bottom, 0px));
+  padding-block: var(--space-2xl) calc(var(--space-2xl) + env(safe-area-inset-bottom, 0px));
   transition: background-color 400ms var(--ease-out);
 }
 
@@ -2198,6 +2400,8 @@ html.menu-open {
 .site-footer__meta dt {
   margin-bottom: 0.2rem;
   color: var(--fg-muted);
+  font-size: var(--fs-small);
+  font-weight: 500;
 }
 
 .site-footer__meta dd {
@@ -2275,7 +2479,16 @@ html.menu-open {
 
 /* --------------------------------------------------------------------------
    17. Farbvarianten-Umschalter (nur Prototyp)
+   Erscheint nur mit ?varianten in der Adresse (siehe _partials/kopf.html).
    -------------------------------------------------------------------------- */
+html:not(.has-palette) .palette {
+  display: none;
+}
+
+html.has-palette .site-footer {
+  padding-bottom: calc(var(--space-2xl) + 4.5rem + env(safe-area-inset-bottom, 0px));
+}
+
 .palette {
   position: fixed;
   right: calc(env(safe-area-inset-right, 0px) + 0.75rem);
@@ -2428,7 +2641,7 @@ html.menu-open {
 
 .page-head__title {
   max-width: 16ch;
-  font-size: clamp(2.5rem, 5.2vw, 4.75rem);
+  font-size: clamp(2.5rem, min(1.25rem + 4.2vw, max(5.2vw, 3.9rem)), 4.75rem);
 }
 
 .page-head__lead {
@@ -2437,7 +2650,7 @@ html.menu-open {
 
 .page-head__horizon {
   --sun-d: clamp(7rem, 15vw, 12.5rem);
-  --sun-gap: 0.4rem;
+  --sun-gap: calc(var(--sun-d) * 0.07); /* Fuge 0,14 r wie die große Logo-Fassung */
   position: relative;
   height: calc(var(--sun-d) / 2 + var(--sun-gap) + 1.5rem);
   overflow: hidden;
@@ -2484,6 +2697,7 @@ html.menu-open {
 }
 
 .page-head--small .page-head__title {
+  max-width: 20ch; /* kleinere Schrift läuft breiter: Kontakt bleibt einzeilig */
   font-size: clamp(2.25rem, 4.4vw, 3.75rem);
 }
 
@@ -2508,13 +2722,16 @@ html.menu-open {
   min-width: 0;
 }
 
+/* Icon-Vorgabe: 32er-Raster, Unterkante bei 26, Strich 1.5 mit runden Enden,
+   Akzent höchstens als eine kleine Fläche */
 .proof__icon {
   width: 2.25rem;
   height: 2.25rem;
   margin-bottom: 0.25rem;
   fill: none;
   stroke: var(--fg);
-  stroke-width: 1.4;
+  stroke-width: 1.5;
+  stroke-linecap: round;
   stroke-linejoin: round;
   overflow: visible;
 }
@@ -2598,9 +2815,9 @@ html.menu-open {
 }
 
 /* --------------------------------------------------------------------------
-   18e. Bildplatzhalter: Menschen am Horizont
-   Abstrakte Szenen, bis echte Fotos vorliegen. Beim Erscheinen treten die
-   Figuren hinter der Linie hervor, danach geht die Sonne auf.
+   18e. Bildplatzhalter: Foto-Briefing
+   Bis echte Fotos vorliegen, steht im Rahmen das Briefing: oben das Format,
+   mittig das Motiv. Innere Linie und Schnittmarken zeigen den Bildausschnitt.
    -------------------------------------------------------------------------- */
 .people-band {
   padding-bottom: var(--space-section);
@@ -2608,93 +2825,91 @@ html.menu-open {
 
 .photo {
   display: grid;
+  grid-template-columns: minmax(0, 1fr); /* sonst gibt der gestreckte Rahmen seine Breite vor */
   gap: 0.75rem;
   min-width: 0;
+}
+
+/* Rahmen und Briefing liegen übereinander, längerer Text streckt den Rahmen */
+.photo__frame,
+.photo__caption {
+  grid-area: 1 / 1;
 }
 
 .photo__frame {
   position: relative;
   overflow: hidden;
+  place-self: stretch;
   aspect-ratio: 4 / 3;
   border-radius: var(--radius-l);
   background: var(--color-surface);
 }
 
+/* innere Linie und vier Schnittmarken als 12-px-Winkel auf ihren Ecken */
+.photo__frame::before,
+.photo__frame::after {
+  content: "";
+  position: absolute;
+  inset: 16px;
+  pointer-events: none;
+}
+
+.photo__frame::before {
+  border: 1px solid var(--line);
+}
+
+.photo__frame::after {
+  --mark: linear-gradient(var(--fg-muted), var(--fg-muted));
+  background:
+    var(--mark) left top / 12px 1px,
+    var(--mark) left top / 1px 12px,
+    var(--mark) right top / 12px 1px,
+    var(--mark) right top / 1px 12px,
+    var(--mark) left bottom / 12px 1px,
+    var(--mark) left bottom / 1px 12px,
+    var(--mark) right bottom / 12px 1px,
+    var(--mark) right bottom / 1px 12px;
+  background-repeat: no-repeat;
+}
+
 .photo--wide .photo__frame {
-  aspect-ratio: 3 / 2;
+  aspect-ratio: 3 / 1;
+}
+
+@media (max-width: 39.99rem) {
+  .photo--wide .photo__frame {
+    aspect-ratio: 3 / 2;
+  }
 }
 
 .photo__caption {
-  color: var(--fg-muted);
-  font-size: var(--fs-small);
-  line-height: 1.5;
+  position: relative;
+  display: grid;
+  grid-template-rows: 1fr auto 1fr;
+  justify-items: center;
+  gap: var(--space-s);
+  min-width: 0;
+  padding: calc(16px + var(--space-s));
 }
 
 .photo__caption .ph {
-  margin-right: 0.35rem;
+  justify-self: start;
+  align-self: start;
 }
 
-.scene {
-  display: block;
-  width: 100%;
-  height: 100%;
-}
-
-.scene__sun {
-  fill: var(--accent-graphic);
-  stroke: var(--color-motif-stroke);
-  stroke-width: 2;
-}
-
-.scene__line {
-  stroke: var(--fg);
-  stroke-width: 1.5;
-  stroke-opacity: 0.75;
-}
-
-.scene__fig {
-  fill: color-mix(in srgb, var(--fg) 24%, var(--color-surface));
-}
-
-.scene__fig--alt {
-  fill: color-mix(in srgb, var(--fg) 40%, var(--color-surface));
-}
-
-.scene__fig--light {
-  fill: color-mix(in srgb, var(--fg) 12%, var(--color-surface));
+.photo__brief {
+  max-width: 32rem;
+  color: var(--fg-muted);
+  font-family: var(--font-display);
+  font-size: clamp(1.125rem, 1.6vw, 1.25rem);
+  font-style: italic;
+  line-height: 1.4;
+  text-align: center;
+  text-wrap: balance;
 }
 
 .offer--tint .photo__frame {
   background: var(--color-bg);
-}
-
-.scene__board {
-  fill: var(--color-bg);
-  stroke: color-mix(in srgb, var(--fg) 45%, transparent);
-  stroke-width: 2;
-}
-
-.scene__stand {
-  fill: none;
-  stroke: color-mix(in srgb, var(--fg) 45%, transparent);
-  stroke-width: 3;
-  stroke-linecap: round;
-}
-
-.scene__note,
-.scene__ui {
-  fill: color-mix(in srgb, var(--fg) 14%, var(--color-bg));
-}
-
-.scene__note--accent,
-.scene__ui--accent {
-  fill: var(--accent-graphic);
-}
-
-@media (min-width: 48rem) {
-  .photo--wide .photo__frame {
-    aspect-ratio: 16 / 7;
-  }
 }
 
 /* --------------------------------------------------------------------------
@@ -2715,6 +2930,7 @@ html.menu-open {
 }
 
 .quote-card figure {
+  position: relative;
   display: grid;
   align-content: start;
   gap: var(--space-m);
@@ -2728,13 +2944,20 @@ html.menu-open {
 .quote-card figure::before {
   content: "„";
   content: "„" / "";
-  height: 1.5rem;
-  margin-top: -0.75rem;
+  height: 2rem;
+  margin-top: -0.25rem;
   color: var(--accent-display);
   font-family: var(--font-display);
   font-size: 5rem;
   font-style: italic;
-  line-height: 0.6;
+  line-height: 0;
+}
+
+/* Platzhalter-Kennzeichnung in der Kartenecke, nicht im Zitatsatz */
+.quote-card__ph {
+  position: absolute;
+  top: clamp(1.5rem, 3.5vw, 2.25rem);
+  right: clamp(1.5rem, 3.5vw, 2.25rem);
 }
 
 .quote-card__text p {
@@ -2745,10 +2968,6 @@ html.menu-open {
   font-weight: 360;
   line-height: 1.45;
   text-wrap: pretty;
-}
-
-.quote-card__text .ph {
-  font-style: normal;
 }
 
 .quote-card__by {
@@ -2767,36 +2986,13 @@ html.menu-open {
   font-weight: 650;
 }
 
-/* Avatar-Platzhalter: kleine Sonne auf der Linie */
+/* Avatar-Platzhalter: neutraler Kreis, hier kommt später das Foto der Person hin */
 .quote-card__avatar {
-  position: relative;
   flex: none;
   width: 2.75rem;
   height: 2.75rem;
+  border: 1px dashed var(--color-line-strong);
   border-radius: 50%;
-  background: var(--color-surface-strong);
-  overflow: hidden;
-}
-
-.quote-card__avatar::before {
-  content: "";
-  position: absolute;
-  left: 25%;
-  right: 25%;
-  bottom: 30%;
-  height: 25%;
-  border-radius: 999px 999px 0 0;
-  background: var(--accent-graphic);
-}
-
-.quote-card__avatar::after {
-  content: "";
-  position: absolute;
-  left: 0;
-  right: 0;
-  bottom: calc(30% - 3px);
-  height: 1px;
-  background: var(--fg);
 }
 
 @media (min-width: 60rem) {
@@ -2855,11 +3051,12 @@ html.menu-open {
 
 .cta-band__horizon {
   --sun-d: clamp(6.5rem, 15vw, 14rem);
+  --sun-gap: calc(var(--sun-d) * 0.07); /* Fuge wie im Seitenkopf */
   position: absolute;
   left: 0;
   right: 0;
   bottom: clamp(1.5rem, 4vw, 2.5rem);
-  height: calc(var(--sun-d) / 2 + 0.4rem + 1px);
+  height: calc(var(--sun-d) / 2 + var(--sun-gap) + 3px); /* +2 px für die Kontur in Frisch */
   overflow: hidden;
   pointer-events: none;
 }
@@ -2877,17 +3074,25 @@ html.menu-open {
 .cta-band__sun {
   position: absolute;
   right: 12%;
-  bottom: calc(1px + 0.4rem);
+  bottom: calc(1px + var(--sun-gap));
   width: var(--sun-d);
   height: calc(var(--sun-d) / 2);
   border-radius: var(--sun-d) var(--sun-d) 0 0;
   background: var(--accent-graphic);
   box-shadow: 0 0 0 1.5px var(--color-motif-stroke);
-  transition: transform 1.5s var(--ease-sun) 0.35s;
 }
 
-.cta-band__inner.is-pending .cta-band__sun {
-  transform: translateY(calc(100% + 0.5rem));
+/* schmale Handys: mehr Breite, damit der Button einzeilig bleibt */
+@media (max-width: 29.99rem) {
+  .cta-band__inner {
+    padding-inline: 1.25rem;
+  }
+
+  /* volle Breite: das Innenmaß ist nur noch Mindestabstand, so passt es ab 375 px */
+  .cta-band__actions > .btn {
+    flex: 1 1 100%;
+    padding-inline: 1rem;
+  }
 }
 
 @media (min-width: 60rem) {
@@ -2931,6 +3136,24 @@ html:has(.subnav) {
 
 .subnav__list::-webkit-scrollbar {
   display: none;
+}
+
+/* schmal: weiche Kanten zeigen, dass die Leiste weitergeht; Einträge rasten
+   am linken Rand ein (passt zum Versatz von 16 px in main.js). Rechts so viel
+   Innenabstand wie Verlauf, damit der letzte Eintrag am Ende ganz sichtbar ist. */
+@media (max-width: 59.99rem) {
+  .subnav__list {
+    margin-inline: -1rem;
+    padding-inline: 1rem 2rem;
+    -webkit-mask-image: linear-gradient(to right, transparent, #000 1rem, #000 calc(100% - 2rem), transparent);
+    mask-image: linear-gradient(to right, transparent, #000 1rem, #000 calc(100% - 2rem), transparent);
+    scroll-snap-type: x proximity;
+    scroll-padding-inline: 1rem;
+  }
+
+  .subnav__link {
+    scroll-snap-align: start;
+  }
 }
 
 .subnav__link {
@@ -3085,6 +3308,39 @@ html.motion .subnav__link::after {
   line-height: 1.4;
 }
 
+/* schmal: ruhige Liste mit Haarlinien statt Pillen, die wie Filter wirken */
+@media (max-width: 47.99rem) {
+  .chips {
+    display: grid;
+    gap: 0;
+  }
+
+  .chips li {
+    position: relative;
+    padding: 0.6rem 0 0.6rem 1.5rem;
+    border: 0;
+    border-top: 1px solid var(--line);
+    border-radius: 0;
+    background: none;
+    font-size: var(--fs-small);
+  }
+
+  .chips li:last-child {
+    border-bottom: 1px solid var(--line);
+  }
+
+  /* kurzer Strich als Aufzählungszeichen, Mitte der ersten Zeile */
+  .chips li::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: calc(0.6rem + 0.75em);
+    width: 0.75rem;
+    height: 1px;
+    background: var(--fg-muted);
+  }
+}
+
 .offer__body {
   display: grid;
   gap: var(--space-xl);
@@ -3125,15 +3381,13 @@ html.motion .subnav__link::after {
   line-height: 1.3;
 }
 
-/* ohne Nummern: kleiner Horizont als Aufzählungszeichen */
+/* ohne Nummern: kurzer Strich wie in den Leistungslisten, mittig zur ersten Zeile */
 .checklist--plain li::before {
   content: "";
-  top: 1.5rem;
-  width: 1rem;
-  height: 0.5rem;
-  border-radius: 1rem 1rem 0 0;
-  background: var(--accent-graphic);
-  box-shadow: 0 0 0 1px var(--color-motif-stroke);
+  top: calc(1rem + 0.775em);
+  width: 0.75rem;
+  height: 1px;
+  background: var(--fg-muted);
 }
 
 .checklist--plain li {
@@ -3567,8 +3821,8 @@ html.motion .subnav__link::after {
 }
 
 .talk-step:last-child .talk-step__num {
-  border-color: var(--accent-line);
-  background: var(--accent-graphic);
+  border-color: var(--color-accent-fill);
+  background: var(--color-accent-fill); /* Weiß darauf 5,4:1, die Grafikfarbe schafft nur 4,1:1 */
   color: var(--color-on-accent);
   box-shadow: 0 0 0 1px var(--color-motif-stroke);
 }
@@ -3603,7 +3857,7 @@ html.motion .subnav__link::after {
   gap: var(--space-m);
 }
 
-@media (min-width: 36rem) {
+@container (min-width: 32rem) {
   .field-row {
     grid-template-columns: repeat(2, minmax(0, 1fr));
     align-items: start;
@@ -3656,6 +3910,13 @@ html.motion .subnav__link::after {
 
 .form__status.is-error {
   border-left-color: var(--color-error);
+}
+
+/* dasselbe Zeichen wie bei den Feldfehlern */
+.form__status.is-error strong {
+  display: flex;
+  align-items: baseline;
+  gap: 0.5rem;
 }
 
 .booking {
@@ -3839,7 +4100,7 @@ html.motion .subnav__link::after {
 
 [data-reveal].is-pending {
   opacity: 0;
-  transform: translateY(1.5rem);
+  transform: translateY(0.75rem);
 }
 
 [data-reveal].is-pending:focus-within {
@@ -3853,7 +4114,7 @@ html.motion .subnav__link::after {
    Alles hier ist Zusatz. Ohne JavaScript oder bei reduzierter Bewegung bleibt
    die ruhige Endfassung stehen. Scroll-Werte (0 bis 1) setzt main.js als
    Custom Properties direkt an den animierten Elementen: --page-p, --hero-p,
-   --tl, --sp, --fm.
+   --tl, --sp.
    -------------------------------------------------------------------------- */
 
 /* Zeitlinie unter der Kopfzeile: Lesefortschritt, an der Spitze eine kleine Sonne */
@@ -3956,6 +4217,22 @@ html.motion .nav__link::after {
   animation: fade-up 0.7s var(--ease-out) 0.35s both;
 }
 
+/* Nach einem Seitenwechsel steht der Hero sofort, wie die Seitenköpfe (19c) */
+html.vt-nav .hero__title .word > span,
+html.vt-nav .hero__title .accent-mark,
+html.vt-nav .hero .kicker,
+html.vt-nav .hero .kicker::before,
+html.vt-nav .hero__lead,
+html.vt-nav .hero .btn-row,
+html.vt-nav .horizon__line,
+html.vt-nav .horizon__sun-wrap,
+html.vt-nav .horizon__rings,
+html.vt-nav .horizon__scale,
+html.vt-nav .horizon__tick--now,
+html.vt-nav .horizon__label {
+  animation: none;
+}
+
 @keyframes slide-up {
   from { transform: translateY(0.9rem); }
   to { transform: none; }
@@ -3987,7 +4264,7 @@ html.motion .nav__link::after {
 
 .horizon__rings-lift {
   transform-box: view-box;
-  transform-origin: 280px 320px;
+  transform-origin: 280px 300px;
   transform: scale(calc(1 + var(--hero-p, 0) * 0.08));
 }
 
@@ -4020,32 +4297,9 @@ html.motion .section-head.is-pending::before {
   transform: scale(0);
 }
 
-/* Warum jetzt: das Datum wird unterstrichen, sobald die Aussage erscheint */
-.reason__title time {
-  padding-bottom: 1px;
-  background: linear-gradient(var(--accent-line), var(--accent-line)) no-repeat 0 100% / 100% 2px;
-  transition: background-size 1s var(--ease-out) 0.5s;
-}
-
-.reason.is-pending .reason__title time {
-  background-size: 0% 2px;
-}
-
-/* Leistungen: Karten kommen leicht diagonal, Lichtkegel folgt dem Zeiger,
-   die kleinen Sonnen heben sich beim Überfahren */
+/* Leistungen: Karten kommen leicht diagonal, Lichtkegel folgt dem Zeiger */
 .service__card {
   isolation: isolate;
-}
-
-.service__list li::before {
-  transition: transform 450ms var(--ease-sun);
-}
-
-.service__list li:nth-child(2)::before { transition-delay: 60ms; }
-.service__list li:nth-child(3)::before { transition-delay: 120ms; }
-
-.service__card:hover .service__list li::before {
-  transform: translateY(-3px);
 }
 
 @property --mx { syntax: "<length-percentage>"; inherits: false; initial-value: 50%; }
@@ -4144,7 +4398,7 @@ html.motion .stance__quote.is-pending .qw {
 }
 
 .stance__rise {
-  transform: translateY(calc((1 - var(--sp, 1)) * 150px));
+  transform: translateY(calc((1 - var(--sp, 1)) * 174px));
 }
 
 /* Team: die Initiale steigt hinter der Porträtlinie auf */
@@ -4169,6 +4423,17 @@ html.motion .stance__quote.is-pending .qw {
   cursor: progress;
 }
 
+/* während des Versands kein Hover-Wechsel */
+.btn--primary[aria-disabled="true"],
+.btn--primary[aria-disabled="true"]:hover {
+  background: var(--color-accent-fill);
+  cursor: progress;
+}
+
+.btn[aria-disabled="true"]:active {
+  transform: none;
+}
+
 .btn--submit.is-loading .btn__spinner {
   display: inline-block;
   animation: sun-bob 0.45s var(--ease-out) infinite alternate;
@@ -4181,37 +4446,6 @@ html.motion .stance__quote.is-pending .qw {
 
 .form__status.is-success {
   animation: fade-up 0.6s var(--ease-out) both;
-}
-
-.sunrise {
-  position: relative;
-  display: block;
-  width: 2rem;
-  height: 1.1rem;
-  margin-bottom: 0.15rem;
-}
-
-.sunrise::before {
-  content: "";
-  position: absolute;
-  left: 0.45rem;
-  right: 0.45rem;
-  bottom: 4px;
-  height: 0.55rem;
-  border-radius: 1.1rem 1.1rem 0 0;
-  background: var(--accent-graphic);
-  box-shadow: 0 0 0 1px var(--color-motif-stroke);
-  animation: fade-up 0.9s var(--ease-sun) 0.15s both;
-}
-
-.sunrise::after {
-  content: "";
-  position: absolute;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  height: 2px;
-  background: var(--fg);
 }
 
 /* Mobiles Menü: Punkte erscheinen nacheinander */
@@ -4228,7 +4462,7 @@ html.motion .stance__quote.is-pending .qw {
   animation: fade-up 0.55s var(--ease-out) 0.28s backwards;
 }
 
-/* Footer: großes Schlusslogo, die Sonne geht hinter dem Horizont auf */
+/* Footer: großes Schlusslogo, ruhig im Endzustand */
 .footer-mark {
   margin-top: var(--space-l);
   color: color-mix(in srgb, var(--fg) 16%, transparent); /* dekorativ, aria-hidden */
@@ -4244,12 +4478,9 @@ html.motion .stance__quote.is-pending .qw {
   fill: currentColor;
 }
 
+/* auch die Sonne gedämpft: Der Schluss gehört der Sonne im CTA-Band */
 .footer-mark .logo-accent {
-  fill: var(--accent-graphic);
-}
-
-.footer-mark__rise {
-  transform: translateY(calc((1 - var(--fm, 1)) * 48px));
+  fill: currentColor;
 }
 
 @media (min-width: 48rem) {
@@ -4257,7 +4488,7 @@ html.motion .stance__quote.is-pending .qw {
     grid-column: 1 / -1;
   }
 
-  .site-footer {
+  html.has-palette .site-footer {
     padding-bottom: calc(var(--space-2xl) + 3rem + env(safe-area-inset-bottom, 0px));
   }
 }
@@ -4285,45 +4516,13 @@ html.vt-nav .page-head .kicker,
 html.vt-nav .page-head__title,
 html.vt-nav .page-head__lead,
 html.vt-nav .page-head__horizon::after,
-html.vt-from-sub .page-head__sun {
+html.vt-nav .page-head__sun {
   animation: none;
 }
 
 @keyframes page-sun-rise {
-  from { transform: translateY(calc(100% + 0.5rem)); }
+  from { transform: translateY(calc(100% + var(--sun-gap) + 2px)); }
   to { transform: none; }
-}
-
-/* Bildszenen: Menschen treten hinter dem Horizont hervor, dann die Sonne */
-.scene__fig,
-.scene__rise {
-  transition: transform 1.1s var(--ease-sun), opacity 0.8s var(--ease-out);
-}
-
-.scene__fig {
-  transition-delay: calc(0.15s + var(--i, 0) * 90ms);
-}
-
-.scene__rise--board {
-  transition-delay: 0.1s;
-}
-
-.scene__rise--sun {
-  transition-duration: 1.6s;
-  transition-delay: 0.7s;
-}
-
-.photo.is-pending .scene__fig {
-  transform: translateY(70px);
-}
-
-.photo.is-pending .scene__rise--sun {
-  transform: translateY(140px);
-}
-
-.photo.is-pending .scene__rise--board {
-  opacity: 0;
-  transform: translateY(16px);
 }
 
 /* Leistungen im Detail: Anlässe erscheinen nacheinander */
@@ -4511,6 +4710,32 @@ html:not(.vt-palette)::view-transition-group(nav-indicator) {
   animation-timing-function: var(--ease-sun);
 }
 
+/* Ohne Gegenstück auf der neuen Seite (zurück zur Startseite) geht die kleine
+   Sonne an ihrer Fuge unter, der Marker verschwindet rasch */
+html:not(.vt-palette)::view-transition-old(page-sun):only-child {
+  animation: page-sun-set 200ms var(--ease-out) both; /* so schnell wie page-out */
+}
+
+html:not(.vt-palette)::view-transition-old(nav-indicator):only-child {
+  animation-duration: 200ms;
+}
+
+@keyframes page-sun-set {
+  from { clip-path: inset(-2px -2px -2px); }
+  to { transform: translateY(100%); clip-path: inset(-2px -2px calc(100% + 2px)); opacity: 0; }
+}
+
+/* Start → Unterseite: Die neue Sonne geht im Übergangsbild hinter ihrer Fuge auf,
+   statt unter der Linie zu stehen (das Bild wird nicht vom Horizont beschnitten) */
+html:not(.vt-palette)::view-transition-new(page-sun):only-child {
+  animation: page-sun-rise-vt 900ms var(--ease-sun) both;
+}
+
+@keyframes page-sun-rise-vt {
+  from { transform: translateY(100%); clip-path: inset(-2px -2px calc(100% + 2px)); }
+  to { clip-path: inset(-2px); }
+}
+
 @keyframes page-out {
   to { opacity: 0; transform: translateY(-8px); }
 }
@@ -4582,10 +4807,6 @@ html:not(.js) .site-header__cta {
     transform: none !important;
   }
 
-  .reason.is-pending .reason__title time {
-    background-size: 100% 2px !important;
-  }
-
   .person.is-pending .person__initial {
     transform: translate(-50%, 0.14em) !important;
   }
@@ -4596,8 +4817,7 @@ html:not(.js) .site-header__cta {
 
   .horizon__lift,
   .horizon__rings-lift,
-  .stance__rise,
-  .footer-mark__rise {
+  .stance__rise {
     transform: none !important;
   }
 
@@ -4628,8 +4848,7 @@ html:not(.js) .site-header__cta {
 @media (prefers-reduced-motion: reduce) {
   .horizon__lift,
   .horizon__rings-lift,
-  .stance__rise,
-  .footer-mark__rise {
+  .stance__rise {
     transform: none !important;
   }
 
@@ -4668,9 +4887,6 @@ html:not(.js) .site-header__cta {
 /* Wartezustände der Bausteine aus 18b bis 18l: im Druck und bei reduzierter
    Bewegung immer im Endzustand */
 @media print {
-  .photo.is-pending .scene__fig,
-  .photo.is-pending .scene__rise,
-  .cta-band__inner.is-pending .cta-band__sun,
   .offer__head.is-pending .chips li,
   .offer__result.is-pending::before,
   .contact__intro.is-pending .talk-step {
@@ -4689,9 +4905,6 @@ html:not(.js) .site-header__cta {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .photo.is-pending .scene__fig,
-  .photo.is-pending .scene__rise,
-  .cta-band__inner.is-pending .cta-band__sun,
   .offer__head.is-pending .chips li,
   .offer__result.is-pending::before,
   .contact__intro.is-pending .talk-step {
