@@ -220,7 +220,7 @@ Neuzeit ist noch nicht gegründet. Was es erst nach Gründung oder Aufträgen gi
 - **Fehler** erst nach dem ersten Absenden, danach bei jeder Eingabe neu geprüft: `aria-invalid="true"`, Rand 2px `--color-error`, darunter `.field__error` mit „!“-Zeichen, verknüpft über `aria-describedby`. Der Fokus springt ins erste fehlerhafte Feld.
 - **Senden:** Button mit `aria-disabled`, Text „Einen Moment …“ und kleinem Halbkreis in Schriftfarbe als Ladezeichen. Der Ladezustand bleibt auch bei reduzierter Bewegung, er verhindert doppeltes Absenden.
 - **Versandfehler:** `.form__status.is-error` mit Kante und „!“ in Fehlerrot, sofort angesagt (`role="alert"`). Eingaben bleiben erhalten.
-- **Erfolg:** `.form.is-sent` blendet die Felder aus. Die Statusbox wird zur ruhigen Abschlusskarte mit Überschrift (bekommt den Fokus), dem weiteren Ablauf, „Termin direkt wählen“ und „Weitere Anfrage“.
+- **Erfolg:** `.form.is-sent` blendet die Felder aus. Die Statusbox wird zur ruhigen Abschlusskarte mit Überschrift (bekommt den Fokus), dem weiteren Ablauf, „Termin direkt wählen“ (nur mit hinterlegtem Calendly-Link) und „Weitere Anfrage“.
 - Zwei Felder nebeneinander erst ab 32rem Formularbreite. Auswahlfelder mit eigenem Winkel. Spam-Schutz über ein verstecktes Feld.
 
 ## Ränder

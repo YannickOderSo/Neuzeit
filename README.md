@@ -67,7 +67,7 @@ Das Skript setzt die Teile in alle Seiten ein, schreibt Titel, Beschreibung und 
 3. **Cookie-Banner:** Die Seite setzt keine eigenen Cookies und hat kein Tracking, deshalb gibt es keinen Banner. Calendly kann Cookies setzen, lädt aber erst nach einem Klick mit Hinweis und Einwilligung. Kommt Analytics oder ein anderer Dienst dazu, wird ein Banner nötig.
 4. **Rechtstexte:** Impressum und Datenschutzerklärung ergänzen und von einer Kanzlei prüfen lassen, ebenso die Aussagen zu EU AI Act, NIS2 und DSGVO.
 5. **Suchmaschinen:** In `tools/sync.py` `INDEXIERBAR = True` setzen und das Skript ausführen. Bei eigener Domain auch `BASIS_URL` anpassen.
-6. **Nach der Gründung:** Kontaktdaten ergänzen, im Footer als eigene Spalte (`.site-footer__meta`, Hinweis zum Raster in `styles.css`) und auf der Kontaktseite (`.contact__direct`). Nachnamen und Porträtfotos bei Bedarf in Start- und Über-uns-Seite.
+6. **Nach der Gründung:** Kontaktdaten ergänzen, im Footer als eigene Spalte (`.site-footer__meta`, Hinweis zum Raster in `styles.css`) und auf der Kontaktseite (`.contact__direct`). Webadresse und E-Mail auch in die Absenderzeile für den Druck (`.site-footer__print` in `_partials/fusszeile.html`), weil gedruckt nur diese Zeile vom Footer bleibt. Danach `python3 tools/sync.py`. Nachnamen und Porträtfotos bei Bedarf in Start- und Über-uns-Seite.
 7. **Nach den ersten Aufträgen:** Kundenstimmen (`.quote-card`), Fallbeispiele (`.case`, Vorlage `fallbeispiel.html`) und Fotos aus Projekten (`.photo`) wieder einbauen, nur mit Freigabe der Kunden. Die Bausteine stehen weiter in `styles.css`, den Bildplatzhalter zeigt auch `styleguide.html`.
 
 ## Weitere Ordner
