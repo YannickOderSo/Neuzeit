@@ -59,6 +59,7 @@
     window.clearTimeout(closingTimer);
     menu.removeEventListener("animationend", onClosingEnd);
     menu.classList.remove("is-closing");
+    menu.inert = false;
   }
 
   function finishClosing() {
@@ -86,6 +87,7 @@
     if (menu.hidden || menu.classList.contains("is-closing")) return;
     if (motionOK && !desktopNav.matches) {
       menu.classList.add("is-closing");
+      menu.inert = true; /* beim Ausblenden nicht mehr erreichbar */
       menu.addEventListener("animationend", onClosingEnd);
       closingTimer = window.setTimeout(finishClosing, 400); /* falls animationend ausbleibt */
     } else {
@@ -128,6 +130,11 @@
 
     menu.addEventListener("click", function (event) {
       if (event.target.closest("a[href]")) closeMenu(false);
+    });
+
+    /* Seitenwechsel: das ausblendende Menü darf nicht ins Übergangsbild geraten */
+    window.addEventListener("pageswap", function () {
+      if (menu.classList.contains("is-closing")) finishClosing();
     });
 
     var onBreakpointChange = function (mq) {
@@ -575,12 +582,15 @@
   /* Abschlusskarte statt Formular, bis jemand eine weitere Anfrage beginnt */
   function showSent(name, onAgain) {
     clearStatus(false);
+    /* Der Fokus auf der Überschrift sagt die Karte an, die Live-Region schweigt */
+    status.removeAttribute("role");
+    status.setAttribute("aria-live", "off");
     var title = document.createElement("h3");
     title.tabIndex = -1;
     title.textContent = "Danke, " + name + ".";
     /* Ablauf wie unter „So läuft das Potenzialgespräch“, ohne neue Zusagen */
     var text = document.createElement("p");
-    text.textContent = (endpoint ? "Ihre Anfrage ist bei uns angekommen. " : "") +
+    text.textContent = (endpoint ? "Ihre Anfrage ist bei uns angekommen. Wir melden uns mit Terminvorschlägen. " : "") +
       "Im Potenzialgespräch fragen wir nach und ordnen ein, danach entscheiden Sie in Ruhe, ob es weitergeht.";
     status.appendChild(title);
     status.appendChild(text);
@@ -746,9 +756,6 @@
         /* Prototyp: noch kein Calendly-Link hinterlegt */
         var box2 = document.createElement("div");
         box2.className = "booking__placeholder";
-        var icon = document.createElement("span");
-        icon.className = "sunrise";
-        icon.setAttribute("aria-hidden", "true");
         var title = document.createElement("strong");
         title.textContent = "Hier erscheint der Buchungskalender.";
         var text = document.createElement("p");
@@ -762,7 +769,6 @@
         back.className = "btn btn--ghost btn--small";
         back.textContent = "Zurück";
         back.addEventListener("click", showConsent);
-        box2.appendChild(icon);
         box2.appendChild(title);
         box2.appendChild(text);
         box2.appendChild(back);
