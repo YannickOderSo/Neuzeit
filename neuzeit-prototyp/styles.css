@@ -3460,6 +3460,39 @@ html.motion .subnav__link::after {
   text-wrap: pretty;
 }
 
+/* Arbeitsergebnisse: kurze Liste mit Haarlinien wie die Checkliste */
+.offer__outputs {
+  margin-top: var(--space-l);
+}
+
+/* sehr schmal kein einzelnes Wort in der zweiten Zeile */
+.offer__outputs .offer__label {
+  text-wrap: balance;
+}
+
+.offer__outputs li {
+  padding-block: var(--space-xs);
+  border-top: 1px solid var(--line);
+  font-size: var(--fs-small);
+  line-height: 1.45;
+}
+
+/* keine Schlusslinie: unten rechts steht die Sonne auf ihrem Horizont */
+.offer__outputs li:last-child {
+  padding-bottom: 0;
+}
+
+/* schmal: volle Breite, Platz für die Sonne nur in der letzten Zeile */
+@media (max-width: 47.99rem) {
+  .offer__result {
+    padding-right: clamp(1.5rem, 3.5vw, 2.25rem);
+  }
+
+  .offer__outputs li:last-child {
+    padding-right: 4rem;
+  }
+}
+
 /* kleine Sonne in der Ecke */
 .offer__result::before,
 .offer__result::after {
