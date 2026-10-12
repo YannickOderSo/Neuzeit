@@ -243,8 +243,9 @@
     subnavList.addEventListener("scroll", function () { moveSubnavIndicator(currentSpy); }, { passive: true });
   }
 
-  /* Inhaltsverzeichnis der Rechtstexte: dieselbe Leselinie wie bei den
-     Sprungmarken, ein Viertel des Bildschirms unter der Kopfzeile */
+  /* Inhaltsverzeichnis der Rechtstexte: Leselinie knapp unter der Kopfzeile,
+     höchstens 7rem tief. Kurze Abschnitte liegen dicht beieinander; nach einem
+     Klick muss der angesprungene Abschnitt markiert sein, nicht der nächste. */
   var toc = document.querySelector("[data-toc]");
   var tocLinks = toc ? Array.prototype.slice.call(toc.querySelectorAll("a[href^='#']")) : [];
   var tocTargets = tocLinks.map(function (link) {
@@ -254,7 +255,8 @@
 
   function updateToc() {
     if (!toc) return;
-    var probe = (header ? header.getBoundingClientRect().bottom : 0) + window.innerHeight * 0.25;
+    var rem = parseFloat(getComputedStyle(document.documentElement).fontSize) || 16;
+    var probe = (header ? header.getBoundingClientRect().bottom : 0) + Math.min(window.innerHeight * 0.25, 7 * rem);
     var active = null;
     tocTargets.forEach(function (target, i) {
       if (target && target.getBoundingClientRect().top <= probe) active = tocLinks[i];

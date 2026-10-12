@@ -42,8 +42,14 @@ try {
 const TYPEN = { ".html": "text/html; charset=utf-8", ".css": "text/css", ".js": "text/javascript",
   ".svg": "image/svg+xml", ".png": "image/png", ".woff2": "font/woff2" };
 const server = http.createServer((anfrage, antwort) => {
-  const datei = path.join(ORDNER, decodeURIComponent(new URL(anfrage.url, "http://x").pathname));
-  if (!datei.startsWith(ORDNER) || !fs.existsSync(datei) || fs.statSync(datei).isDirectory()) {
+  let datei;
+  try {
+    datei = path.join(ORDNER, decodeURIComponent(new URL(anfrage.url, "http://x").pathname));
+  } catch {
+    datei = "";
+  }
+  const relativ = path.relative(ORDNER, datei);
+  if (!datei || relativ.startsWith("..") || path.isAbsolute(relativ) || !fs.existsSync(datei) || fs.statSync(datei).isDirectory()) {
     antwort.writeHead(404).end();
     return;
   }
