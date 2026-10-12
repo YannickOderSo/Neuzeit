@@ -50,5 +50,5 @@ Das Skript setzt die Teile in alle Seiten ein, schreibt Titel, Beschreibung und 
 ## Weitere Ordner
 
 - `neuzeit-prototyp/logo/`: Logo in allen Varianten, Favicon, Profilbild und `LOGO.md` mit den Regeln
-- `neuzeit-prototyp/fonts/`: Fraunces und Manrope, selbst ausgeliefert (SIL Open Font License)
+- `neuzeit-prototyp/fonts/`: Fraunces und Manrope, selbst ausgeliefert (SIL Open Font License). Fraunces ist auf das Schriftbild der Wortmarke festgelegt und dadurch halb so groß; Quelle, Befehl und Ersatzschriften in `fonts/README.md`
 - `neuzeit-prototyp/og/`: Vorschaubilder für geteilte Links (1200 × 630)

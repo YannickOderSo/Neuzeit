@@ -10,10 +10,13 @@
    Fraunces und Manrope, SIL Open Font License 1.1, siehe fonts/OFL-*.txt
    -------------------------------------------------------------------------- */
 /* @font-face:start */
+/* Fraunces ist in den Dateien schon auf SOFT 30, WONK 0 und wght 300–500
+   festgelegt (fonts/README.md). font-variation-settings bei body bleibt als
+   Absicherung, wirkt aber nicht mehr. */
 @font-face {
   font-family: "Fraunces";
   font-style: normal;
-  font-weight: 100 900;
+  font-weight: 300 500;
   font-display: swap;
   src: url("fonts/fraunces.woff2") format("woff2");
 }
@@ -21,7 +24,7 @@
 @font-face {
   font-family: "Fraunces";
   font-style: italic;
-  font-weight: 100 900;
+  font-weight: 300 500;
   font-display: swap;
   src: url("fonts/fraunces-italic.woff2") format("woff2");
 }
@@ -32,6 +35,80 @@
   font-weight: 200 800;
   font-display: swap;
   src: url("fonts/manrope.woff2") format("woff2");
+}
+
+/* Ersatzschriften bis zum Laden: Systemschriften auf die Maße von Manrope und
+   Fraunces gebracht, damit beim Wechsel nichts springt. Je Regel nur Schriften
+   mit gleichen Laufweiten. size-adjust: gemessene Breite der Webschrift im Text
+   der Seiten; Ober- und Unterlänge (Manrope 1,066/0,3 em, Fraunces 0,978/0,255 em)
+   geteilt durch size-adjust, weil der Browser sie mitskaliert. */
+@font-face {
+  font-family: "Manrope Ersatz";
+  font-weight: 200 500;
+  src: local("Arial"), local("Helvetica"), local("Liberation Sans"), local("Arimo");
+  size-adjust: 103.6%;
+  ascent-override: 102.9%;
+  descent-override: 29%;
+  line-gap-override: 0%;
+}
+
+@font-face {
+  font-family: "Manrope Ersatz";
+  font-weight: 550 800;
+  src: local("Arial Bold"), local("Helvetica Bold"), local("Liberation Sans Bold"), local("Arimo Bold");
+  size-adjust: 98.9%;
+  ascent-override: 107.8%;
+  descent-override: 30.3%;
+  line-gap-override: 0%;
+}
+
+/* Fraunces läuft je nach Größe (opsz) verschieden breit. Die Werte treffen die
+   Überschriften im ersten Bildschirm. Ziffern haben eine eigene Regel: Sie sind
+   in Fraunces breiter, und die Breite der 0 ist die Einheit ch, mit der viele
+   Überschriften ihre Zeilenlänge begrenzen. Große Überschriften (ab 75rem)
+   laufen in Fraunces schmaler, dort ist ch deshalb größer. */
+@font-face {
+  font-family: "Fraunces Ersatz";
+  font-style: normal;
+  src: local("Times New Roman"), local("Liberation Serif"), local("Tinos");
+  size-adjust: 106%;
+  ascent-override: 92.3%;
+  descent-override: 24.1%;
+  line-gap-override: 0%;
+}
+
+@font-face {
+  font-family: "Fraunces Ersatz";
+  font-style: italic;
+  src: local("Times New Roman Italic"), local("Liberation Serif Italic"), local("Tinos Italic");
+  size-adjust: 108%;
+  ascent-override: 90.6%;
+  descent-override: 23.6%;
+  line-gap-override: 0%;
+}
+
+@font-face {
+  font-family: "Fraunces Ersatz";
+  font-style: normal;
+  src: local("Times New Roman"), local("Liberation Serif"), local("Tinos");
+  unicode-range: U+30-39;
+  size-adjust: 119%;
+  ascent-override: 82.2%;
+  descent-override: 21.4%;
+  line-gap-override: 0%;
+}
+
+@media (min-width: 75rem) {
+  @font-face {
+    font-family: "Fraunces Ersatz";
+    font-style: normal;
+    src: local("Times New Roman"), local("Liberation Serif"), local("Tinos");
+    unicode-range: U+30-39;
+    size-adjust: 131%;
+    ascent-override: 74.7%;
+    descent-override: 19.5%;
+    line-gap-override: 0%;
+  }
 }
 /* @font-face:end */
 
@@ -84,8 +161,8 @@
   --focus: var(--color-accent-text);
 
   /* Schrift */
-  --font-display: "Fraunces", "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, "Times New Roman", serif;
-  --font-body: "Manrope", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --font-display: "Fraunces", "Fraunces Ersatz", "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, "Times New Roman", serif;
+  --font-body: "Manrope", "Manrope Ersatz", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
 
   --fs-display: clamp(2.75rem, min(1.25rem + 5vw, max(6vw, 4.5rem)), 5.5rem);
   --fs-h2: clamp(2rem, 3.8vw, 3.375rem);
