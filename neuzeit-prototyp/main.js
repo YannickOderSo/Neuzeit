@@ -598,7 +598,8 @@
     }
     var actions = document.createElement("div");
     actions.className = "form__status-actions";
-    if (document.getElementById("termin")) {
+    var terminSection = document.getElementById("termin");
+    if (terminSection && !terminSection.hidden) {
       var booking = document.createElement("a");
       booking.className = "btn btn--ghost btn--small";
       booking.href = "#termin";
@@ -757,6 +758,12 @@
 
   document.querySelectorAll("[data-calendly]").forEach(function (box) {
     var url = calendlyUrl((box.getAttribute("data-calendly-url") || "").trim());
+    /* Ohne gültigen Link bleibt die Terminbuchung samt Verweisen ausgeblendet */
+    if (url) {
+      document.querySelectorAll("[data-calendly-only]").forEach(function (el) {
+        el.hidden = false;
+      });
+    }
     var loadButton = box.querySelector("[data-calendly-load]");
     var consent = box.querySelector("[data-calendly-consent]");
     var frame = box.querySelector("[data-calendly-frame]");
