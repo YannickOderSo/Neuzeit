@@ -1,0 +1,1298 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Operation Jackpot</title>
+<style>
+  @font-face { font-family: "Manrope"; font-weight: 200 800; src: url("../../neuzeit-prototyp/fonts/manrope.woff2") format("woff2"); }
+  @font-face { font-family: "Fraunces"; font-style: italic; font-weight: 300 500; src: url("../../neuzeit-prototyp/fonts/fraunces-italic.woff2") format("woff2"); }
+  html, body { margin: 0; height: 100%; background: #05070e; }
+  body { display: grid; place-items: center; }
+  canvas { display: block; width: min(100vw, 177.78vh); height: auto; }
+  #play { position: fixed; inset: 0; margin: auto; width: 220px; height: 64px; border: 0; border-radius: 32px;
+          font: 700 22px Manrope, system-ui, sans-serif; color: #FBF8F5; background: #E95739; cursor: pointer; }
+  body.render #play { display: none; }
+</style>
+</head>
+<body>
+<canvas id="c" width="1280" height="720"></canvas>
+<button id="play" type="button">▶ Abspielen</button>
+<audio id="ton" src="build/ton.wav" preload="auto"></audio>
+<script src="build/timeline.js"></script>
+<script>
+"use strict";
+// Operation Jackpot: jede Szene ist eine Funktion der Zeit. Zeiten kommen aus build/timeline.js (bauen.py).
+
+const C = document.getElementById("c");
+const X = C.getContext("2d");
+const W = 1280, H = 720;
+const TL = window.TIMELINE;
+const SZ = Object.fromEntries(TL.szenen.map(s => [s.id, s]));
+const S = (id, i) => SZ[id].saetze[i];
+const CUE = (id, name) => TL.cues.find(c => c.szene === id && c.name === name);
+
+const F = {
+  nacht: "#18203F", tief: "#0b1024", koralle: "#E95739", korallHell: "#FF8A70",
+  creme: "#FBF8F5", dunst: "#B9C2D4", gold: "#F2C14E", schwarz: "#05070e",
+};
+const NAMENSFARBE = { yannick: F.korallHell, aurel: "#9CC3FF", navi: "#8FE3B0", croupier: F.gold, tuersteher: "#C9A0FF" };
+
+// ------------------------------------------------------------------ Werkzeuge
+
+const clamp = (v, a = 0, b = 1) => Math.max(a, Math.min(b, v));
+const lerp = (a, b, u) => a + (b - a) * u;
+const ss = (a, b, t) => { const u = clamp((t - a) / (b - a)); return u * u * (3 - 2 * u); };
+const easeOut = u => 1 - Math.pow(1 - clamp(u), 3);
+const easeBack = u => { u = clamp(u); const c = 1.9; return 1 + (c + 1) * Math.pow(u - 1, 3) + c * Math.pow(u - 1, 2); };
+const hash = n => { const s = Math.sin(n * 127.1 + 311.7) * 43758.5453; return s - Math.floor(s); };
+const TAU = Math.PI * 2;
+
+function ell(x, y, rx, ry, farbe, rot = 0) { X.beginPath(); X.ellipse(x, y, Math.max(0.1, rx), Math.max(0.1, ry), rot, 0, TAU); X.fillStyle = farbe; X.fill(); }
+function rr(x, y, w, h, r, farbe) { X.beginPath(); X.roundRect(x, y, w, h, r); X.fillStyle = farbe; X.fill(); }
+function linie(x1, y1, x2, y2, b, farbe) { X.beginPath(); X.moveTo(x1, y1); X.lineTo(x2, y2); X.lineWidth = b; X.strokeStyle = farbe; X.lineCap = "round"; X.stroke(); }
+function text(t, x, y, groesse, farbe, opt = {}) {
+  X.font = `${opt.stil || ""} ${opt.gewicht || 700} ${groesse}px ${opt.familie || "Manrope"}`;
+  X.fillStyle = farbe; X.textAlign = opt.align || "center"; X.textBaseline = opt.base || "middle";
+  X.letterSpacing = opt.abstand || "0px";
+  X.fillText(t, x, y);
+  X.letterSpacing = "0px";
+}
+function glow(x, y, r, farbe, a) {
+  const g = X.createRadialGradient(x, y, 0, x, y, r);
+  g.addColorStop(0, farbe.replace("A", a)); g.addColorStop(1, farbe.replace("A", 0));
+  X.fillStyle = g; X.fillRect(x - r, y - r, 2 * r, 2 * r);
+}
+
+// Mundöffnung einer Figur zur Zeit t, aus der Lautstärke ihrer Stimme
+function mund(wer, t) {
+  for (const s of TL.szenen) {
+    if (t < s.start || t >= s.ende) continue;
+    for (const x of s.saetze) {
+      if (x.wer === wer && t >= x.start && t < x.ende) return x.env[Math.min(x.env.length - 1, Math.floor((t - x.start) * TL.fps))] || 0;
+    }
+  }
+  return 0;
+}
+function spricht(wer, t, vor = 0, nach = 0) {
+  for (const s of TL.szenen) for (const x of s.saetze) if (x.wer === wer && t >= x.start - vor && t < x.ende + nach) return true;
+  return false;
+}
+
+// Posen: Handpositionen relativ zu den Füßen (Figur ist etwa 360 Einheiten groß)
+const POSE = {
+  locker:   { L: [-66, -122, "offen"], R: [66, -122, "offen"] },
+  offen:    { L: [-122, -236, "offen"], R: [122, -236, "offen"] },
+  zeigenR:  { L: [-66, -122, "offen"], R: [156, -262, "zeigen"] },
+  markerR:  { L: [-66, -122, "offen"], R: [146, -246, "marker"] },
+  daumenR:  { L: [-66, -122, "offen"], R: [96, -222, "daumen"] },
+  achsel:   { L: [-96, -205, "offen"], R: [96, -205, "offen"] },
+  jubel:    { L: [-98, -392, "offen"], R: [98, -392, "offen"] },
+  schale:   { L: [-40, -150, "offen"], R: [40, -150, "offen"] },
+  essen:    { L: [-10, -264, "faust"], R: [40, -150, "offen"] },
+  tippen:   { L: [-42, -160, "offen"], R: [42, -160, "offen"] },
+  abwehr:   { L: [-92, -268, "offen"], R: [92, -268, "offen"] },
+  schieben: { L: [-66, -122, "offen"], R: [86, -150, "offen"] },
+  finger:   { L: [-66, -122, "offen"], R: [76, -306, "zeigen"] },
+  kratzen:  { L: [-66, -122, "offen"], R: [44, -352, "faust"] },
+  winkenR:  { L: [-66, -122, "offen"], R: [124, -196, "offen"] },
+  werfen:   { L: [-66, -122, "offen"], R: [-40, -176, "faust"] },
+  verschr:  { L: [36, -186, "faust"], R: [-36, -186, "faust"] },
+  sofaA:    { L: [-52, -150, "offen"], R: [42, -204, "schlauch"] },
+  prostA:   { L: [-52, -150, "offen"], R: [92, -312, "schlauch"] },
+  ziehenA:  { L: [-52, -150, "offen"], R: [14, -268, "schlauch"] },
+  daumenA:  { L: [-96, -222, "daumen"], R: [42, -204, "schlauch"] },
+  sofaY:    { L: [-42, -196, "glas"], R: [42, -204, "schlauch"] },
+  prostY:   { L: [-92, -312, "glas"], R: [42, -204, "schlauch"] },
+  ziehenY:  { L: [-42, -196, "glas"], R: [14, -268, "schlauch"] },
+};
+
+// Wechselt weich zwischen Posen; keys = [[Zeit, Pose], ...]
+function pose(t, keys) {
+  keys = keys.slice().sort((a, b) => a[0] - b[0]);
+  let i = 0;
+  while (i + 1 < keys.length && keys[i + 1][0] <= t) i++;
+  const neu = POSE[keys[i][1]] || keys[i][1];
+  if (i === 0) return neu;
+  const alt = POSE[keys[i - 1][1]] || keys[i - 1][1];
+  const u = ss(keys[i][0], keys[i][0] + 0.28, t);
+  const mix = s => [lerp(alt[s][0], neu[s][0], u), lerp(alt[s][1], neu[s][1], u), u < 0.5 ? alt[s][2] : neu[s][2]];
+  return { L: mix("L"), R: mix("R") };
+}
+
+// ------------------------------------------------------------------ Figuren
+
+const STIL = {
+  yannick: { haut: "#F1C4A3", haare: "locken", haar: "#9A522D", haarDunkel: "#76391D", bart: "voll", bartFarbe: "#8C4727",
+             kleid: "hoodie", oben: "#30323B", shirt: "#1B1C22", hose: "#262A37", schuhe: "#15161A", breite: 66, kopfhoerer: true },
+  aurel:   { haut: "#F4CBAA", haare: "scheitel", haar: "#5E3C24", haarDunkel: "#462B18", bart: "schnurr", bartFarbe: "#4A2E1A",
+             kleid: "mantel", oben: "#1F2A4E", shirt: "#283462", hose: "#20263A", schuhe: "#19130F", breite: 56 },
+  tuersteher: { haut: "#D29A74", haare: "glatze", kleid: "anzug", oben: "#131419", shirt: "#E9E9EE", hose: "#131419",
+                schuhe: "#0A0A0A", breite: 86, sonnenbrille: true, hoerner: true },
+  croupier: { haut: "#EFC29F", haare: "gegelt", haar: "#2A2320", haarDunkel: "#171211", bart: "schnurr", bartFarbe: "#2A2320",
+              kleid: "weste", oben: "#6B1B2C", shirt: "#F4F1EC", hose: "#15151A", schuhe: "#0A0A0A", breite: 58, fliege: true },
+};
+
+function figur(p) {
+  const st = STIL[p.stil];
+  const f = c => (p.silhouette ? F.schwarz : c);
+  const t = p.t;
+  const B = st.breite;
+  const oben = p.sitzen ? 55 : 0;
+  const gang = p.gehen ?? null;
+  const hops = gang !== null ? Math.abs(Math.sin(gang)) * 5 : 0;
+  const hand = pose(t, p.keys || [[0, "locker"]]);
+  const m = clamp(p.m || 0);
+
+  X.save();
+  X.translate(p.x, p.y);
+  X.scale(p.s * (p.spiegeln ? -1 : 1), p.s);
+  if (p.alpha !== undefined) X.globalAlpha = p.alpha;
+
+  // Beine
+  if (!p.ohneBeine) {
+    if (p.sitzen) {
+      for (const sx of [-1, 1]) {
+        rr(sx * 21 - 12, -64, 24, 86, 10, f(st.hose));
+        ell(sx * 21, -64, 23, 17, f(st.hose));
+        ell(sx * 23, 22, 21, 9, f(st.schuhe));
+      }
+    } else {
+      for (const sx of [-1, 1]) {
+        const sw = gang !== null ? Math.sin(gang) * 20 * sx : 0;
+        linie(sx * 17, -104, sx * 18 + sw, -14, 27, f(st.hose));
+        ell(sx * 20 + sw, -8, 21, 9, f(st.schuhe));
+      }
+    }
+  }
+  if (p.nurBeine) { X.restore(); return; }
+
+  X.translate(0, oben - hops);
+  if (p.wackeln) X.translate(Math.sin(t * 40) * p.wackeln, 0);
+
+  // Rumpf
+  const saum = p.sitzen ? -96 : -50;
+  if (st.kleid === "mantel") {
+    rr(-B, -240, 2 * B, 240 + saum, 24, f(st.oben));
+    X.beginPath(); X.moveTo(-21, -240); X.lineTo(21, -240); X.lineTo(6, -168); X.lineTo(-6, -168); X.closePath();
+    X.fillStyle = f(st.shirt); X.fill();
+    rr(-21, -252, 42, 18, 7, f(st.shirt));
+    linie(0, -250, 0, -205, 2.5, f("#8A93AD"));
+    for (const sx of [-1, 1]) {
+      X.beginPath(); X.moveTo(sx * 21, -240); X.lineTo(sx * 7, -168); X.lineTo(sx * 38, -212); X.closePath();
+      X.fillStyle = f("#2E3C6C"); X.fill();
+    }
+    linie(0, -168, 0, saum + 4, 2, f("#141C38"));
+    for (const by of [-150, -118, -86]) if (by < saum - 6) ell(12, by, 4.5, 4.5, f("#10162C"));
+  } else if (st.kleid === "hoodie") {
+    rr(-B, -240, 2 * B, 140, 30, f(st.oben));
+    ell(0, -242, 42, 13, f("#24262E"));
+    rr(-24, -238, 48, 136, 8, f(st.shirt));
+    text("€", 0, -175, 34, p.silhouette ? F.schwarz : "rgba(233,87,57,0.55)", { gewicht: 800 });
+    linie(-17, -234, -15, -192, 2.5, f("#C9CCD6"));
+    linie(17, -234, 15, -192, 2.5, f("#C9CCD6"));
+  } else if (st.kleid === "anzug") {
+    rr(-B, -244, 2 * B, 150, 34, f(st.oben));
+    X.beginPath(); X.moveTo(-20, -244); X.lineTo(20, -244); X.lineTo(0, -190); X.closePath(); X.fillStyle = f(st.shirt); X.fill();
+    X.beginPath(); X.moveTo(-5, -238); X.lineTo(5, -238); X.lineTo(7, -196); X.lineTo(0, -188); X.lineTo(-7, -196); X.closePath();
+    X.fillStyle = f("#000"); X.fill();
+  } else if (st.kleid === "weste") {
+    rr(-B, -240, 2 * B, 138, 24, f(st.shirt));
+    for (const sx of [-1, 1]) {
+      X.beginPath(); X.moveTo(sx * 12, -238); X.lineTo(sx * (B - 4), -232); X.lineTo(sx * (B - 6), -104); X.lineTo(sx * 2, -104); X.lineTo(sx * 2, -190); X.closePath();
+      X.fillStyle = f(st.oben); X.fill();
+    }
+  }
+
+  // Hals und Kopf
+  rr(-14, -262, 28, 28, 8, f(st.haut));
+  if (st.kopfhoerer) {
+    for (const sx of [-1, 1]) { ell(sx * 31, -240, 14, 17, f("#121317")); ell(sx * 31, -240, 8, 10, f(F.koralle)); }
+  }
+  X.save();
+  X.translate(0, -300);
+  X.rotate(p.neigen || 0);
+  X.translate(0, 300);
+  kopf(p, st, f, m);
+  X.restore();
+
+  // Arme
+  for (const seite of ["L", "R"]) {
+    const sx = seite === "L" ? -1 : 1;
+    const [hx, hy, art] = hand[seite];
+    const zx = sx * (B - 10), zy = -224;
+    const mx = (zx + hx) / 2 + sx * 18, my = (zy + hy) / 2 + 10;
+    X.beginPath(); X.moveTo(zx, zy); X.quadraticCurveTo(mx, my, hx, hy);
+    X.lineWidth = st.breite > 80 ? 30 : 23; X.strokeStyle = f(st.kleid === "weste" ? st.shirt : st.oben); X.lineCap = "round"; X.stroke();
+    handZeichnen(hx, hy, art, sx, st, f, t);
+  }
+  if (p.extra) p.extra(f);
+  X.restore();
+}
+
+function handZeichnen(x, y, art, sx, st, f, t) {
+  if (art === "glas") {
+    rr(x - 9, y - 34, 18, 26, 4, f("rgba(255,255,255,0.55)"));
+    rr(x - 7, y - 24, 14, 15, 3, f("#C8702A"));
+  }
+  if (art === "schlauch") {
+    rr(x - 5, y - 34, 10, 30, 4, f("#C9CED9"));
+    rr(x - 7, y - 40, 14, 9, 3, f(F.gold));
+  }
+  ell(x, y, 12, 12, f(st.haut));
+  if (art === "daumen") rr(x - 5, y - 28, 10, 20, 5, f(st.haut));
+  if (art === "zeigen") {
+    const a = Math.atan2(y + 224, x - sx * 50);
+    linie(x, y, x + Math.cos(a) * 18, y + Math.sin(a) * 18, 8, f(st.haut));
+  }
+  if (art === "marker") { X.save(); X.translate(x, y); X.rotate(-0.6); rr(-4, -26, 9, 24, 3, f("#1B2A6B")); X.restore(); }
+}
+
+function kopf(p, st, f, m) {
+  const t = p.t;
+  const bx = (p.blick || 0) * 6;
+  // Haare hinten
+  if (st.haare === "locken") ell(0, -322, 58, 42, f(st.haarDunkel));
+  if (st.haare === "scheitel") { rr(-55, -340, 110, 70, 30, f(st.haarDunkel)); }
+  // Ohren und Gesicht
+  ell(-49, -298, 9, 13, f(st.haut)); ell(49, -298, 9, 13, f(st.haut));
+  ell(0, -300, 48, 55, f(st.haut));
+  // Bart
+  if (st.bart === "voll") {
+    X.save(); X.beginPath(); X.rect(-60, -296, 120, 80); X.clip();
+    ell(0, -286, 50, 50, f(st.bartFarbe));
+    X.restore();
+    ell(-22 + bx * 0.5, -292, 17, 10, f(st.haut)); ell(22 + bx * 0.5, -292, 17, 10, f(st.haut));
+    ell(bx * 0.5, -279, 18, 6, f(st.bartFarbe));
+  }
+  if (!p.silhouette) { ell(-30 + bx * 0.4, -284, 9, 6, "rgba(232,120,110,0.25)"); ell(30 + bx * 0.4, -284, 9, 6, "rgba(232,120,110,0.25)"); }
+  // Augen
+  const zu = p.augenZu || ((t + (p.stil.length * 0.9)) % 3.7) < 0.12;
+  const brau = (p.brauen || 0) * 7;
+  for (const sx of [-1, 1]) {
+    const ax = sx * 18 + bx, ay = -306;
+    if (st.sonnenbrille) continue;
+    if (zu) linie(ax - 6, ay, ax + 6, ay, 3, f("#2A1C14"));
+    else { ell(ax, ay, 5.5, 7.5, f("#231812")); if (!p.silhouette) ell(ax + 1.8, ay - 2.5, 1.8, 2, "#fff"); }
+    const bf = st.haare === "glatze" ? "#6b4a36" : (st.bartFarbe || st.haar);
+    linie(ax - 8, ay - 15 - brau + sx * -1, ax + 8, ay - 16 - brau - sx * 1.5, 3.5, f(bf));
+  }
+  if (st.sonnenbrille) {
+    rr(-34 + bx, -316, 30, 18, 6, f("#07080c")); rr(4 + bx, -316, 30, 18, 6, f("#07080c"));
+    linie(-4 + bx, -309, 4 + bx, -309, 3, f("#07080c"));
+  }
+  // Nase
+  ell(bx * 1.2, -291, 6, 5, f("rgba(200,120,90,0.45)"));
+  // Mund
+  const my = -272 + (st.bart === "voll" ? 2 : 0);
+  if (m > 0.06) {
+    ell(bx, my, 9 + 4 * m, 3 + 12 * m, f("#6E2323"));
+    if (!p.silhouette) ell(bx, my + 2 + 7 * m, 5 + 2 * m, 2 + 3 * m, "#C9585B");
+  } else {
+    X.beginPath(); X.arc(bx, my - 6, 11, 0.2 * Math.PI, 0.8 * Math.PI);
+    X.lineWidth = 3.2; X.strokeStyle = f("#6E2323"); X.lineCap = "round"; X.stroke();
+  }
+  if (st.bart === "schnurr") {
+    X.beginPath(); X.moveTo(-15 + bx, my - 8); X.quadraticCurveTo(bx, my - 15, 15 + bx, my - 8);
+    X.lineWidth = 4.5; X.strokeStyle = f(st.bartFarbe); X.stroke();
+  }
+  // Haare vorne
+  if (st.haare === "locken") {
+    for (let i = 0; i < 22; i++) {
+      const a = Math.PI * (1.02 + 0.96 * i / 21);
+      const r = 50 + 6 * hash(i + 3);
+      ell(Math.cos(a) * r, -306 + Math.sin(a) * r * 0.92, 15 + 5 * hash(i), 15 + 5 * hash(i + 9), f(i % 3 ? st.haar : st.haarDunkel));
+    }
+    for (let i = 0; i < 7; i++) {
+      const a = Math.PI * (1.2 + 0.6 * i / 6);
+      ell(Math.cos(a) * 30, -318 + Math.sin(a) * 28, 16, 15, f(i % 2 ? st.haar : "#A85E35"));
+    }
+    for (const sx of [-1, 1]) { ell(sx * 50, -310, 12, 18, f(st.haar)); ell(sx * 47, -290, 7, 14, f(st.bartFarbe)); }
+  }
+  if (st.haare === "scheitel") {
+    X.beginPath();
+    X.moveTo(-6, -358);
+    X.bezierCurveTo(-36, -356, -58, -332, -54, -284);
+    X.lineTo(-44, -286);
+    X.bezierCurveTo(-42, -312, -30, -330, -4, -334);
+    X.bezierCurveTo(16, -330, 34, -322, 44, -296);
+    X.lineTo(54, -290);
+    X.bezierCurveTo(58, -330, 36, -356, -6, -358);
+    X.fillStyle = f(st.haar); X.fill();
+    X.beginPath(); X.moveTo(-4, -356); X.quadraticCurveTo(-26, -340, -40, -300);
+    X.moveTo(4, -354); X.quadraticCurveTo(28, -342, 44, -306);
+    X.lineWidth = 2; X.strokeStyle = f(st.haarDunkel); X.stroke();
+  }
+  if (st.haare === "glatze" && !p.silhouette) ell(-14, -340, 14, 7, "rgba(255,255,255,0.25)", -0.3);
+  if (st.haare === "gegelt") {
+    X.save(); X.beginPath(); X.rect(-60, -380, 120, 66); X.clip();
+    ell(0, -310, 50, 50, f(st.haar)); X.restore();
+    if (!p.silhouette) linie(-24, -348, 18, -352, 3, "rgba(255,255,255,0.35)");
+  }
+  if (st.hoerner) {
+    for (const sx of [-1, 1]) {
+      X.beginPath(); X.moveTo(sx * 18, -350); X.quadraticCurveTo(sx * 30, -384, sx * 38, -392); X.quadraticCurveTo(sx * 36, -366, sx * 34, -342);
+      X.closePath(); X.fillStyle = f("#D3263A"); X.fill();
+    }
+  }
+  if (st.fliege) {
+    X.beginPath(); X.moveTo(0, -244); X.lineTo(-16, -252); X.lineTo(-16, -236); X.closePath();
+    X.moveTo(0, -244); X.lineTo(16, -252); X.lineTo(16, -236); X.closePath(); X.fillStyle = f("#0A0A0A"); X.fill();
+  }
+}
+
+// ------------------------------------------------------------------ Kulissen
+
+function himmel(oben, unten) {
+  const g = X.createLinearGradient(0, 0, 0, H);
+  g.addColorStop(0, oben); g.addColorStop(1, unten);
+  X.fillStyle = g; X.fillRect(0, 0, W, H);
+}
+
+function sterne(t, n, yMax, versatz = 0) {
+  for (let i = 0; i < n; i++) {
+    const x = ((hash(i) * W * 1.3 - versatz * (0.2 + hash(i + 7) * 0.2)) % W + W) % W;
+    const y = hash(i + 50) * yMax;
+    const a = 0.35 + 0.65 * Math.abs(Math.sin(t * (0.6 + hash(i + 3) * 2) + i));
+    ell(x, y, 1 + hash(i + 9) * 1.4, 1 + hash(i + 9) * 1.4, `rgba(251,248,245,${a})`);
+  }
+}
+
+function mond(x, y, r) {
+  glow(x, y, r * 2.6, "rgba(246,239,217,A)", 0.22);
+  ell(x, y, r, r, "#F6EFD9");
+  ell(x - r * 0.3, y - r * 0.2, r * 0.18, r * 0.18, "rgba(200,190,160,0.45)");
+  ell(x + r * 0.35, y + r * 0.25, r * 0.12, r * 0.12, "rgba(200,190,160,0.45)");
+  ell(x + r * 0.1, y - r * 0.45, r * 0.08, r * 0.08, "rgba(200,190,160,0.45)");
+}
+
+function kuerbis(x, y, r, t, zwinkern = false) {
+  const fl = 0.75 + 0.25 * Math.sin(t * 13) * Math.sin(t * 7.3);
+  glow(x, y, r * 2.6, "rgba(255,170,60,A)", 0.28 * fl);
+  for (const [dx, rx] of [[-0.45, 0.62], [0.45, 0.62], [0, 0.7]]) ell(x + dx * r, y, rx * r, r * 0.86, dx === 0 ? "#F28B26" : "#DC7419");
+  rr(x - r * 0.1, y - r * 1.12, r * 0.2, r * 0.36, 4, "#3E6B2F");
+  const glut = `rgba(255,${200 + 40 * fl | 0},90,1)`;
+  X.fillStyle = glut;
+  X.beginPath(); X.moveTo(x - r * 0.48, y - r * 0.08); X.lineTo(x - r * 0.3, y - r * 0.42); X.lineTo(x - r * 0.12, y - r * 0.08); X.closePath(); X.fill();
+  if (zwinkern) linie(x + r * 0.12, y - r * 0.22, x + r * 0.48, y - r * 0.22, r * 0.09, glut);
+  else { X.beginPath(); X.moveTo(x + r * 0.12, y - r * 0.08); X.lineTo(x + r * 0.3, y - r * 0.42); X.lineTo(x + r * 0.48, y - r * 0.08); X.closePath(); X.fill(); }
+  X.beginPath(); X.moveTo(x - r * 0.55, y + r * 0.18);
+  for (let i = 0; i <= 6; i++) X.lineTo(x - r * 0.55 + i * r * 0.183, y + r * (i % 2 ? 0.3 : 0.5));
+  X.lineTo(x + r * 0.55, y + r * 0.18); X.quadraticCurveTo(x, y + r * 0.75, x - r * 0.55, y + r * 0.18); X.fill();
+}
+
+function fledermaus(x, y, s, t) {
+  const fl = Math.sin(t * 16) * 14;
+  X.save(); X.translate(x, y); X.scale(s, s); X.fillStyle = F.schwarz;
+  X.beginPath();
+  X.moveTo(0, 0); X.quadraticCurveTo(-20, -18 - fl, -46, -6 - fl); X.quadraticCurveTo(-34, 0, -30, 10); X.quadraticCurveTo(-16, 2, 0, 8);
+  X.quadraticCurveTo(16, 2, 30, 10); X.quadraticCurveTo(34, 0, 46, -6 - fl); X.quadraticCurveTo(20, -18 - fl, 0, 0);
+  X.fill(); ell(0, 2, 7, 9, F.schwarz);
+  X.restore();
+}
+
+function schein(x, y, rot, s = 1) {
+  X.save(); X.translate(x, y); X.rotate(rot); X.scale(s, s);
+  rr(-30, -15, 60, 30, 3, "#7CC67F"); X.lineWidth = 2; X.strokeStyle = "#3E8E46"; X.strokeRect(-26, -11, 52, 22);
+  text("€", 0, 1, 18, "#2F6E36", { gewicht: 800 });
+  X.restore();
+}
+function chip(x, y, r, farbe) {
+  ell(x, y + r * 0.18, r, r * 0.45, "rgba(0,0,0,0.35)");
+  ell(x, y, r, r * 0.45, farbe);
+  X.setLineDash([r * 0.35, r * 0.35]); X.beginPath(); X.ellipse(x, y, r * 0.78, r * 0.35, 0, 0, TAU);
+  X.lineWidth = r * 0.16; X.strokeStyle = "rgba(255,255,255,0.85)"; X.stroke(); X.setLineDash([]);
+}
+function muenze(x, y, r, rot) { ell(x, y, r * Math.abs(Math.cos(rot)) + 1, r, "#E9B83F"); ell(x, y, r * 0.65 * Math.abs(Math.cos(rot)) + 0.5, r * 0.65, "#F7D777"); }
+
+// Geldregen: Scheine, Chips und Münzen fallen ab t0
+function geldregen(t, t0, dauer, n) {
+  for (let i = 0; i < n; i++) {
+    const start = t0 + hash(i) * dauer * 0.7;
+    const lt = t - start;
+    if (lt < 0) continue;
+    const y = -60 + lt * (260 + 200 * hash(i + 1)) + 0.5 * 60 * lt * lt;
+    if (y > H + 60) continue;
+    const x = hash(i + 2) * W + Math.sin(lt * 3 + i) * 40;
+    const art = i % 5;
+    if (art < 3) schein(x, y, Math.sin(lt * 4 + i) * 1.2, 0.9 + hash(i + 4) * 0.4);
+    else if (art === 3) chip(x, y, 14, [F.koralle, "#2F5BD3", "#E9E9EE", F.gold][i % 4]);
+    else muenze(x, y, 11, lt * 8 + i);
+  }
+}
+
+// Wohnzimmer (Lagebesprechung und Shisha)
+function wohnzimmer(t) {
+  const g = X.createLinearGradient(0, 0, 0, 600);
+  g.addColorStop(0, "#E3D3BC"); g.addColorStop(1, "#D3BFA3");
+  X.fillStyle = g; X.fillRect(-300, -100, W + 600, 710);
+  rr(-300, 596, W + 600, 18, 0, "#B69C7E");
+  X.fillStyle = "#7A5A40"; X.fillRect(-300, 610, W + 600, 210);
+  for (let i = -2; i < 11; i++) linie(i * 160 + 40, 612, i * 160 - 40, 720, 2, "rgba(60,40,25,0.35)");
+  // Fenster mit Nacht
+  rr(96, 96, 252, 222, 8, "#F4EEE4");
+  himmelFenster(t, 108, 108, 228, 198);
+  linie(222, 108, 222, 306, 8, "#F4EEE4"); linie(108, 207, 336, 207, 8, "#F4EEE4");
+  rr(84, 318, 276, 14, 4, "#E8DECF");
+  for (const sx of [74, 330]) { rr(sx, 80, 40, 270, 14, F.koralle); for (let k = 1; k < 4; k++) linie(sx + k * 10, 90, sx + k * 10, 340, 2, "rgba(150,40,20,0.35)"); }
+  rr(60, 72, 320, 14, 6, "#6A4A33");
+  // Bild an der Wand: die Neuzeit-Sonne
+  rr(472, 118, 132, 100, 4, "#6A4A33"); rr(480, 126, 116, 84, 2, F.creme);
+  X.save(); X.beginPath(); X.rect(480, 126, 116, 84); X.clip(); ell(538, 196, 30, 30, F.koralle); X.restore();
+  linie(492, 196, 584, 196, 3, F.nacht);
+  // Stehlampe
+  linie(1180, 330, 1180, 600, 6, "#3B3B44"); ell(1180, 604, 34, 8, "#3B3B44");
+  X.beginPath(); X.moveTo(1130, 330); X.lineTo(1230, 330); X.lineTo(1206, 262); X.lineTo(1154, 262); X.closePath(); X.fillStyle = "#F6E7C8"; X.fill();
+  glow(1180, 320, 260, "rgba(255,214,150,A)", 0.3);
+}
+
+function himmelFenster(t, x, y, w, h) {
+  X.save(); X.beginPath(); X.rect(x, y, w, h); X.clip();
+  const g = X.createLinearGradient(0, y, 0, y + h); g.addColorStop(0, "#0E1430"); g.addColorStop(1, "#24305E");
+  X.fillStyle = g; X.fillRect(x, y, w, h);
+  for (let i = 0; i < 26; i++) ell(x + hash(i + 100) * w, y + hash(i + 200) * h * 0.8, 1.3, 1.3, `rgba(255,255,255,${0.4 + 0.6 * Math.abs(Math.sin(t + i))})`);
+  mond(x + w * 0.72, y + h * 0.3, 26);
+  X.restore();
+}
+
+function sofaHinten() {
+  rr(46, 392, 438, 200, 34, "#3B4C82");
+  rr(76, 410, 180, 140, 26, "#4A5C96"); rr(274, 410, 180, 140, 26, "#4A5C96");
+}
+function sofaVorne() {
+  rr(58, 560, 414, 62, 20, "#34457A");
+  rr(26, 470, 64, 162, 28, "#2F3F72"); rr(440, 470, 64, 162, 28, "#2F3F72");
+  rr(56, 628, 14, 18, 3, "#2A2016"); rr(460, 628, 14, 18, 3, "#2A2016");
+}
+
+// Flipchart mit Lageplan
+function flipchart(x, y, w, h, z) {
+  linie(x + 30, y + h - 20, x - 6, y + h + 180, 9, "#5C4632");
+  linie(x + w - 30, y + h - 20, x + w + 6, y + h + 180, 9, "#5C4632");
+  linie(x + w / 2, y + h - 10, x + w / 2, y + h + 160, 9, "#4C3A29");
+  rr(x - 12, y - 18, w + 24, 22, 6, "#3B3B44");
+  if (z.seite2 > 0) seite2(x, y, w, h, z);
+  if (z.seite2 < 1) {
+    X.save();
+    X.translate(x, y); X.scale(1, 1 - easeOut(z.seite2)); X.translate(-x, -y);
+    seite1(x, y, w, h, z);
+    X.restore();
+  }
+  rr(x - 12, y - 18, w + 24, 22, 6, "#3B3B44");
+}
+
+function papier(x, y, w, h) {
+  rr(x, y, w, h, 4, "#FFFFFF");
+  X.fillStyle = "rgba(0,0,0,0.06)"; X.fillRect(x, y + h - 8, w, 8);
+}
+
+function nummer(n, x, y) { ell(x, y, 15, 15, F.koralle); text(String(n), x, y + 1, 18, "#fff", { gewicht: 800 }); }
+
+function haus(x, y, s, farbe) {
+  X.save(); X.translate(x, y); X.scale(s, s);
+  X.beginPath(); X.moveTo(-22, 0); X.lineTo(-22, -24); X.lineTo(0, -44); X.lineTo(22, -24); X.lineTo(22, 0); X.closePath();
+  X.lineWidth = 4; X.strokeStyle = farbe; X.lineJoin = "round"; X.stroke();
+  X.strokeRect(-6, -16, 12, 16);
+  X.restore();
+}
+function casinoIcon(x, y, s, farbe) {
+  X.save(); X.translate(x, y); X.scale(s, s);
+  X.lineWidth = 4; X.strokeStyle = farbe; X.lineJoin = "round";
+  X.strokeRect(-30, -40, 60, 40);
+  X.beginPath(); X.moveTo(-36, -40); X.lineTo(0, -60); X.lineTo(36, -40); X.stroke();
+  X.font = "800 22px Manrope"; X.fillStyle = farbe; X.textAlign = "center"; X.textBaseline = "middle"; X.fillText("€", 0, -19);
+  X.restore();
+}
+
+function seite1(x, y, w, h, z) {
+  papier(x, y, w, h);
+  text("LAGEPLAN · 31.10.", x + 26, y + 38, 28, F.nacht, { align: "left", gewicht: 800, abstand: "1px" });
+  // Route
+  const ra = x + 64, rb = x + w - 96, ry = y + 118;
+  haus(ra, ry, 1, F.nacht);
+  if (z.p1 > 0) {
+    X.save(); X.setLineDash([10, 9]); X.lineWidth = 4; X.strokeStyle = F.koralle;
+    X.beginPath(); X.moveTo(ra + 30, ry - 18); X.lineTo(lerp(ra + 30, rb - 42, z.p1), ry - 18); X.stroke(); X.restore();
+    X.globalAlpha = ss(0.6, 1, z.p1);
+    casinoIcon(rb, ry, 1, F.nacht);
+    text("Spielbank Neuenkirchen", rb, ry + 22, 15, F.nacht, { gewicht: 700 });
+    X.globalAlpha = 1;
+  }
+  const zeilen = [[z.p1, "Hinfahren"], [z.p2, "Dicker Haufen Geld"], [z.p3, "Heimfahren + Shisha"]];
+  zeilen.forEach(([p, txt], i) => {
+    if (p <= 0) return;
+    const zy = y + 190 + i * 50;
+    X.save(); X.globalAlpha = clamp(p * 2);
+    X.translate(x + 40, zy); X.scale(easeBack(p), easeBack(p));
+    nummer(i + 1, 0, 0);
+    text(txt, 26, 1, 24, F.nacht, { align: "left", gewicht: 700 });
+    X.restore();
+    if (z.haken > 0) {
+      X.save(); X.globalAlpha = clamp(z.haken * 3 - i);
+      X.beginPath(); X.moveTo(x + w - 52, zy); X.lineTo(x + w - 40, zy + 12); X.lineTo(x + w - 18, zy - 14);
+      X.lineWidth = 6; X.strokeStyle = F.koralle; X.lineCap = "round"; X.lineJoin = "round"; X.stroke(); X.restore();
+    }
+  });
+  if (z.kreis > 0) {
+    X.beginPath(); X.ellipse(x + 150, y + 241, 150, 30, -0.04, -1.2, -1.2 + TAU * 1.05 * z.kreis);
+    X.lineWidth = 4; X.strokeStyle = F.koralle; X.stroke();
+  }
+}
+
+function seite2(x, y, w, h, z) {
+  papier(x, y, w, h);
+  text("STAKEHOLDER-ANALYSE", x + 26, y + 36, 24, F.nacht, { align: "left", gewicht: 800 });
+  text("Objekt: Roulettetisch", x + 26, y + 64, 17, F.koralle, { align: "left", gewicht: 700 });
+  const ox = x + w / 2, oy = y + 200;
+  linie(x + 40, oy, x + w - 30, oy, 3, F.nacht); linie(ox, y + 96, ox, y + h - 24, 3, F.nacht);
+  text("Einfluss", ox - 10, y + 104, 14, F.nacht, { align: "right" });
+  text("Interesse", x + w - 34, oy + 16, 14, F.nacht, { align: "right" });
+  // der Tisch, oben rechts
+  const tx = ox + 80, ty = oy - 56;
+  ell(tx, ty, 46, 20, "#1F7A4C"); ell(tx - 18, ty - 2, 12, 6, "#6B3A1E");
+  text("Tisch", tx, ty + 34, 15, F.nacht);
+  if (z.frage > 0) { X.save(); X.globalAlpha = z.frage; text("?", tx + 60, ty - 18, 44, F.koralle, { gewicht: 800 }); X.restore(); }
+  if (z.wir > 0) {
+    X.save(); X.globalAlpha = z.wir;
+    for (const dx of [-80, -56]) {
+      const sx = ox + dx, sy = oy - 30;
+      ell(sx, sy - 22, 7, 7, F.nacht); linie(sx, sy - 14, sx, sy + 4, 3, F.nacht);
+      linie(sx - 8, sy - 6, sx + 8, sy - 6, 3, F.nacht); linie(sx, sy + 4, sx - 6, sy + 16, 3, F.nacht); linie(sx, sy + 4, sx + 6, sy + 16, 3, F.nacht);
+    }
+    text("wir", ox - 68, oy - 64, 15, F.koralle);
+    linie(ox - 40, oy - 34, tx - 52, ty + 4, 3, F.koralle);
+    X.restore();
+  }
+}
+
+// Landstraße bei Nacht, richtung 1 nach rechts, -1 nach links
+function landstrasse(t, lt, richtung) {
+  himmel("#070B1C", "#26346A");
+  sterne(t, 90, 300, lt * 6 * richtung);
+  mond(1040, 100, 42);
+  const v = 430 * lt * richtung;
+  // Hügel
+  X.fillStyle = "#18224A"; X.beginPath(); X.moveTo(0, H);
+  for (let x = 0; x <= W; x += 20) { const u = x + v * 0.08; X.lineTo(x, 360 - 36 * Math.sin(u / 210) - 24 * Math.sin(u / 97 + 1)); }
+  X.lineTo(W, H); X.fill();
+  // Bäume
+  for (let i = -2; i < 12; i++) {
+    const base = i * 150 - ((v * 0.42) % 150 + 150) % 150;
+    const k = Math.floor((v * 0.42) / 150) + i;
+    const hh = 80 + 60 * hash(k);
+    const x = base + 40 * hash(k + 5);
+    if (hash(k + 11) > 0.45) {
+      X.fillStyle = "#101934"; X.beginPath(); X.moveTo(x, 470 - hh - 30); X.lineTo(x - 36, 470); X.lineTo(x + 36, 470); X.closePath(); X.fill();
+    } else { ell(x, 452 - hh * 0.6, 42, hh * 0.5, "#121C3A"); rr(x - 5, 436, 10, 34, 2, "#0D1328"); }
+  }
+  X.fillStyle = "#1B2340"; X.fillRect(0, 466, W, 36);
+  // Straße
+  X.fillStyle = "#2A2D38"; X.fillRect(0, 500, W, 100);
+  X.fillStyle = "#B9C2D4"; X.fillRect(0, 502, W, 3); X.fillRect(0, 594, W, 3);
+  for (let i = -1; i < 12; i++) {
+    const x = i * 140 - ((v % 140) + 140) % 140;
+    rr(x, 548, 70, 6, 3, "rgba(251,248,245,0.8)");
+  }
+  // Vordergrund: Böschung, darauf stehen die Untertitel
+  X.fillStyle = "#0E1430"; X.fillRect(0, 600, W, 120);
+  for (let i = -1; i < 26; i++) {
+    const x = i * 56 - ((v * 1.35 % 56) + 56) % 56;
+    const k = Math.floor(v * 1.35 / 56) + i;
+    X.fillStyle = "#16204A"; X.beginPath(); X.moveTo(x, 606); X.lineTo(x + 6, 590 - 10 * hash(k)); X.lineTo(x + 12, 606); X.fill();
+  }
+  // Laternen am hinteren Straßenrand
+  for (let i = -1; i < 4; i++) {
+    const x = i * 480 - ((v * 1.0 % 480) + 480) % 480 + 200;
+    glow(x, 540, 140, "rgba(255,210,120,A)", 0.14);
+    linie(x, 502, x, 300, 7, "#3A3F52"); linie(x, 304, x + 36 * richtung, 304, 6, "#3A3F52");
+    ell(x + 40 * richtung, 310, 12, 6, "#FFE3A0");
+    X.save(); X.globalCompositeOperation = "lighter";
+    const g = X.createLinearGradient(0, 310, 0, 560); g.addColorStop(0, "rgba(255,220,140,0.20)"); g.addColorStop(1, "rgba(255,220,140,0)");
+    X.fillStyle = g; X.beginPath(); X.moveTo(x + 32 * richtung, 312); X.lineTo(x + 48 * richtung, 312); X.lineTo(x + 130 * richtung, 580); X.lineTo(x - 50 * richtung, 580); X.closePath(); X.fill();
+    X.restore();
+  }
+}
+
+// Das Auto in Koralle; Aurel fährt, Yannick sitzt daneben
+function auto(x, y, richtung, t, o) {
+  const hub = Math.sin(t * 13) * 1.4 + (o.beladen ? 5 : 0);
+  const g0 = o.gross || 1.25;
+  X.save(); X.translate(x, y); X.scale(richtung * g0, g0);
+  ell(0, 0, 210, 14, "rgba(0,0,0,0.45)");
+  // Scheinwerferkegel
+  X.save(); X.globalCompositeOperation = "lighter";
+  const g = X.createLinearGradient(180, 0, 520, 0); g.addColorStop(0, "rgba(255,236,170,0.35)"); g.addColorStop(1, "rgba(255,236,170,0)");
+  X.fillStyle = g; X.beginPath(); X.moveTo(178, -72 + hub); X.lineTo(520, -120); X.lineTo(520, 10); X.closePath(); X.fill();
+  X.restore();
+  X.translate(0, hub);
+  // Kofferraumdeckel offen
+  if (o.beladen) {
+    X.save(); X.translate(-150, -100); X.rotate(-1.15); rr(-6, -66, 14, 76, 6, "#C7432A"); X.restore();
+    for (let i = 0; i < 9; i++) schein(-170 + (i % 3) * 22 + hash(i) * 8, -106 - Math.floor(i / 3) * 10 - hash(i + 2) * 6, (hash(i + 4) - 0.5) * 1.2, 0.7);
+  }
+  // Kabine und Fenster
+  X.beginPath(); X.moveTo(-124, -100); X.lineTo(-98, -178); X.quadraticCurveTo(-90, -190, -64, -190);
+  X.lineTo(58, -190); X.quadraticCurveTo(80, -190, 94, -174); X.lineTo(136, -100); X.closePath(); X.fillStyle = F.koralle; X.fill();
+  X.save();
+  X.beginPath(); X.moveTo(-108, -104); X.lineTo(-88, -170); X.lineTo(52, -170); X.quadraticCurveTo(68, -170, 80, -156); X.lineTo(116, -104); X.closePath();
+  X.fillStyle = "#1A2240"; X.fill(); X.clip();
+  glow(10, -130, 120, "rgba(140,170,255,A)", 0.12);
+  figur({ stil: "yannick", x: -34, y: -10, s: 0.4, t, m: o.mY, blick: o.blickY, keys: o.keysY || [[0, "locker"]], spiegeln: richtung < 0, extra: o.plan });
+  figur({ stil: "aurel", x: 46, y: -10, s: 0.4, t, m: o.mA, blick: o.blickA, keys: [[0, "locker"]], spiegeln: richtung < 0 });
+  X.beginPath(); X.arc(86, -120, 18, Math.PI * 0.9, Math.PI * 1.9); X.lineWidth = 6; X.strokeStyle = "#0D0F18"; X.stroke();
+  kuerbis(104, -114 + Math.sin(t * 9) * 1.5, 9, t);
+  X.fillStyle = "rgba(255,255,255,0.07)"; X.beginPath(); X.moveTo(-60, -170); X.lineTo(-20, -170); X.lineTo(-70, -104); X.lineTo(-110, -104); X.fill();
+  X.restore();
+  linie(6, -188, 2, -102, 9, F.koralle);
+  // Karosserie
+  rr(-188, -104, 376, 78, 28, F.koralle);
+  rr(-188, -56, 376, 10, 4, "#C7432A");
+  linie(-60, -100, -64, -34, 2, "#B83C25"); linie(60, -100, 62, -34, 2, "#B83C25");
+  rr(-30, -86, 22, 6, 3, "#B83C25"); rr(84, -86, 22, 6, 3, "#B83C25");
+  ell(176, -76, 10, 8, "#FFF2C0"); rr(-190, -84, 10, 18, 4, "#FF4B4B");
+  // Räder
+  for (const rx of [-112, 112]) {
+    ell(rx, -26, 32, 32, "#111218"); ell(rx, -26, 17, 17, "#9AA3B8");
+    const a = -t * 430 / 32;
+    for (let k = 0; k < 3; k++) linie(rx, -26, rx + Math.cos(a + k * 2.09) * 15, -26 + Math.sin(a + k * 2.09) * 15, 3, "#5A6278");
+  }
+  if (o.daumen > 0) {
+    X.save(); X.globalAlpha = o.daumen;
+    linie(70, -150, 112, -206, 18, "#3A4A80");
+    ell(116, -212, 12, 12, STIL.aurel.haut); rr(111, -240, 10, 20, 5, STIL.aurel.haut);
+    X.restore();
+  }
+  X.restore();
+}
+
+function navi(t, eintraege) {
+  for (const e of eintraege) {
+    const u = ss(e.t0, e.t0 + 0.45, t) * (1 - ss(e.t1, e.t1 + 0.4, t));
+    if (u <= 0) continue;
+    X.save(); X.globalAlpha = u; X.translate(0, (1 - easeBack(u)) * -150);
+    rr(800, 24, 456, 116, 18, "rgba(11,16,36,0.92)");
+    X.lineWidth = 2; X.strokeStyle = F.koralle; X.beginPath(); X.roundRect(800, 24, 456, 116, 18); X.stroke();
+    rr(816, 40, 84, 84, 12, "#1F7A4C");
+    X.save(); X.translate(858, 82); X.strokeStyle = "#fff"; X.lineWidth = 9; X.lineCap = "round"; X.lineJoin = "round";
+    X.beginPath();
+    if (e.pfeil === "rechts") { X.moveTo(-14, 28); X.lineTo(-14, -6); X.lineTo(14, -6); X.stroke(); X.beginPath(); X.moveTo(4, -18); X.lineTo(16, -6); X.lineTo(4, 6); }
+    else { X.moveTo(0, 28); X.lineTo(0, -22); X.stroke(); X.beginPath(); X.moveTo(-13, -10); X.lineTo(0, -24); X.lineTo(13, -10); }
+    X.stroke(); X.restore();
+    text(e.z1, 918, 64, 21, F.creme, { align: "left", gewicht: 800 });
+    text(e.z2, 918, 98, 18, "#8FE3B0", { align: "left", gewicht: 700 });
+    X.restore();
+  }
+}
+
+// ------------------------------------------------------------------ Szenen
+
+function kamera(z, cx, cy, wx = 0, wy = 0) { X.setTransform(z, 0, 0, z, W / 2 - cx * z + wx, H / 2 - cy * z + wy); }
+
+function szIntro(t, lt, d) {
+  const T = 2.2;
+  const wackler = lt > T && lt < T + 0.45 ? (1 - (lt - T) / 0.45) * 12 : 0;
+  kamera(1, 640, 360, (hash(t * 60) - 0.5) * wackler, (hash(t * 61 + 3) - 0.5) * wackler);
+  himmel("#050816", "#1C2756");
+  sterne(t, 170, 480);
+  mond(640, 330 - ss(0, 8, lt) * 30, 118);
+  for (let i = 0; i < 3; i++) {
+    const u = (lt - 0.2 - i * 0.45) / 3.4;
+    if (u > 0 && u < 1) fledermaus(lerp(-80, 1360, u), 190 + i * 60 + Math.sin(u * 9 + i) * 26, 0.7 + i * 0.15, t + i);
+  }
+  const s1 = S("intro", 1), s2 = S("intro", 2);
+  const auf = ss(s1.start - 0.3, s1.start + 0.9, t);
+  if (auf > 0) {
+    const y = 540 + (1 - auf) * 260;
+    figur({ stil: "aurel", x: 560, y, s: 0.66, t, silhouette: true, keys: [[0, "locker"], [s2.start + 0.2, "achsel"]] });
+    figur({ stil: "yannick", x: 720, y, s: 0.66, t, silhouette: true, keys: [[0, "locker"], [s2.start + 0.4, "kratzen"]] });
+    for (const [i, qx] of [[0, 560], [1, 720]]) {
+      const q = easeBack(ss(s2.start + 0.5 + i * 0.25, s2.start + 0.9 + i * 0.25, t));
+      if (q > 0) { X.save(); X.translate(qx, 270); X.scale(q, q); text("?", 0, 0, 70, F.koralle, { gewicht: 800 }); X.restore(); }
+    }
+  }
+  X.fillStyle = F.schwarz; X.beginPath(); X.moveTo(0, H); X.lineTo(0, 560); X.quadraticCurveTo(640, 430, W, 560); X.lineTo(W, H); X.fill();
+  kuerbis(1120, 628, 46, t);
+  // Titel
+  if (lt > T) {
+    const u = clamp((lt - T) / 0.35);
+    const hoch = ss(s1.start - 0.4, s1.start + 0.6, t);
+    const sc = lerp(2.4, 1, easeBack(u)) * lerp(1, 0.72, hoch);
+    titel(640, lerp(300, 128, hoch), sc);
+    X.save(); X.translate(640, lerp(300, 128, hoch)); X.scale(sc, sc);
+    const s0 = S("intro", 0);
+    const n = Math.floor(10 * clamp((t - s0.start) / 1.4));
+    text("31.10.2026".slice(0, n), 0, 74, 34, F.dunst, { gewicht: 700, abstand: "10px" });
+    X.restore();
+  }
+  balken(56);
+}
+
+function titel(x, y, sc) {
+  X.save(); X.translate(x, y); X.scale(sc, sc);
+  X.font = "800 78px Manrope"; X.letterSpacing = "4px";
+  const a = X.measureText("OPERATION").width, b = X.measureText("JACKPOT").width, luecke = 26;
+  X.letterSpacing = "0px";
+  X.shadowColor = "rgba(233,87,57,0.7)"; X.shadowBlur = 30;
+  text("OPERATION", -(a + b + luecke) / 2, 0, 78, F.creme, { gewicht: 800, abstand: "4px", align: "left" });
+  text("JACKPOT", -(a + b + luecke) / 2 + a + luecke, 0, 78, F.koralle, { gewicht: 800, abstand: "4px", align: "left" });
+  X.restore();
+}
+
+function balken(h) { X.setTransform(1, 0, 0, 1, 0, 0); X.fillStyle = "#000"; X.fillRect(0, 0, W, h); X.fillRect(0, H - h, W, h); }
+
+function szLage(t, lt, d) {
+  const s = i => S("lage", i);
+  const zoom = 1 + 0.05 * ss(0, d, lt) + 0.06 * ss(s(5).start, s(5).start + 0.5, t) * (1 - ss(s(5).ende + 0.3, s(5).ende + 0.9, t));
+  kamera(zoom, 700, 380);
+  wohnzimmer(t);
+  kuerbis(300, 300, 20, t);
+  const z = {
+    p1: ss(s(2).start, s(2).start + 0.8, t), p2: ss(s(3).start, s(3).start + 0.5, t), p3: ss(s(7).start, s(7).start + 0.5, t),
+    kreis: ss(s(5).start + 0.3, s(5).ende, t), seite2: ss(s(9).start - 0.3, s(9).start + 0.15, t),
+    frage: ss(s(10).start + 0.6, s(10).start + 0.9, t), wir: ss(s(11).start, s(11).start + 0.3, t), haken: 0,
+  };
+  flipchart(712, 138, 340, 330, z);
+
+  // Aurel auf dem Sofa mit Chips
+  const essen = [];
+  for (let te = 1.0; te < d; te += 3.3) {
+    const tt = SZ.lage.start + te;
+    if (!spricht("aurel", tt, 0.7, 1.4)) essen.push([tt, "essen"], [tt + 0.55, "schale"]);
+  }
+  const keysA = [[0, "schale"], ...essen,
+    [s(1).start, "achsel"], [s(1).ende + 0.3, "schale"],
+    [s(6).start, "daumenR"], [s(6).ende + 0.2, "schale"],
+    [s(8).start, "daumenR"], [s(8).ende + 0.3, "schale"],
+    [s(10).start, "achsel"], [s(10).ende + 0.3, "schale"]];
+  const kauen = essen.some(([te, p]) => p === "essen" && t > te + 0.4 && t < te + 1.5) ? 0.3 * Math.abs(Math.sin(t * 14)) : 0;
+  const blickA = spricht("yannick", t) ? 1 : 0.4;
+  const pa = { stil: "aurel", x: 250, y: 620, s: 0.86, t, sitzen: true, m: Math.max(mund("aurel", t), kauen), blick: blickA, keys: keysA,
+    brauen: spricht("aurel", t) && t > s(10).start ? 1 : 0,
+    extra: () => { ell(0, -146, 50, 15, F.koralle); for (let i = 0; i < 6; i++) ell(-30 + i * 12, -154 + hash(i) * 4, 8, 5, F.gold); } };
+  sofaHinten();
+  figur({ ...pa, ohneBeine: true });
+  sofaVorne();
+  figur({ ...pa, nurBeine: true });
+
+  // Yannick am Flipchart
+  const keysY = [[0, "locker"], [s(0).start, "offen"], [s(0).ende + 0.2, "locker"],
+    [s(2).start - 0.2, "zeigenR"], [s(3).ende + 0.3, "locker"], [s(5).start - 0.2, "zeigenR"], [s(5).ende + 0.3, "locker"],
+    [s(7).start - 0.2, "zeigenR"], [s(7).ende + 0.3, "locker"], [s(9).start - 0.5, "markerR"], [s(9).ende + 0.3, "locker"],
+    [s(11).start - 0.2, "finger"]];
+  let blickY = spricht("aurel", t) ? -1 : 0.6;
+  if (t > s(11).start - 0.3) blickY = 0;
+  figur({ stil: "yannick", x: 600, y: 650, s: 0.96, t, m: mund("yannick", t), blick: blickY, keys: keysY,
+    brauen: t > s(11).start - 0.2 ? 1 : 0, neigen: Math.sin(t * 6) * 0.03 * mund("yannick", t) });
+}
+
+function szFahrt(t, lt, d) {
+  kamera(1, 640, 360);
+  landstrasse(t, lt, 1);
+  const s = i => S("fahrt", i);
+  // Ortsschild am Ende
+  const sx = 1500 - (lt - (d - 4.2)) * 430;
+  if (sx < 1500 && sx > -300) {
+    linie(sx, 504, sx, 380, 8, "#8C93A6");
+    rr(sx - 125, 296, 250, 96, 6, "#111"); rr(sx - 118, 303, 236, 82, 4, "#F7D117");
+    text("Neuenkirchen", sx, 344, 32, "#111", { gewicht: 800 });
+  }
+  const planZeit = t > s(2).start - 0.2 && t < s(3).ende + 1.2;
+  const biss = t > s(3).ende + 0.2;
+  auto(560, 592, 1, t, {
+    mA: mund("aurel", t), mY: mund("yannick", t),
+    blickA: spricht("yannick", t) || spricht("aurel", t) ? -1 : 1, blickY: 1,
+    keysY: [[0, "locker"], [s(2).start - 0.2, { L: [-66, -122, "offen"], R: [60, -250, "offen"] }], [s(3).ende + 1.0, "locker"]],
+    plan: planZeit ? () => {
+      rr(52, -300, 52, 66, 3, "#fff");
+      for (let i = 0; i < 4; i++) linie(60, -286 + i * 13, 96, -286 + i * 13, 3, "#9AA3B8");
+      if (biss) { ell(104, -300, 16, 16, "#1A2240"); ell(92, -300, 10, 10, "#1A2240"); }
+    } : null,
+  });
+  navi(t, [
+    { t0: CUE("fahrt", "gong").t0, t1: s(0).ende + 1.0, z1: "Ziel: Spielbank Neuenkirchen", z2: "Ankunft: reich", pfeil: "gerade" },
+    { t0: s(4).start - 0.7, t1: s(4).ende + 0.8, z1: "In 300 m rechts abbiegen", z2: "Würde im Fahrzeug lassen", pfeil: "rechts" },
+  ]);
+}
+
+function neonText(txt, x, y, groesse, farbe, aus, t) {
+  X.font = `800 ${groesse}px Manrope`;
+  X.letterSpacing = "6px";
+  const breiten = [...txt].map(c => X.measureText(c).width + 6);
+  let cx = x - breiten.reduce((a, b) => a + b, 0) / 2;
+  X.textAlign = "left"; X.textBaseline = "middle";
+  [...txt].forEach((c, i) => {
+    const an = !aus.includes(i);
+    X.shadowColor = an ? farbe : "transparent"; X.shadowBlur = an ? 26 : 0;
+    X.fillStyle = an ? farbe : "rgba(120,110,120,0.35)";
+    X.fillText(c, cx, y);
+    if (an) { X.shadowBlur = 8; X.fillStyle = "rgba(255,255,255,0.75)"; X.fillText(c, cx, y); }
+    cx += breiten[i];
+  });
+  X.shadowBlur = 0; X.letterSpacing = "0px";
+}
+
+function szEingang(t, lt, d) {
+  kamera(1, 640, 360);
+  const s = i => S("eingang", i);
+  himmel("#060918", "#1A2350");
+  sterne(t, 60, 60);
+  // Fassade
+  X.fillStyle = "#252A4A"; X.fillRect(0, 50, W, 560);
+  for (let r = 0; r < 22; r++) for (let k = 0; k < 18; k++) {
+    X.fillStyle = (r + k) % 3 ? "rgba(255,255,255,0.025)" : "rgba(0,0,0,0.08)";
+    X.fillRect(k * 76 + (r % 2) * 38, 54 + r * 26, 72, 22);
+  }
+  const neon = CUE("eingang", "neon");
+  const flackert = neon.aussetzer.some(([a, dd]) => t >= a && t < a + dd);
+  rr(300, 92, 680, 160, 18, "#141831");
+  neonText("SPIELBANK", 640, 150, 84, F.koralle, flackert ? [3, 7] : [], t);
+  neonText("NEUENKIRCHEN", 640, 216, 38, F.gold, flackert ? [4] : [], t);
+  // Tür
+  const tuer = CUE("eingang", "tuer");
+  const auf = easeOut(ss(tuer.t0, tuer.t0 + 1.1, t));
+  rr(522, 290, 236, 320, 10, "#C9A24A");
+  const lg = X.createLinearGradient(0, 300, 0, 610); lg.addColorStop(0, "#FFE0A0"); lg.addColorStop(1, "#FF9A5A");
+  X.fillStyle = lg; X.fillRect(536, 302, 208, 308);
+  const breit = 104 * (1 - auf * 0.85);
+  rr(536, 302, breit, 308, 4, "#3A1F1A"); rr(744 - breit, 302, breit, 308, 4, "#3A1F1A");
+  if (auf < 0.6) { ell(536 + breit - 14, 460, 6, 6, F.gold); ell(744 - breit + 14, 460, 6, 6, F.gold); }
+  X.strokeStyle = "rgba(220,220,230,0.4)"; X.lineWidth = 1.5;
+  X.beginPath(); for (let i = 0; i < 5; i++) { X.moveTo(528, 296); X.lineTo(528 + 60 * Math.cos(i * 0.39), 296 + 60 * Math.sin(i * 0.39)); } X.stroke();
+  // Gehweg, Teppich, Absperrung, Kürbisse
+  X.fillStyle = "#33384F"; X.fillRect(0, 610, W, 110);
+  X.fillStyle = "#A3202A"; X.beginPath(); X.moveTo(540, 610); X.lineTo(740, 610); X.lineTo(860, 720); X.lineTo(420, 720); X.closePath(); X.fill();
+  for (const px of [452, 828]) { linie(px, 690, px, 600, 9, F.gold); ell(px, 596, 10, 10, F.gold); ell(px, 692, 18, 6, F.gold); }
+  X.beginPath(); X.moveTo(462, 610); X.quadraticCurveTo(495, 650 + Math.sin(t * 2) * 3, 530, 612); X.lineWidth = 7; X.strokeStyle = "#B3122A"; X.stroke();
+  kuerbis(492, 588, 22, t); kuerbis(790, 588, 22, t + 1);
+
+  // Türsteher
+  const beiseite = ss(tuer.t0 - 0.3, tuer.t0 + 0.6, t);
+  figur({ stil: "tuersteher", x: 950 + beiseite * 140, y: 688, s: 1.04, t, m: mund("tuersteher", t), blick: -1,
+    keys: [[0, "verschr"]], neigen: spricht("tuersteher", t) ? -0.05 : 0, wackeln: spricht("tuersteher", t) && t > s(2).start && t < s(2).start + 0.9 ? 2.5 : 0 });
+
+  // Aurel und Yannick kommen, reden, gehen rein
+  const kommen = easeOut(clamp(lt / 2.3));
+  const rein = ss(tuer.t0 + 0.35, d - 0.25, t);
+  for (const w of ["aurel", "yannick"]) {
+    const ziel = w === "aurel" ? 400 : 570;
+    let x = lerp(w === "aurel" ? -160 : -40, ziel, kommen);
+    let y = 690, sc = 0.98, alpha = 1;
+    x = lerp(x, w === "aurel" ? 610 : 668, rein); y = lerp(690, 600, rein); sc = lerp(0.98, 0.62, rein); alpha = 1 - ss(0.75, 1, rein);
+    const laeuft = (lt < 2.3) || rein > 0 && rein < 1;
+    const keys = w === "aurel" ? [[0, "locker"], [s(2).ende - 0.2, "daumenR"], [tuer.t0 + 0.4, "locker"]] : [[0, "locker"], [s(1).start, "achsel"], [s(1).ende + 0.3, "locker"]];
+    figur({ stil: w, x, y, s: sc, t, m: mund(w, t), blick: 1, keys, gehen: laeuft ? t * 9 + (w === "aurel" ? 0 : 1.4) : null, alpha });
+  }
+}
+
+const RAD = [0, 32, 15, 19, 4, 21, 2, 25, 17, 34, 6, 27, 13, 36, 11, 30, 8, 23, 10, 5, 24, 16, 33, 1, 20, 14, 31, 9, 22, 18, 29, 7, 28, 12, 35, 3, 26];
+const ROT = new Set([1, 3, 5, 7, 9, 12, 14, 16, 18, 19, 21, 23, 25, 27, 30, 32, 34, 36]);
+const zahlFarbe = n => (n === 0 ? "#1D8A4E" : ROT.has(n) ? "#C0212D" : "#17171D");
+
+function rouletteRad(cx, cy, rx, ry, theta, kugel) {
+  ell(cx, cy + 14, rx * 1.1, ry * 1.1 + 4, "#2C150A");
+  ell(cx, cy, rx * 1.1, ry * 1.1, "#7A4322");
+  ell(cx, cy, rx * 0.98, ry * 0.98, "#2A160C");
+  const st = TAU / 37;
+  RAD.forEach((n, i) => {
+    const a0 = theta + (i - 0.5) * st, a1 = theta + (i + 0.5) * st;
+    X.beginPath(); X.ellipse(cx, cy, rx * 0.92, ry * 0.92, 0, a0, a1); X.ellipse(cx, cy, rx * 0.63, ry * 0.63, 0, a1, a0, true); X.closePath();
+    X.fillStyle = zahlFarbe(n); X.fill();
+    X.lineWidth = 1.2; X.strokeStyle = F.gold; X.stroke();
+    const am = theta + i * st;
+    text(String(n), cx + Math.cos(am) * rx * 0.8, cy + Math.sin(am) * ry * 0.8, 10, "#fff", { gewicht: 800 });
+  });
+  const g = X.createRadialGradient(cx, cy - ry * 0.1, 4, cx, cy, rx * 0.6);
+  g.addColorStop(0, "#E8C468"); g.addColorStop(0.5, "#A86B2C"); g.addColorStop(1, "#5A3216");
+  ell(cx, cy, rx * 0.62, ry * 0.62, g);
+  ell(cx, cy, rx * 0.1, ry * 0.12, F.gold);
+  for (let k = 0; k < 4; k++) { const a = theta * 1 + k * Math.PI / 2; linie(cx, cy, cx + Math.cos(a) * rx * 0.2, cy + Math.sin(a) * ry * 0.2, 4, F.gold); }
+  if (kugel) {
+    const bx = cx + Math.cos(kugel.a) * rx * kugel.r, by = cy + Math.sin(kugel.a) * ry * kugel.r - kugel.h;
+    ell(bx + 2, by + 3 + kugel.h, 7, 4, "rgba(0,0,0,0.4)");
+    ell(bx, by, 7.5, 7.5, "#FAFAFA"); ell(bx - 2, by - 2, 2.5, 2.5, "#fff");
+  }
+}
+
+// Tischfläche: u quer (0..1), v Tiefe (0 hinten, 1 vorne)
+function tisch(u, v) {
+  const y = lerp(482, 760, v);
+  const l = lerp(70, -160, v), r = lerp(1210, 1440, v);
+  return [lerp(l, r, u), y];
+}
+function zelle(u0, v0, u1, v1, farbe, zahl) {
+  const p = [tisch(u0, v0), tisch(u1, v0), tisch(u1, v1), tisch(u0, v1)];
+  X.beginPath(); X.moveTo(...p[0]); p.slice(1).forEach(q => X.lineTo(...q)); X.closePath();
+  X.fillStyle = farbe; X.fill(); X.lineWidth = 1.6; X.strokeStyle = "rgba(255,255,255,0.8)"; X.stroke();
+  const [mx, my] = tisch((u0 + u1) / 2, (v0 + v1) / 2);
+  text(zahl, mx, my, 12 + 9 * v1, "#fff", { gewicht: 800 });
+}
+const LAYOUT = { u0: 0.53, u1: 0.965, v0: 0.03, v1: 0.44 };
+function zahlFeld(n) {
+  const c = Math.ceil(n / 3) - 1, row = 2 - ((n - 1) % 3);
+  const du = (LAYOUT.u1 - LAYOUT.u0) / 12, dv = (LAYOUT.v1 - LAYOUT.v0) / 3;
+  return [LAYOUT.u0 + c * du, LAYOUT.u0 + (c + 1) * du, LAYOUT.v0 + row * dv, LAYOUT.v0 + (row + 1) * dv];
+}
+
+function szRoulette(t, lt, d) {
+  const s = i => S("roulette", i);
+  const kg = CUE("roulette", "kugel");
+  const t0 = kg.t0, tL = kg.t1 - 0.4;
+  const gewonnen = s(5).ende;
+  const k = ss(t0 + 0.3, t0 + 1.6, t) * (1 - ss(gewonnen + 0.1, gewonnen + 0.9, t));
+  const RADX = 270, RADY = 560;
+  kamera(1 + 1.25 * k, lerp(640, RADX, k), lerp(360, RADY + 40, k));
+
+  // Raum
+  const g = X.createLinearGradient(0, 0, 0, 480); g.addColorStop(0, "#2A0A14"); g.addColorStop(1, "#5A1A2A");
+  X.fillStyle = g; X.fillRect(-200, -200, W + 400, 700);
+  for (let i = 0; i < 18; i++) glow(hash(i + 30) * W, 80 + hash(i + 40) * 300, 30 + hash(i + 50) * 40, i % 2 ? "rgba(242,193,78,A)" : "rgba(255,138,112,A)", 0.18 + 0.1 * Math.sin(t * 2 + i));
+  linie(-200, 430, W + 200, 430, 4, "rgba(242,193,78,0.5)");
+  X.fillStyle = "#24070F"; X.fillRect(-200, 470, W + 400, 400);
+  // Kronleuchter
+  linie(640, -10, 640, 60, 3, F.gold);
+  X.beginPath(); X.ellipse(640, 70, 110, 22, 0, 0, Math.PI); X.lineWidth = 4; X.strokeStyle = F.gold; X.stroke();
+  for (let i = 0; i < 9; i++) { const x = 540 + i * 25; linie(x, 72, x, 92 + (i % 2) * 10, 2, "rgba(255,240,200,0.8)"); glow(x, 96 + (i % 2) * 10, 16, "rgba(255,240,200,A)", 0.6); }
+
+  // Figuren hinter dem Tisch
+  const jubel = t > gewonnen;
+  figur({ stil: "croupier", x: RADX + 10, y: 594, s: 1.0, t, m: mund("croupier", t), blick: 0.5,
+    keys: [[0, "locker"], [s(0).start, "winkenR"], [s(0).ende + 0.3, "locker"], [s(4).start, "winkenR"], [t0 - 0.35, "werfen"], [t0 + 0.4, "locker"]] });
+  figur({ stil: "yannick", x: 600, y: 594, s: 1.0, t, m: mund("yannick", t), blick: spricht("aurel", t) ? 1 : (t > t0 && t < gewonnen ? -1 : 0.3),
+    keys: [[0, "tippen"], [s(3).start, "abwehr"], [s(3).ende + 0.3, "tippen"], [gewonnen + 0.1, "jubel"], [s(7).start - 0.2, "finger"]],
+    brauen: t > s(3).start && t < s(3).ende ? 1 : 0, neigen: Math.sin(t * 6) * 0.03 * mund("yannick", t) });
+  figur({ stil: "aurel", x: 920, y: 594, s: 1.0, t, m: mund("aurel", t) + (jubel && t < s(6).start ? 0.5 : 0), blick: t > t0 && t < gewonnen ? -1 : -0.6,
+    keys: [[0, "locker"], [s(2).start + 0.8, "schieben"], [s(2).ende + 0.5, "locker"], [gewonnen + 0.1, "jubel"], [s(6).ende + 0.6, "daumenR"]],
+    neigen: jubel ? Math.sin(t * 9) * 0.06 : 0 });
+
+  // Tisch
+  const p = [tisch(0, 0), tisch(1, 0), tisch(1, 1), tisch(0, 1)];
+  X.beginPath(); X.moveTo(...p[0]); p.slice(1).forEach(q => X.lineTo(...q)); X.closePath();
+  const fg = X.createLinearGradient(0, 480, 0, 720); fg.addColorStop(0, "#14613C"); fg.addColorStop(1, "#1F7A4C");
+  X.fillStyle = fg; X.fill();
+  X.beginPath(); X.moveTo(p[0][0] - 10, p[0][1]); X.lineTo(p[1][0] + 10, p[1][1]); X.lineWidth = 18; X.strokeStyle = "#5A2E1A"; X.stroke();
+  zelle(LAYOUT.u0 - 0.035, LAYOUT.v0, LAYOUT.u0, LAYOUT.v1, zahlFarbe(0), "0");
+  for (let n = 1; n <= 36; n++) { const [u0, u1, v0, v1] = zahlFeld(n); zelle(u0, v0, u1, v1, zahlFarbe(n), String(n)); }
+  // Gewinnfeld leuchtet
+  if (t > tL) {
+    const [u0, u1, v0, v1] = zahlFeld(31);
+    const [mx, my] = tisch((u0 + u1) / 2, (v0 + v1) / 2);
+    glow(mx, my, 60, "rgba(255,230,140,A)", 0.5 + 0.3 * Math.sin(t * 10));
+  }
+
+  // Yannicks Laptop
+  X.save(); X.translate(578, 516);
+  X.beginPath(); X.moveTo(-70, 0); X.lineTo(70, 0); X.lineTo(84, 18); X.lineTo(-84, 18); X.closePath(); X.fillStyle = "#9AA3B8"; X.fill();
+  rr(-66, -86, 132, 86, 6, "#2B2F3A"); rr(-60, -80, 120, 74, 3, "#E9F2EA");
+  for (let i = 0; i < 6; i++) linie(-60, -68 + i * 12, 60, -68 + i * 12, 1, "#9CC7A4");
+  for (let i = 0; i < 4; i++) linie(-60 + i * 30, -80, -60 + i * 30, -6, 1, "#9CC7A4");
+  [18, 30, 12, 40, 24].forEach((hh, i) => rr(8 + i * 10, -10 - hh, 7, hh, 1, i === 3 ? F.koralle : "#2F7A4C"));
+  if (t > s(3).start && t < s(3).ende + 0.4) { X.fillStyle = "rgba(192,33,45,0.85)"; X.fillRect(-60, -80, 120, 74); text("#WERT!", 0, -43, 22, "#fff", { gewicht: 800 }); }
+  if (jubel) { X.fillStyle = "rgba(31,122,76,0.9)"; X.fillRect(-60, -80, 120, 74); text("31 ✓", 0, -43, 28, "#fff", { gewicht: 800 }); }
+  X.restore();
+
+  // Chips: Aurels Stapel wandert auf die 31
+  const [u0, u1, v0, v1] = zahlFeld(31);
+  const ziel = tisch((u0 + u1) / 2, (v0 + v1) / 2);
+  const start = [890, 598];
+  const w = easeOut(ss(s(2).start + 1.4, s(2).start + 2.1, t));
+  const cx = lerp(start[0], ziel[0], w), cy = lerp(start[1], ziel[1], w) - Math.sin(w * Math.PI) * 50;
+  const cfarben = [F.koralle, "#2F5BD3", "#E9E9EE", F.gold, F.koralle, "#2F5BD3"];
+  cfarben.forEach((c, i) => chip(cx, cy - i * 6, 22, c));
+  // Gewinnstapel
+  if (jubel) {
+    const wachs = ss(gewonnen + 0.2, gewonnen + 3, t);
+    for (let i = 0; i < 46 * wachs; i++) chip(700 + (i % 9) * 36 + hash(i) * 8, 642 - Math.floor(i / 9) * 9 - (i % 2) * 3, 18, cfarben[i % 6]);
+  }
+
+  // Rad und Kugel
+  const st = TAU / 37, ziel31 = RAD.indexOf(31) * st;
+  const theta = (t < tL ? -0.55 : -0.18) * (t - tL) + Math.PI / 2 - ziel31;  // so gedreht, dass die 31 vorne liegt, wenn die Kugel fällt
+  let kugel = null;
+  if (t >= t0 && t < tL) {
+    const u = (t - t0) / (tL - t0);
+    const phi = ziel31 - TAU * 6 * Math.pow(1 - u, 2.2);
+    const r = u < 0.74 ? 1.0 : lerp(1.0, 0.775, easeOut((u - 0.74) / 0.26));
+    const h = u > 0.74 ? Math.abs(Math.sin((u - 0.74) * 46)) * 9 * (1 - u) / 0.26 : 0;
+    kugel = { a: theta + phi, r, h };
+  } else if (t >= tL) kugel = { a: theta + ziel31, r: 0.775, h: 0 };
+  rouletteRad(RADX, RADY, 190, 80, theta, kugel);
+  if (t >= tL) {
+    const a = theta + ziel31, puls = 0.5 + 0.5 * Math.sin(t * 9);
+    X.beginPath(); X.ellipse(RADX + Math.cos(a) * 190 * 0.775, RADY + Math.sin(a) * 80 * 0.775, 16, 11, 0, 0, TAU);
+    X.lineWidth = 3; X.strokeStyle = `rgba(255,226,140,${0.5 + 0.5 * puls})`; X.stroke();
+  }
+
+  X.setTransform(1, 0, 0, 1, 0, 0);
+  // Spotlight während des Drehens
+  if (k > 0) {
+    const vg = X.createRadialGradient(W / 2, H / 2 + 40, 160, W / 2, H / 2, 760);
+    vg.addColorStop(0, "rgba(0,0,0,0)"); vg.addColorStop(1, `rgba(0,0,0,${0.7 * k})`);
+    X.fillStyle = vg; X.fillRect(0, 0, W, H);
+  }
+  // Ergebnis
+  const er = ss(s(5).start, s(5).start + 0.35, t) * (1 - ss(gewonnen + 0.3, gewonnen + 0.7, t));
+  if (er > 0) {
+    X.save(); X.translate(640, 150); X.scale(easeBack(er), easeBack(er));
+    ell(0, 0, 96, 96, "#17171D"); X.lineWidth = 8; X.strokeStyle = F.gold; X.beginPath(); X.arc(0, 0, 96, 0, TAU); X.stroke();
+    text("31", 0, 6, 96, "#fff", { gewicht: 800 });
+    rr(-200, 118, 400, 50, 25, "rgba(10,10,16,0.85)");
+    text("SCHWARZ · UNGERADE", 0, 144, 28, F.gold, { gewicht: 800, abstand: "3px" });
+    X.restore();
+  }
+  // Jackpot
+  if (jubel) {
+    gluehbirnen(t, true);
+    const j = ss(gewonnen, gewonnen + 0.4, t) * (1 - ss(gewonnen + 3.2, gewonnen + 3.8, t));
+    if (j > 0) {
+      X.save(); X.translate(640, 230); X.globalAlpha = j;
+      for (let i = 0; i < 16; i++) { X.rotate(TAU / 16); X.fillStyle = i % 2 ? "rgba(242,193,78,0.25)" : "rgba(233,87,57,0.2)"; X.beginPath(); X.moveTo(0, 0); X.lineTo(700, -60); X.lineTo(700, 60); X.fill(); }
+      X.setTransform(1, 0, 0, 1, 0, 0); X.translate(640, 230); X.rotate(Math.sin(t * 6) * 0.05); X.scale(easeBack(j), easeBack(j));
+      X.shadowColor = F.koralle; X.shadowBlur = 30;
+      text("JACKPOT!", 0, 0, 120, F.gold, { gewicht: 800, abstand: "4px" });
+      X.restore();
+    }
+    geldregen(t, gewonnen, 7, 160);
+  } else gluehbirnen(t, false);
+}
+
+function gluehbirnen(t, an) {
+  for (let i = 0; i < 32; i++) {
+    const x = 20 + i * 40;
+    const ein = an ? (Math.floor(t * 7) + i) % 2 === 0 : true;
+    const farbe = ein ? (an ? "rgba(255,226,140,1)" : "rgba(255,226,140,0.35)") : "rgba(120,90,60,0.6)";
+    if (ein && an) glow(x, 16, 22, "rgba(255,220,120,A)", 0.6);
+    ell(x, 16, 7, 7, farbe);
+  }
+}
+
+function szHeim(t, lt, d) {
+  kamera(1, 640, 360);
+  landstrasse(t, lt, -1);
+  const s = i => S("heim", i);
+  // Scheine fliegen aus dem Kofferraum
+  for (let i = 0; i < 26; i++) {
+    const t0 = hash(i) * d;
+    const a = lt - t0;
+    if (a < 0 || a > 2.4) continue;
+    schein(910 + a * 280 + hash(i + 1) * 30, 450 - a * 130 + a * a * 70 + hash(i + 2) * 30, a * 5 + i, 0.8);
+  }
+  auto(640, 592, -1, t, {
+    beladen: true, mA: mund("aurel", t), mY: 0, blickA: 0.5, blickY: 0.5,
+    daumen: ss(s(1).start - 0.3, s(1).start, t) * (1 - ss(s(1).ende + 0.8, s(1).ende + 1.1, t)),
+  });
+  navi(t, [{ t0: CUE("heim", "gong").t0, t1: d + SZ.heim.start, z1: "Route: nach Hause", z2: "Status: vermögend", pfeil: "gerade" }]);
+}
+
+function rauch(x, y, a, r) {
+  for (let k = 0; k < 5; k++) {
+    const g = X.createRadialGradient(x + (k - 2) * r * 0.35, y + Math.sin(k * 2) * r * 0.2, 0, x + (k - 2) * r * 0.35, y, r * 0.7);
+    g.addColorStop(0, `rgba(235,236,245,${0.32 * a})`); g.addColorStop(1, "rgba(235,236,245,0)");
+    X.fillStyle = g; X.fillRect(x - r * 2, y - r * 2, r * 4, r * 4);
+  }
+}
+
+function szShisha(t, lt, d) {
+  const s = i => S("shisha", i);
+  kamera(1.03 + 0.04 * ss(0, d, lt), 600, 400);
+  wohnzimmer(t);
+  // Flipchart: alles abgehakt
+  X.save(); X.translate(808, 168); X.scale(0.74, 0.74); X.translate(-808, -168);
+  flipchart(808, 168, 340, 330, { p1: 1, p2: 1, p3: 1, kreis: 1, seite2: 0, frage: 0, wir: 0, haken: ss(0.6, 2.2, lt) });
+  X.restore();
+  // Geldhaufen
+  for (let i = 0; i < 70; i++) {
+    const u = hash(i + 70) * 2 - 1;
+    const x = 1100 + u * 150, top = 650 - 120 * (1 - u * u);
+    const y = lerp(650, top, Math.sqrt(hash(i + 90)));
+    if (i % 6 === 0) muenze(x, y, 10, i); else schein(x, y, (hash(i) - 0.5) * 1.6, 0.85);
+  }
+  for (let i = 0; i < 5; i++) { const a = Math.abs(Math.sin(t * 2.5 + i * 1.7)); X.save(); X.globalAlpha = a; text("✦", 1010 + hash(i) * 180, 560 + hash(i + 3) * 70, 18, "#fff"); X.restore(); }
+
+  // Wer zieht wann an der Shisha
+  const stoesse = CUE("shisha", "blubbern").stoesse;
+  const zuege = [];
+  stoesse.forEach((ts, i) => {
+    let wer = i % 2 ? "yannick" : "aurel";
+    if (spricht(wer, ts, 0.5, 1.9)) wer = wer === "aurel" ? "yannick" : "aurel";
+    if (!spricht(wer, ts, 0.5, 1.9)) zuege.push({ ts, wer });
+  });
+  const baseA = [[0, "sofaA"], [s(0).start, "prostA"], [s(0).ende + 0.4, "sofaA"], [s(4).start, "daumenA"], [s(4).ende + 0.8, "sofaA"]];
+  const baseY = [[0, "sofaY"], [s(1).start - 0.1, "prostY"], [s(1).ende + 0.5, "sofaY"]];
+  for (const z of zuege) {
+    const k = z.wer === "aurel" ? baseA : baseY;
+    k.push([z.ts - 0.35, z.wer === "aurel" ? "ziehenA" : "ziehenY"], [z.ts + 0.8, z.wer === "aurel" ? "sofaA" : "sofaY"]);
+  }
+  const ausatmen = (wer) => zuege.some(z => z.wer === wer && t > z.ts + 0.95 && t < z.ts + 1.8) ? 0.32 : 0;
+  const lachen = t > s(4).ende + 0.2 ? 0.45 * Math.abs(Math.sin(t * 9)) : 0;
+  const hops = t > s(4).ende + 0.2 ? Math.abs(Math.sin(t * 9)) * 4 : 0;
+
+  sofaHinten();
+  const pY = { stil: "yannick", x: 176, y: 620 - hops, s: 0.86, t, sitzen: true, m: Math.max(mund("yannick", t), ausatmen("yannick"), lachen), blick: spricht("aurel", t) ? 1 : 0.3, keys: baseY };
+  const pA = { stil: "aurel", x: 372, y: 620 - hops, s: 0.86, t, sitzen: true, m: Math.max(mund("aurel", t), ausatmen("aurel"), lachen), blick: spricht("yannick", t) ? -1 : -0.3, keys: baseA };
+  figur({ ...pY, ohneBeine: true }); figur({ ...pA, ohneBeine: true });
+  sofaVorne();
+  figur({ ...pY, nurBeine: true }); figur({ ...pA, nurBeine: true });
+
+  // Couchtisch und Shisha
+  rr(520, 586, 300, 20, 6, "#6A4A33"); rr(540, 606, 14, 46, 3, "#4C3424"); rr(786, 606, 14, 46, 3, "#4C3424");
+  const zug = zuege.find(z => t > z.ts - 0.1 && t < z.ts + 0.9);
+  const handPos = (p) => { const h = pose(t, p.keys).R; return [p.x + h[0] * p.s, p.y + (h[1] + 55) * p.s - 34 * p.s]; };
+  for (const [px, p] of [[664, pA], [616, pY]]) {
+    const [hx, hy] = handPos(p);
+    X.beginPath(); X.moveTo(px, 418); X.bezierCurveTo(px + (px > 640 ? 10 : -10), 660, hx + 60, 680, hx, hy + 30);
+    X.lineWidth = 7; X.strokeStyle = "#2A2F3D"; X.stroke();
+  }
+  // Bowl aus Glas mit Wasser
+  X.beginPath(); X.moveTo(616, 586); X.bezierCurveTo(548, 572, 560, 470, 626, 456); X.lineTo(654, 456); X.bezierCurveTo(720, 470, 732, 572, 664, 586); X.closePath();
+  X.fillStyle = "rgba(110,170,215,0.5)"; X.fill(); X.lineWidth = 3; X.strokeStyle = "rgba(220,240,255,0.75)"; X.stroke();
+  X.save(); X.clip(); X.fillStyle = "rgba(50,110,170,0.55)"; X.fillRect(540, 512, 200, 80);
+  if (zug) for (let i = 0; i < 12; i++) { const by = 582 - ((t - zug.ts) * 130 + i * 11) % 74; ell(624 + hash(i) * 32, by, 3 + hash(i + 4) * 3, 3 + hash(i + 4) * 3, "rgba(255,255,255,0.85)"); }
+  X.restore();
+  // Rauchsäule aus Metall mit Ringen, Kohleteller, Tonkopf mit Kohle
+  rr(633, 316, 14, 146, 5, "#C9CED9");
+  for (const ry of [440, 404, 372]) ell(640, ry, 13, 5, F.gold);
+  for (const sx of [-1, 1]) { linie(640, 424, 640 + sx * 22, 418, 6, "#C9CED9"); ell(640 + sx * 24, 418, 5, 5, F.gold); }
+  ell(640, 346, 58, 10, "#AEB6C8"); ell(640, 343, 52, 7, "#C9CED9");
+  X.beginPath(); X.moveTo(616, 300); X.lineTo(664, 300); X.lineTo(654, 334); X.lineTo(626, 334); X.closePath(); X.fillStyle = F.koralle; X.fill();
+  ell(640, 300, 25, 6, "#D8DCE6");
+  kuerbis(560, 560, 22, t);
+
+  // Licht dimmen, dann Glut und Leuchten
+  X.setTransform(1, 0, 0, 1, 0, 0);
+  X.fillStyle = "rgba(10,12,34,0.36)"; X.fillRect(0, 0, W, H);
+  kamera(1.03 + 0.04 * ss(0, d, lt), 600, 400);
+  X.save(); X.globalCompositeOperation = "lighter";
+  glow(1180, 320, 320, "rgba(255,200,130,A)", 0.22);
+  glow(560, 560, 140, "rgba(255,160,60,A)", 0.25);
+  const glut = zug ? 0.9 : 0.45 + 0.1 * Math.sin(t * 5);
+  glow(640, 294, 80, "rgba(255,120,40,A)", glut);
+  X.restore();
+  kuerbis(560, 560, 22, t);
+  for (const kx of [-9, 9]) rr(640 + kx - 8, 288, 16, 9, 2, `rgba(${150 + 105 * glut | 0},${50 + 60 * glut | 0},30,1)`);
+  for (let i = 0; i < 3; i++) { const a = (t * 0.4 + i / 3) % 1; rauch(640 + Math.sin(t + i * 2) * 10 * a, 280 - a * 120, 0.35 * (1 - a), 10 + a * 30); }
+
+  // Rauch nach jedem Zug
+  for (const z of zuege) {
+    const a = t - (z.ts + 1.0);
+    if (a < 0 || a > 5) continue;
+    const p = z.wer === "aurel" ? pA : pY;
+    const mx = p.x, my = p.y - (272 - 55) * p.s;
+    rauch(mx + a * 40 + 30, my - a * 46, (1 - a / 5) * clamp(a * 3), 26 + a * 26);
+  }
+  // Rauchwolken mit Botschaft: €, 27, 31
+  const wolken = [
+    { txt: "€", t0: SZ.shisha.start + 0.8, x: 300, y: 250 },
+    { txt: "27", t0: s(2).ende + 0.15, x: 330, y: 250 },
+    { txt: "31", t0: s(4).ende + 0.25, x: 560, y: 230 },
+  ];
+  for (const w of wolken) {
+    const a = t - w.t0;
+    if (a < 0 || a > 3.4) continue;
+    const ein = ss(0, 0.8, a), aus = ss(2.5, 3.4, a);
+    X.save(); X.globalAlpha = ein * (1 - aus);
+    rauch(w.x, w.y, 1, 70 + aus * 60);
+    X.translate(w.x, w.y - aus * 40); X.rotate(Math.sin(t * 1.7) * 0.05); X.scale(0.6 + 0.4 * ein + aus * 0.3, 0.6 + 0.4 * ein + aus * 0.3);
+    X.shadowColor = "rgba(255,255,255,0.9)"; X.shadowBlur = 28;
+    text(w.txt, 0, 0, 150, "rgba(240,242,250,0.8)", { gewicht: 800 });
+    X.restore();
+  }
+}
+
+function szAbspann(t, lt, d) {
+  kamera(1, 640, 360);
+  himmel("#050816", "#1C2756");
+  sterne(t, 170, 720);
+  mond(1040, 150, 70);
+  const s0 = S("abspann", 0);
+  const scrollStart = S("abspann", 3).ende + 0.6;
+  const weg = ss(scrollStart, scrollStart + 1.2, t);
+  const tit = ss(s0.start - 0.2, s0.start + 0.4, t) * (1 - weg);
+  if (tit > 0) {
+    X.save(); X.globalAlpha = tit; titel(640, 290, lerp(1.3, 1, easeOut(tit))); X.restore();
+    ["Demnächst.", "Vielleicht.", "Eher nicht."].forEach((w, i) => {
+      const a = ss(S("abspann", i + 1).start - 0.05, S("abspann", i + 1).start + 0.2, t) * (1 - weg);
+      if (a > 0) { X.save(); X.globalAlpha = a; text(w, 400 + i * 240, 400, 34, i === 2 ? F.korallHell : F.dunst, { stil: "italic", familie: "Fraunces", gewicht: 400 }); X.restore(); }
+    });
+  }
+  const zeilen = [
+    ["OPERATION JACKPOT", 40, F.koralle], ["Ein Animationsfilm über den 31.10.2026", 24, F.creme], ["", 20],
+    ["Yannick", 30, F.korallHell], ["der Stratege", 22, F.dunst], ["", 10],
+    ["Aurel", 30, "#9CC3FF"], ["der Bauchmensch", 22, F.dunst], ["", 20],
+    ["Stimmen: Piper TTS mit Thorsten, Karlsson, Kerstin und Pavoque", 20, F.creme],
+    ["Musik und Geräusche: aus Sinuswellen und Rauschen gebaut", 20, F.creme],
+    ["Drehbuch, Animation, Ton: Claude", 20, F.creme], ["", 26],
+    ["Spiel mit Verantwortung. Glücksspiel kann süchtig machen.", 20, F.gold],
+    ["Diese Geschichte ist frei erfunden – der Geldhaufen leider auch.", 20, F.gold],
+  ];
+  const hoehe = zeilen.reduce((a, z) => a + z[1] * 1.6, 0);
+  const sp = clamp((t - scrollStart) / (SZ.abspann.ende - 1.6 - scrollStart));
+  let y = lerp(H + 20, (H - hoehe) / 2, easeOut(sp));
+  if (t > scrollStart) for (const [txt, gr, farbe] of zeilen) { y += gr * 1.6; if (txt) text(txt, 560, y - gr * 0.8, gr, farbe, { gewicht: gr > 25 ? 800 : 600 }); }
+  kuerbis(1150, 620, 50, t, lt > d - 3.0 && lt < d - 2.4);
+  balken(56);
+}
+
+const SZENEN = { intro: szIntro, lage: szLage, fahrt: szFahrt, eingang: szEingang, roulette: szRoulette, heim: szHeim, shisha: szShisha, abspann: szAbspann };
+
+// ------------------------------------------------------------------ Untertitel und Bildaufbau
+
+function umbrechen(txt, maxB) {
+  const woerter = txt.split(" "), zeilen = [];
+  let z = "";
+  for (const w of woerter) { const p = z ? z + " " + w : w; if (X.measureText(p).width > maxB && z) { zeilen.push(z); z = w; } else z = p; }
+  zeilen.push(z);
+  return zeilen;
+}
+
+function untertitel(t, szene) {
+  if (szene.id === "abspann") return;
+  let satz = null;
+  for (const x of szene.saetze) if (t >= x.start - 0.08 && t < x.ende + 0.3) satz = x;
+  if (!satz) return;
+  const a = ss(satz.start - 0.08, satz.start + 0.1, t) * (1 - ss(satz.ende + 0.1, satz.ende + 0.3, t));
+  const erz = satz.wer === "erzaehler";
+  X.setTransform(1, 0, 0, 1, 0, 0);
+  X.font = erz ? "italic 400 30px Fraunces" : "600 29px Manrope";
+  const zeilen = umbrechen(satz.text, 940);
+  const breite = Math.max(...zeilen.map(z => X.measureText(z).width));
+  const h = zeilen.length * 38 + (erz ? 18 : 46);
+  const y0 = (szene.id === "intro" ? H - 70 : H - 22) - h;
+  X.save(); X.globalAlpha = a;
+  rr(640 - breite / 2 - 26, y0, breite + 52, h, 16, "rgba(6,8,20,0.74)");
+  if (!erz) text(satz.name.toUpperCase(), 640, y0 + 22, 15, NAMENSFARBE[satz.wer] || F.creme, { gewicht: 800, abstand: "2px" });
+  zeilen.forEach((z, i) => text(z, 640, y0 + (erz ? 28 : 56) + i * 38, erz ? 30 : 29, F.creme, erz ? { stil: "italic", familie: "Fraunces", gewicht: 400 } : { gewicht: 600 }));
+  X.restore();
+}
+
+function renderFrame(t) {
+  const szene = TL.szenen.find(s => t >= s.start && t < s.ende) || TL.szenen[TL.szenen.length - 1];
+  const lt = t - szene.start, d = szene.ende - szene.start;
+  X.setTransform(1, 0, 0, 1, 0, 0);
+  X.globalAlpha = 1; X.globalCompositeOperation = "source-over"; X.shadowBlur = 0;
+  X.fillStyle = "#000"; X.fillRect(0, 0, W, H);
+  X.save();
+  SZENEN[szene.id](t, lt, d);
+  X.restore();
+  untertitel(t, szene);
+  const f = clamp(Math.min(lt / 0.45, (d - lt) / 0.45));
+  if (f < 1) { X.setTransform(1, 0, 0, 1, 0, 0); X.fillStyle = `rgba(3,4,10,${1 - f})`; X.fillRect(0, 0, W, H); }
+}
+
+window.renderFrame = renderFrame;
+window.bereit = Promise.all([
+  document.fonts.load("800 40px Manrope"), document.fonts.load("600 20px Manrope"), document.fonts.load("italic 400 20px Fraunces"),
+]).then(() => { renderFrame(0); return true; });
+
+// Abspielen im Browser: Bild folgt dem Ton
+if (new URLSearchParams(location.search).has("render")) document.body.classList.add("render");
+const ton = document.getElementById("ton");
+document.getElementById("play").addEventListener("click", () => {
+  document.getElementById("play").style.display = "none";
+  ton.play();
+  const loop = () => { renderFrame(ton.currentTime); if (!ton.ended) requestAnimationFrame(loop); };
+  requestAnimationFrame(loop);
+});
+window.bereit.then(() => { const t = parseFloat(new URLSearchParams(location.search).get("t")); if (!isNaN(t)) renderFrame(t); });
+</script>
+</body>
+</html>
