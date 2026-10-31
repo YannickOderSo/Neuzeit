@@ -3,11 +3,12 @@
   "fps": 30,
   "stimmen": {
     "yannick":    { "name": "Yannick",   "modell": "de_DE-thorsten-medium",           "tempo": 0.95, "hoehe": 1.0,  "pan": -0.15 },
+    "yannick_leise": { "name": "Yannick", "modell": "de_DE-thorsten_emotional-medium", "sprecher": 7, "tempo": 1.0, "hoehe": 1.0, "pan": -0.15 },
     "aurel":      { "name": "Aurel",     "modell": "de_DE-karlsson-low",              "tempo": 0.95, "hoehe": 1.03, "pan": 0.15 },
     "erzaehler":  { "name": "Erzähler",  "modell": "de_DE-thorsten_emotional-medium", "sprecher": 4, "tempo": 1.05, "hoehe": 0.9,  "pan": 0 },
     "navi":       { "name": "Navi",      "modell": "de_DE-kerstin-low",               "tempo": 1.0,  "hoehe": 1.0,  "pan": 0 },
     "tuersteher": { "name": "Türsteher", "modell": "de_DE-thorsten-medium",           "tempo": 1.0,  "hoehe": 0.8,  "pan": 0.2 },
-    "croupier":   { "name": "Croupier",  "modell": "de_DE-pavoque-low",               "tempo": 1.05, "hoehe": 1.0,  "pan": 0.2 }
+    "aufsicht":   { "name": "Saalaufsicht", "modell": "de_DE-kerstin-low",            "tempo": 1.0,  "hoehe": 1.05, "pan": -0.2 }
   },
   "szenen": [
     {
@@ -27,15 +28,15 @@
       "saetze": [
         { "wer": "yannick", "text": "Meine Herren, willkommen zur Lagebesprechung.", "say": "Meine Herren, willkommen zur Lage-Besprechung." },
         { "wer": "aurel",   "text": "Ich bin der Einzige hier." },
-        { "wer": "yannick", "text": "Phase eins: Wir fahren zur Spielbank Neuenkirchen.", "say": "Phase eins: Wir fahren zur Spielbank Neuenkirrchen." },
+        { "wer": "yannick", "text": "Phase eins: Wir fahren zur Spielbank Neunkirchen.", "say": "Phase eins: Wir fahren zur Spielbank Neun-Kirchen." },
         { "wer": "yannick", "text": "Phase zwei: Wir machen einen dicken Haufen Geld.", "pause": 0.3 },
         { "wer": "aurel",   "text": "Und wie genau?" },
         { "wer": "yannick", "text": "Phase zwei ist … ein dicker Haufen Geld.", "say": "Phase zwei ist, ein dicker Haufen Geld." },
         { "wer": "aurel",   "text": "Genial. Und Phase drei?", "say": "Ge-nial. Und Phase drei?" },
         { "wer": "yannick", "text": "Heimfahren. Shisha.", "say": "Heimfahren. Schischa." },
         { "wer": "aurel",   "text": "Das ist der beste Plan, den ich je gesehen habe." },
-        { "wer": "yannick", "text": "Ich habe sogar eine Stakeholder-Analyse vom Roulettetisch gemacht.", "say": "Ich habe sogar eine Steikholder-Analyse vom Rulett-Tisch gemacht." },
-        { "wer": "aurel",   "text": "Der Tisch hat keine Stakeholder.", "say": "Der Tisch hat keine Steikholder." },
+        { "wer": "yannick", "text": "Ich habe sogar eine Stakeholder-Analyse vom Spielautomaten gemacht.", "say": "Ich habe sogar eine Steikholder-Analyse vom Spielautomaten gemacht." },
+        { "wer": "aurel",   "text": "Der Automat hat keine Stakeholder.", "say": "Der Automat hat keine Steikholder." },
         { "wer": "yannick", "text": "Noch nicht.", "pause": 0.3 }
       ]
     },
@@ -44,7 +45,7 @@
       "geraeusche": [["motor", "start", 0.0, "ende"], ["gong", "S0", -0.7], ["gong", "S4", -0.7]],
       "musik": "heist",
       "saetze": [
-        { "wer": "navi",    "text": "Route wird berechnet. Ziel: Spielbank Neuenkirchen. Voraussichtliche Ankunft: reich.", "say": "Route wird berechnet. Ziel: Spielbank Neuenkirrchen. Voraussichtliche Ankunft: reich." },
+        { "wer": "navi",    "text": "Route wird berechnet. Ziel: Spielbank Neunkirchen, Saarland. Voraussichtliche Ankunft: reich.", "say": "Route wird berechnet. Ziel: Spielbank Neun-Kirchen, Saarland. Voraussichtliche Ankunft: reich." },
         { "wer": "aurel",   "text": "Hast du die Snacks?", "pause": 0.4, "say": "Hast du die Snäcks?" },
         { "wer": "yannick", "text": "Ich habe einen Projektplan." },
         { "wer": "aurel",   "text": "Kann man den essen?" },
@@ -52,8 +53,8 @@
       ]
     },
     {
-      "id": "eingang", "vorlauf": 2.4, "nachlauf": 1.8,
-      "geraeusche": [["neon", "start", 0.0, "ende"], ["schritte", "start", 0.0], ["tuer", "ende", -1.6]],
+      "id": "eingang", "vorlauf": 2.4, "nachlauf": 2.0,
+      "geraeusche": [["neon", "start", 0.0, "ende"], ["schritte", "start", 0.0], ["drehtuer", "ende", -1.8]],
       "musik": "gedaempft",
       "saetze": [
         { "wer": "tuersteher", "text": "Halloween, hm? Als was geht ihr?", "say": "Hälloween, hm? Als was geht ihr?" },
@@ -62,19 +63,30 @@
       ]
     },
     {
-      "id": "roulette", "vorlauf": 1.2, "nachlauf": 2.6,
-      "geraeusche": [["casino", "start", 0.0, "ende"], ["chips", "S2", 1.2], ["kugel", "S4", 1.6, "S5"], ["trommel", "S5", -2.4, "S5"], ["fanfare", "S5e", 0.1], ["muenzen", "S5e", 0.1]],
+      "id": "automaten", "vorlauf": 2.6, "nachlauf": 2.6,
+      "geraeusche": [["casino", "start", 0.0, "ende"], ["touch", "S3e", 0.5], ["feature", "W0e", 0.2],
+                     ["trommel", "W4e", -1.8, "W4e"], ["fanfare", "W4e", 0.05], ["klingel", "W4e", 0.1], ["muenzen", "W4e", 0.4],
+                     ["schritte", "S7", -2.2]],
       "musik": "heist",
-      "musik_pause": ["S4", 1.0, "S5e", 0.0],
+      "musik_pause": ["W0e", 0.0, "W4e", 2.5],
       "saetze": [
-        { "wer": "croupier", "text": "Faites vos jeux. Machen Sie Ihr Spiel.", "say": "Fett wo schöh. Machen Sie Ihr Spiel." },
-        { "wer": "yannick",  "text": "Laut meiner Excel-Tabelle setzen wir auf …", "say": "Laut meiner Exzel-Tabelle setzen wir auf" },
-        { "wer": "aurel",    "text": "Heute ist der Einunddreißigste. Alles auf die Einunddreißig." },
-        { "wer": "yannick",  "text": "Das ist methodisch überhaupt nicht belastbar." },
-        { "wer": "croupier", "text": "Rien ne va plus. Nichts geht mehr.", "say": "Rjäng nö wa plü. Nichts geht mehr." },
-        { "wer": "croupier", "text": "Einunddreißig. Schwarz. Ungerade.", "pause": 7.0 },
-        { "wer": "aurel",    "text": "Jaaa! Phase zwei erledigt!", "pause": 0.9, "say": "Jaaa! Phase zwei erledigt!" },
-        { "wer": "yannick",  "text": "Ich nenne das: erfolgreiches Erwartungsmanagement." }
+        { "wer": "aurel",   "text": "Da ist er. Clover Link.", "say": "Da ist er. Klouwer Link." },
+        { "wer": "yannick", "text": "Laut meiner Excel-Tabelle nehmen wir Automat zwölf. Beste Auszahlungskurve.", "say": "Laut meiner Exzel-Tabelle nehmen wir Automat zwölf. Beste Auszahlungskurve." },
+        { "wer": "aurel",   "text": "Heute ist der Einunddreißigste. Ich nehm die Einunddreißig." },
+        { "wer": "yannick", "text": "Das ist methodisch überhaupt nicht belastbar." },
+        { "wer": "yannick", "text": "Fünf Kleeblätter. Das Clover Feature.", "pause": 4.2, "say": "Fünf Kleeblätter. Das Klouwer Fietscher." },
+        { "wer": "yannick", "stimme": "yannick_leise", "text": "Rote Kleeblätter auf Walze eins und drei. Fehlt nur noch die Fünf.", "pause": 4.9 },
+        { "wer": "aurel",   "text": "Jaaa! Phase zwei erledigt!", "pause": 4.7 },
+        { "wer": "aufsicht", "text": "Herzlichen Glückwunsch. Grand Jackpot an Automat einunddreißig.", "pause": 2.4, "say": "Herzlichen Glückwunsch! Grand Jackpot an Automat einunddreißig." },
+        { "wer": "yannick", "text": "Ich nenne das: erfolgreiches Erwartungsmanagement." }
+      ],
+      "walzen": [
+        { "anker": "S3e", "versatz": 1.3, "lauf": 1.2,
+          "neu": [[0, 1, "2,00"], [1, 0, "1,00"], [2, 2, "MINI"], [3, 1, "5,00"], [4, 0, "3,00"]] },
+        { "anker": "S4e", "versatz": 0.4, "lauf": 0.7, "abstand": 0.12, "neu": [] },
+        { "anker": "S4e", "versatz": 1.9, "lauf": 0.7, "abstand": 0.12, "neu": [[0, 0, "GRAND"], [3, 2, "2,00"]] },
+        { "anker": "S4e", "versatz": 3.4, "lauf": 0.7, "abstand": 0.12, "neu": [[2, 0, "GRAND"], [1, 2, "MINOR"]] },
+        { "anker": "S5e", "versatz": 0.5, "lauf": 0.7, "abstand": 0.12, "spannung": 1.8, "neu": [[4, 2, "GRAND"]] }
       ]
     },
     {
@@ -87,14 +99,15 @@
       ]
     },
     {
-      "id": "shisha", "vorlauf": 3.0, "nachlauf": 3.0,
-      "geraeusche": [["blubbern", "start", 0.6, "ende"]],
+      "id": "shisha", "vorlauf": 3.2, "nachlauf": 3.0,
+      "geraeusche": [["xkah", "start", 1.0], ["blubbern", "S0e", 0.4, "ende"]],
       "musik": "lounge",
       "saetze": [
-        { "wer": "aurel",   "text": "Auf die beste Lagebesprechung aller Zeiten.", "say": "Auf die beste Lage-Besprechung aller Zeiten." },
+        { "wer": "yannick", "text": "Xkah Pro. Keine Kohle, kein Stress. Timer: einunddreißig Minuten.", "say": "Iks-Kah Pro. Keine Kohle, kein Stress. Timer: einunddreißig Minuten." },
+        { "wer": "aurel",   "text": "Auf die beste Lagebesprechung aller Zeiten.", "pause": 1.4, "say": "Auf die beste Lage-Besprechung aller Zeiten." },
         { "wer": "yannick", "text": "Auf Phase drei.", "pause": 0.3 },
-        { "wer": "aurel",   "text": "Und nächstes Jahr? Einunddreißigster Oktober, zweitausendsiebenundzwanzig?", "pause": 2.6 },
-        { "wer": "yannick", "text": "Dann setzen wir auf die Siebenundzwanzig." },
+        { "wer": "aurel",   "text": "Und nächstes Jahr? Einunddreißigster Oktober, zweitausendsiebenundzwanzig?", "pause": 2.0 },
+        { "wer": "yannick", "text": "Dann nehmen wir Automat siebenundzwanzig.", "pause": 2.6 },
         { "wer": "aurel",   "text": "Methodisch belastbar.", "pause": 0.4 }
       ]
     },

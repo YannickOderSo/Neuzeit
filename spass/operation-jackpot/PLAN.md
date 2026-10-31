@@ -1,6 +1,6 @@
 # Operation Jackpot – Umsetzungsplan
 
-**Stand:** Version 1, zur Abstimmung. Gebaut wird erst nach Freigabe. Offene Fragen stehen am Ende.
+**Stand:** Version 1 ist freigegeben und umgesetzt. Der Film dauert 2:54, das Video wird im Chat abgegeben und liegt nicht im Repo. Die Entscheidungen zu den offenen Fragen stehen am Ende.
 
 Ein kleiner Spaßauftrag: ein animierter Kurzfilm mit Stimmen und Ton über den 31.10.2026. Aurel und Yannick halten eine Lagebesprechung ab, fahren zur Spielbank Neunkirchen im Saarland, spielen dort Clover Link, gewinnen einen dicken Haufen Geld, fahren heim und rauchen zusammen Shisha an der AEON Lounge mit Xkah Pro.
 
@@ -20,7 +20,7 @@ Eine Rohfassung (V0) ist schon gerendert. Sie zeigt Stil, Figuren und Stimmen, h
 | | |
 | --- | --- |
 | Titel | **Operation Jackpot** |
-| Länge | etwa 2½ Minuten |
+| Länge | 2:54 |
 | Format | MP4, 1280 × 720, 30 Bilder pro Sekunde, Stereo-Ton, Untertitel ins Bild gebrannt |
 | Ton | Heist-Parodie: übertrieben ernster Plan, absurd simple Ausführung |
 | Stimmen | deutsche Sprachsynthese mit Piper, offline, jede Figur mit eigener Stimme |
@@ -41,27 +41,36 @@ Die Merkmale stammen aus den Fotos im Chat. Die Fotos selbst liegen nicht im Rep
 | Erzähler | nur Stimme | Thorsten, neutral, etwas tiefer | Kinotrailer-Stimme am Anfang und Ende |
 | Navi | nur Stimme | Kerstin | trocken, leicht passiv-aggressiv |
 | Türsteher | breit, Sonnenbrille, Teufelshörnchen | Thorsten, deutlich tiefer | lässt sie rein, aus Mitleid |
-| Saalaufsicht (neu) | Weste, Namensschild, Funkgerät | Ramona | kommt zur Jackpot-Auszahlung; ersetzt den Croupier |
+| Saalaufsicht (neu) | Dutt, Weste, Namensschild, Funkgerät | Kerstin, etwas höher und ohne Navi-Klang | kommt zur Jackpot-Auszahlung; ersetzt den Croupier |
 
 ### 3. Spielbank Neunkirchen
-- Die Fassade ist frei gezeichnet, ohne Logo der Saarland Spielbank. Das Neonschild sagt „SPIELBANK NEUNKIRCHEN“ und flackert passend zum Neonsurren.
+- Die Fassade ist nach euren Fotos gezeichnet, die Fotos selbst liegen nicht im Repo. Zu sehen sind eine flache Halle aus hellen Paneelen mit grünem Blätterband und das große grüne Schild „Lucky Jungle“ mit Papagei. Darunter steht „Spielbank Neunkirchen“. Der Eingang ist ein eigener Vorbau mit schwarzem Schild, Palmblättern, Papagei, Drehtür und Pflanzkübeln, daneben ein weißer Zaun.
+- Logos sind keine übernommen. Nachts leuchtet „Lucky Jungle“ und flackert passend zum Neonsurren. Zu Halloween stehen Kürbisse vor der Tür, und der Türsteher trägt Hörnchen.
 - Unterwegs zieht das gelbe Ortsschild „Neunkirchen“ vorbei. Das Navi sagt „Spielbank Neunkirchen, Saarland“.
 
 ### 4. Automatensaal und Clover Link
-- Ein dunkler Saal mit Reihen blinkender Automaten statt Roulettetisch. In der Mitte steht eine Clover-Link-Insel: mehrere Automaten im Halbkreis, darüber eine große Jackpot-Anzeige mit vier Stufen (Grand, Major, Minor, Mini), überall Kleeblätter in Grün und Gold.
-- Gezeichnet wird im eigenen Cartoon-Stil, ohne Originallogo und ohne Originalgrafik. Der Name „Clover Link“ fällt im Dialog und steht in eigener Schrift auf der Anzeige (siehe offene Frage 3).
-- Walzen: 5 × 3 mit Kleeblatt, Sieben, Glocke, Kirsche und Hufeisen. Der Gewinn läuft so: Kleeblätter landen, das Link-Feature startet, der Bildschirm füllt sich Feld für Feld mit Kleeblättern, oben blinkt „GRAND“.
-- Die Glückszahl: Yannick will laut Excel Automat 12, Aurel nimmt Automat 31, weil heute der 31. ist. Die Nummer steht groß auf dem Automaten.
-- Jackpot-Betrag als Gag: **31.031,31 €** (siehe offene Frage 5).
+- **Aufbau nach eurem Foto:** vier hohe Automaten mit grün leuchtendem Rahmen nebeneinander (Nummern 29 bis 32), darüber ein LED-Banner „GRAND JACKPOT“ mit Betrag. Oben auf jedem Automaten steht der Schriftzug, darunter die Jackpots: Grand (rotes Kleeblatt), Major (lila), Minor (blau) und Mini (grün), die letzten beiden als Bonus. Unten ist das Spielmenü mit vier Spielen und Einsätzen von 1 bis 10 Cent, darunter blau leuchtende Tasten. Links im Saal stehen weitere Automatenreihen.
+- **Spielablauf nach den Spielregeln** von Red Hot Burning Clover Link (APEX Gaming), einem der Spiele im Menü:
+  - 5 Walzen × 3 Reihen mit Früchten, Sieben und Glocke.
+  - Ab 5 Kleeblättern startet das *Clover Feature* mit 3 Re-Spins. Die Kleeblätter bleiben liegen, nur die freien Felder drehen neu, und jedes neue Kleeblatt setzt die Re-Spins wieder auf 3.
+  - Kleeblätter tragen Beträge oder Mini- und Minor-Bonus.
+  - Der Grand Jackpot fällt sofort, wenn das rote Grand-Kleeblatt auf Walze 1, 3 und 5 liegt.
+- **Im Film:**
+  - Aurel tippt im Menü auf Red Hot Burning und drückt Start. Fünf Kleeblätter landen, das Clover Feature beginnt.
+  - Ein Re-Spin bringt nichts (3 → 2). Danach kommt Grand auf Walze 1 dazu, dann Grand auf Walze 3; beide Male springt der Zähler wieder auf 3.
+  - Beim letzten Re-Spin bleibt Walze 5 lange stehen und leuchtet, Trommelwirbel, dann landet Grand auf Walze 5.
+- Gezeichnet im eigenen Cartoon-Stil, ohne Originallogos. „Clover Link“ steht in eigener Schrift auf den Automaten.
+- Die Glückszahl: Yannick will laut Excel Automat 12, Aurel nimmt Automat 31, weil heute der 31. ist.
+- Der Jackpot steht beim Gewinn auf **31.031,31 €**. Danach zeigt das Banner kurz „AUTOMAT 31“ und springt dann auf 10.000 € zurück.
 
 ### 5. Shisha: AEON Edition 4 Lounge mit Xkah Pro
 Die Angaben stammen aus Händlerbeschreibungen. Ein Foto eures Setups würde die Zeichnung genauer machen.
 - **AEON Edition 4 Lounge:** etwa 53 cm hoch, schlanke einteilige Rauchsäule aus Edelstahl, mundgeblasene klare Glasbowl, ein Schlauchanschluss, Ausblasventil kaum sichtbar im Fuß. Im Film: ein Schlauch, den die beiden hin und her reichen.
-- **Xkah Pro:** kabelloser elektrischer Kopf statt Kohle, mit LED-Display für die Temperatur; ein Licht meldet das Session-Ende. Im Film: keine Kohle und keine Glut. Yannick setzt den Kopf auf, das Display zählt die Temperatur hoch und zeigt dann den Timer „31 min“. Zum Session-Ende blinkt das Licht.
+- **Xkah Pro:** kabelloser elektrischer Kopf statt Kohle, mit LED-Display für die Temperatur; ein Licht meldet das Session-Ende. Im Film: schwarz, keine Kohle und keine Glut. Die Kamera geht nah ran, der Xkah piept, das Display zeigt „ON“, zählt bis 280° hoch und dann den Timer ab 31:00 herunter. Yannick zeigt darauf.
 - Rest der Szene wie in V0: Blubbern im Glas bei jedem Zug, Rauchwolken formen €, dann 27, dann 31. Auf dem Flipchart sind alle Phasen abgehakt, in der Ecke liegt der dicke Haufen Geld.
 
 ### 6. Stimmen
-Piper mit den Stimmen aus der Figurentabelle. Jeder Satz wird nach dem Erzeugen mit einer Spracherkennung (Whisper) gegengehört. Was sie falsch versteht, bekommt im Drehbuch eine Lautschrift unter `say`, wie schon bei „Neuenkirrchen“ und „Lage-Besprechung“. Neu zu prüfen: „Neunkirchen“, „Clover Link“, „Xkah“, „Grand Jackpot“.
+Piper mit den Stimmen aus der Figurentabelle. Jeder Satz wird nach dem Erzeugen mit einer Spracherkennung (Whisper) gegengehört. Was sie falsch versteht, bekommt im Drehbuch eine Lautschrift unter `say`, zum Beispiel „Neun-Kirchen“, „Klouwer Link“, „Iks-Kah Pro“ und „Lage-Besprechung“. Yannicks Flüstersatz kommt aus der Flüsterstimme desselben Sprechers (Thorsten). „Fünf Kleeblätter“ sagt Yannick statt Aurel, weil die Aurel-Stimme das Wort nicht sauber trifft.
 
 ### 7. Musik und Geräusche
 | Szene | Musik | Geräusche |
@@ -117,9 +126,11 @@ Der Abspann bleibt mit: *Spiel mit Verantwortung. Glücksspiel kann süchtig mac
 - **Yannick:** „Laut meiner Excel-Tabelle nehmen wir Automat zwölf. Beste Auszahlungskurve.“
 - **Aurel:** „Heute ist der Einunddreißigste. Ich nehm die Einunddreißig.“ *(setzt sich an Automat 31)*
 - **Yannick:** „Das ist methodisch überhaupt nicht belastbar.“
-- **Bild und Ton:** Aurel drückt Start, die Walzen surren, ein Kleeblatt landet, noch eins, noch eins. Die Musik setzt aus, das Link-Feature startet, Feld für Feld füllen sich die Walzen mit Kleeblättern, Trommelwirbel.
-- **Yannick** *(flüsternd)*: „Sind das … alles Kleeblätter?“
-- **Bild und Ton:** *GRAND* blinkt, Fanfare, Klingeln, die Lichter drehen durch, Münzregen.
+- **Bild und Ton:** Aurel tippt auf Red Hot Burning und drückt Start, die Walzen surren, fünf Kleeblätter landen, jedes mit eigenem Glockenton. Die Musik setzt aus, das Clover Feature startet.
+- **Yannick:** „Fünf Kleeblätter. Das Clover Feature.“
+- **Bild:** Re-Spins, Grand auf Walze 1, Grand auf Walze 3.
+- **Yannick** *(flüsternd)*: „Rote Kleeblätter auf Walze eins und drei. Fehlt nur noch die Fünf.“
+- **Bild und Ton:** Walze 5 hält lange an, Trommelwirbel, Grand landet. *GRAND* blinkt, Fanfare, Jackpot-Klingel, die Rahmen blinken, Münz- und Geldregen, „GRAND JACKPOT!“.
 - **Aurel:** „Jaaa! Phase zwei erledigt!“
 - **Saalaufsicht** *(kommt mit Funkgerät)*: „Herzlichen Glückwunsch. Grand Jackpot an Automat einunddreißig.“
 - **Yannick:** „Ich nenne das: erfolgreiches Erwartungsmanagement.“
@@ -130,7 +141,7 @@ Der Abspann bleibt mit: *Spiel mit Verantwortung. Glücksspiel kann süchtig mac
 - **Aurel:** „Ab in Phase drei.“
 
 ### Szene 7 – Shisha zu Hause *(überarbeitet)*
-- **Bild:** Wohnzimmer bei gedimmtem Licht. Auf dem Couchtisch steht die AEON Edition 4 Lounge. Yannick setzt den Xkah Pro auf, das Display zählt hoch und springt auf „31 min“. Ein Schlauch wandert zwischen den beiden hin und her.
+- **Bild:** Wohnzimmer bei gedimmtem Licht. Auf dem Couchtisch steht die AEON Edition 4 Lounge mit dem Xkah Pro. Nahaufnahme: Das Display zählt hoch und zeigt dann den Timer ab 31:00. Danach wandert der eine Schlauch zwischen den beiden hin und her, angestoßen wird mit Teegläsern.
 - **Yannick:** „Xkah Pro. Keine Kohle, kein Stress. Timer: einunddreißig Minuten.“ *(neu)*
 - **Aurel:** „Auf die beste Lagebesprechung aller Zeiten.“
 - **Yannick:** „Auf Phase drei.“
@@ -150,8 +161,8 @@ Die Werkzeugkette aus V0 bleibt. Zu ändern ist Folgendes:
 
 | Datei | Änderung |
 | --- | --- |
-| `drehbuch.json` | Texte aus dem Drehbuch oben, neue Stimme „aufsicht“ (Ramona), neue Geräusch-Cues für den Automatensaal und den Xkah |
-| `bauen.py` | neue Geräusche: Walzenlauf, Walzenstopp, Kleeblatt-Glocke, Jackpot-Klingeln, Xkah-Piepen; Kugel, Chips und Croupier fallen weg |
+| `drehbuch.json` | Texte aus dem Drehbuch oben, neue Stimmen „aufsicht“ und „yannick_leise“, die Walzen-Abfolge mit allen Kleeblättern unter `walzen`, neue Geräusch-Cues für den Automatensaal und den Xkah |
+| `bauen.py` | rechnet die Walzenzeiten aus und legt dazu Walzenlauf, Walzenstopp und eine Glocke pro Kleeblatt. Neu sind außerdem Feature-Jingle, Jackpot-Klingel, Drehtür und Xkah-Piepen; Kugel, Chips und Croupier fallen weg. Anker `W2`/`W2e` stehen für Start und letzten Stopp eines Spins |
 | `film.html` | neue Szene „automaten“ statt „roulette“: Saal, Clover-Link-Insel, Walzen mit Symbolen, Link-Feature, Jackpot-Anzeige, Saalaufsicht. Shisha-Szene mit AEON Lounge und Xkah Pro, ein Schlauch. Überall Neunkirchen statt Neuenkirchen. |
 | `render.mjs` | unverändert |
 
@@ -165,21 +176,23 @@ Fehlende Stimmmodelle lädt `bauen.py` von Hugging Face nach `build/voices`. Das
 
 ## Ablauf
 
-1. Diesen Plan abstimmen und die offenen Fragen klären
-2. Drehbuch und Ton umbauen, Aussprache mit Whisper prüfen
-3. Automatensaal und Shisha zeichnen, Standbilder prüfen
-4. Rendern, ansehen, nachschärfen
-5. Fertiges Video hier im Chat abgeben; ob es auch ins Repo kommt, klärt Frage 6
+1. Plan abstimmen ✓
+2. Drehbuch und Ton umbauen, Aussprache mit Whisper prüfen ✓
+3. Fassade, Automatensaal und Shisha zeichnen, Standbilder prüfen ✓
+4. Rendern, ansehen, nachschärfen ✓
+5. Video im Chat abgeben ✓
 
-## Offene Fragen
+## Entscheidungen zu den offenen Fragen
 
-1. **AEON Edition 4 Lounge:** Welche Ausführung habt ihr, Clear, Copper Edge oder eine andere? Am besten wäre ein Foto, das wie die Personenfotos nur im Chat bleibt.
-2. **Xkah Pro:** Welche Farbe: Schwarz, Silber, Blau oder Pink?
-3. **Clover Link auf dem Bildschirm:** Name im Dialog und in eigener Schrift auf der Jackpot-Anzeige, gezeichnet ohne Originallogo. Passt das, oder lieber ein Fantasiename wie „Klee-Link“?
-4. **Wer fährt?** In V0 sitzt Aurel am Steuer.
-5. **Jackpot-Betrag:** „31.031,31 €“ als Gag, oder lieber ohne Zahl?
-6. **Video im Repo:** Das Repo ist die Neuzeit-Website, und GitHub Pages veröffentlicht nach dem Mergen alles darin. Vorschlag: das Video nur hier im Chat abgeben und im Repo nur Plan und Quellen behalten.
+Ihr habt den Plan mit „sollte passen“ freigegeben. Damit gelten die Vorschläge:
+
+1. **AEON Edition 4 Lounge:** Ausführung Clear
+2. **Xkah Pro:** Schwarz
+3. **Clover Link:** Name im Dialog und in eigener Schrift auf den Automaten, ohne Originallogo
+4. **Fahrer:** Aurel
+5. **Jackpot-Betrag:** 31.031,31 €
+6. **Video:** nur im Chat. `operation-jackpot.mp4` steht in `.gitignore`, im Repo liegen nur Plan und Quellen.
 
 ## Rechte
 
-Die Stimme Pavoque steht unter CC BY-NC-SA 4.0. Sie fällt mit dem Croupier weg, der Film soll trotzdem privat bleiben. Thorsten und Kerstin sind CC0, Karlsson und Ramona stammen aus dem M-AILABS-Datensatz. Clover Link, AEON und Xkah sind Marken ihrer Hersteller. Sie werden im Film nur genannt und frei nachgezeichnet, ohne Logos.
+Im Film sind nur noch Thorsten und Kerstin (beide CC0) sowie Karlsson aus dem M-AILABS-Datensatz zu hören. Die Stimme Pavoque (CC BY-NC-SA 4.0) ist mit dem Croupier weggefallen. Der Film soll trotzdem privat bleiben. Clover Link, AEON und Xkah sind Marken ihrer Hersteller. Sie werden im Film nur genannt und frei nachgezeichnet, ohne Logos.

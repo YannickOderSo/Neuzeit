@@ -36,7 +36,7 @@ const F = {
   nacht: "#18203F", tief: "#0b1024", koralle: "#E95739", korallHell: "#FF8A70",
   creme: "#FBF8F5", dunst: "#B9C2D4", gold: "#F2C14E", schwarz: "#05070e",
 };
-const NAMENSFARBE = { yannick: F.korallHell, aurel: "#9CC3FF", navi: "#8FE3B0", croupier: F.gold, tuersteher: "#C9A0FF" };
+const NAMENSFARBE = { yannick: F.korallHell, aurel: "#9CC3FF", navi: "#8FE3B0", aufsicht: F.gold, tuersteher: "#C9A0FF" };
 
 // ------------------------------------------------------------------ Werkzeuge
 
@@ -90,21 +90,9 @@ const POSE = {
   jubel:    { L: [-98, -392, "offen"], R: [98, -392, "offen"] },
   schale:   { L: [-40, -150, "offen"], R: [40, -150, "offen"] },
   essen:    { L: [-10, -264, "faust"], R: [40, -150, "offen"] },
-  tippen:   { L: [-42, -160, "offen"], R: [42, -160, "offen"] },
-  abwehr:   { L: [-92, -268, "offen"], R: [92, -268, "offen"] },
-  schieben: { L: [-66, -122, "offen"], R: [86, -150, "offen"] },
   finger:   { L: [-66, -122, "offen"], R: [76, -306, "zeigen"] },
   kratzen:  { L: [-66, -122, "offen"], R: [44, -352, "faust"] },
-  winkenR:  { L: [-66, -122, "offen"], R: [124, -196, "offen"] },
-  werfen:   { L: [-66, -122, "offen"], R: [-40, -176, "faust"] },
   verschr:  { L: [36, -186, "faust"], R: [-36, -186, "faust"] },
-  sofaA:    { L: [-52, -150, "offen"], R: [42, -204, "schlauch"] },
-  prostA:   { L: [-52, -150, "offen"], R: [92, -312, "schlauch"] },
-  ziehenA:  { L: [-52, -150, "offen"], R: [14, -268, "schlauch"] },
-  daumenA:  { L: [-96, -222, "daumen"], R: [42, -204, "schlauch"] },
-  sofaY:    { L: [-42, -196, "glas"], R: [42, -204, "schlauch"] },
-  prostY:   { L: [-92, -312, "glas"], R: [42, -204, "schlauch"] },
-  ziehenY:  { L: [-42, -196, "glas"], R: [14, -268, "schlauch"] },
 };
 
 // Wechselt weich zwischen Posen; keys = [[Zeit, Pose], ...]
@@ -129,8 +117,8 @@ const STIL = {
              kleid: "mantel", oben: "#1F2A4E", shirt: "#283462", hose: "#20263A", schuhe: "#19130F", breite: 56 },
   tuersteher: { haut: "#D29A74", haare: "glatze", kleid: "anzug", oben: "#131419", shirt: "#E9E9EE", hose: "#131419",
                 schuhe: "#0A0A0A", breite: 86, sonnenbrille: true, hoerner: true },
-  croupier: { haut: "#EFC29F", haare: "gegelt", haar: "#2A2320", haarDunkel: "#171211", bart: "schnurr", bartFarbe: "#2A2320",
-              kleid: "weste", oben: "#6B1B2C", shirt: "#F4F1EC", hose: "#15151A", schuhe: "#0A0A0A", breite: 58, fliege: true },
+  aufsicht: { haut: "#F0C6A6", haare: "dutt", haar: "#3B2A20", haarDunkel: "#2A1D16", kleid: "weste", oben: "#1F2A4E",
+              shirt: "#F4F1EC", hose: "#15151A", schuhe: "#0A0A0A", breite: 52, namensschild: true },
 };
 
 function figur(p) {
@@ -245,6 +233,7 @@ function handZeichnen(x, y, art, sx, st, f, t) {
     const a = Math.atan2(y + 224, x - sx * 50);
     linie(x, y, x + Math.cos(a) * 18, y + Math.sin(a) * 18, 8, f(st.haut));
   }
+  if (art === "funk") { rr(x - 8, y - 34, 16, 30, 4, f("#111")); linie(x + 4, y - 34, x + 4, y - 48, 3, f("#111")); rr(x - 5, y - 28, 10, 8, 2, f("#3CFF6B")); }
   if (art === "marker") { X.save(); X.translate(x, y); X.rotate(-0.6); rr(-4, -26, 9, 24, 3, f("#1B2A6B")); X.restore(); }
 }
 
@@ -324,10 +313,11 @@ function kopf(p, st, f, m) {
     X.lineWidth = 2; X.strokeStyle = f(st.haarDunkel); X.stroke();
   }
   if (st.haare === "glatze" && !p.silhouette) ell(-14, -340, 14, 7, "rgba(255,255,255,0.25)", -0.3);
-  if (st.haare === "gegelt") {
-    X.save(); X.beginPath(); X.rect(-60, -380, 120, 66); X.clip();
-    ell(0, -310, 50, 50, f(st.haar)); X.restore();
-    if (!p.silhouette) linie(-24, -348, 18, -352, 3, "rgba(255,255,255,0.35)");
+  if (st.haare === "dutt") {
+    ell(0, -364, 20, 18, f(st.haarDunkel));
+    X.save(); X.beginPath(); X.rect(-60, -380, 120, 70); X.clip();
+    ell(0, -306, 51, 52, f(st.haar)); X.restore();
+    for (const sx of [-1, 1]) ell(sx * 46, -304, 8, 16, f(st.haar));
   }
   if (st.hoerner) {
     for (const sx of [-1, 1]) {
@@ -335,10 +325,7 @@ function kopf(p, st, f, m) {
       X.closePath(); X.fillStyle = f("#D3263A"); X.fill();
     }
   }
-  if (st.fliege) {
-    X.beginPath(); X.moveTo(0, -244); X.lineTo(-16, -252); X.lineTo(-16, -236); X.closePath();
-    X.moveTo(0, -244); X.lineTo(16, -252); X.lineTo(16, -236); X.closePath(); X.fillStyle = f("#0A0A0A"); X.fill();
-  }
+  if (st.namensschild) { rr(-44, -206, 26, 10, 2, f(F.gold)); }
 }
 
 // ------------------------------------------------------------------ Kulissen
@@ -515,7 +502,7 @@ function seite1(x, y, w, h, z) {
     X.beginPath(); X.moveTo(ra + 30, ry - 18); X.lineTo(lerp(ra + 30, rb - 42, z.p1), ry - 18); X.stroke(); X.restore();
     X.globalAlpha = ss(0.6, 1, z.p1);
     casinoIcon(rb, ry, 1, F.nacht);
-    text("Spielbank Neuenkirchen", rb, ry + 22, 15, F.nacht, { gewicht: 700 });
+    text("Spielbank Neunkirchen", rb, ry + 22, 15, F.nacht, { gewicht: 700 });
     X.globalAlpha = 1;
   }
   const zeilen = [[z.p1, "Hinfahren"], [z.p2, "Dicker Haufen Geld"], [z.p3, "Heimfahren + Shisha"]];
@@ -542,15 +529,16 @@ function seite1(x, y, w, h, z) {
 function seite2(x, y, w, h, z) {
   papier(x, y, w, h);
   text("STAKEHOLDER-ANALYSE", x + 26, y + 36, 24, F.nacht, { align: "left", gewicht: 800 });
-  text("Objekt: Roulettetisch", x + 26, y + 64, 17, F.koralle, { align: "left", gewicht: 700 });
+  text("Objekt: Spielautomat 31", x + 26, y + 64, 17, F.koralle, { align: "left", gewicht: 700 });
   const ox = x + w / 2, oy = y + 200;
   linie(x + 40, oy, x + w - 30, oy, 3, F.nacht); linie(ox, y + 96, ox, y + h - 24, 3, F.nacht);
   text("Einfluss", ox - 10, y + 104, 14, F.nacht, { align: "right" });
   text("Interesse", x + w - 34, oy + 16, 14, F.nacht, { align: "right" });
   // der Tisch, oben rechts
   const tx = ox + 80, ty = oy - 56;
-  ell(tx, ty, 46, 20, "#1F7A4C"); ell(tx - 18, ty - 2, 12, 6, "#6B3A1E");
-  text("Tisch", tx, ty + 34, 15, F.nacht);
+  rr(tx - 20, ty - 36, 40, 62, 6, F.nacht); rr(tx - 15, ty - 31, 30, 22, 3, "#2DBA4E"); rr(tx - 15, ty - 5, 30, 18, 3, "#0F3A1C");
+  text("31", tx, ty - 20, 13, F.gold, { gewicht: 800 });
+  text("Automat", tx, ty + 40, 15, F.nacht);
   if (z.frage > 0) { X.save(); X.globalAlpha = z.frage; text("?", tx + 60, ty - 18, 44, F.koralle, { gewicht: 800 }); X.restore(); }
   if (z.wir > 0) {
     X.save(); X.globalAlpha = z.wir;
@@ -794,7 +782,7 @@ function szFahrt(t, lt, d) {
   if (sx < 1500 && sx > -300) {
     linie(sx, 504, sx, 380, 8, "#8C93A6");
     rr(sx - 125, 296, 250, 96, 6, "#111"); rr(sx - 118, 303, 236, 82, 4, "#F7D117");
-    text("Neuenkirchen", sx, 344, 32, "#111", { gewicht: 800 });
+    text("Neunkirchen", sx, 344, 34, "#111", { gewicht: 800 });
   }
   const planZeit = t > s(2).start - 0.2 && t < s(3).ende + 1.2;
   const biss = t > s(3).ende + 0.2;
@@ -809,7 +797,7 @@ function szFahrt(t, lt, d) {
     } : null,
   });
   navi(t, [
-    { t0: CUE("fahrt", "gong").t0, t1: s(0).ende + 1.0, z1: "Ziel: Spielbank Neuenkirchen", z2: "Ankunft: reich", pfeil: "gerade" },
+    { t0: CUE("fahrt", "gong").t0, t1: s(0).ende + 1.0, z1: "Ziel: Spielbank Neunkirchen", z2: "Ankunft: reich", pfeil: "gerade" },
     { t0: s(4).start - 0.7, t1: s(4).ende + 0.8, z1: "In 300 m rechts abbiegen", z2: "Würde im Fahrzeug lassen", pfeil: "rechts" },
   ]);
 }
@@ -831,237 +819,406 @@ function neonText(txt, x, y, groesse, farbe, aus, t) {
   X.shadowBlur = 0; X.letterSpacing = "0px";
 }
 
+// Fassade der Spielbank Neunkirchen: helle Halle, Blätterband, Lucky-Jungle-Schild, Papageien, Drehtür
+function blatt(x, y, l, rot, farbe) {
+  X.save(); X.translate(x, y); X.rotate(rot);
+  X.beginPath(); X.moveTo(0, 0); X.quadraticCurveTo(l * 0.5, -l * 0.28, l, 0); X.quadraticCurveTo(l * 0.5, l * 0.28, 0, 0);
+  X.fillStyle = farbe; X.fill();
+  linie(0, 0, l * 0.9, 0, 1.2, "rgba(0,0,0,0.18)");
+  X.restore();
+}
+
+function blattBand(x0, x1, y0, y1) {
+  X.save(); X.beginPath(); X.rect(x0, y0, x1 - x0, y1 - y0); X.clip();
+  X.fillStyle = "#1E5E2C"; X.fillRect(x0, y0, x1 - x0, y1 - y0);
+  const farben = ["#2E8B3E", "#46A84A", "#1F6B30", "#5DBB4F", "#3C9A44"];
+  for (let i = 0; i < (x1 - x0) / 8; i++) {
+    const x = x0 + hash(i + 400) * (x1 - x0), y = y1 - hash(i + 500) * (y1 - y0) * 0.5;
+    blatt(x, y, 26 + hash(i + 600) * 34, -Math.PI / 2 + (hash(i + 700) - 0.5) * 1.8, farben[i % 5]);
+  }
+  X.restore();
+}
+
+function papagei(x, y, s, t) {
+  X.save(); X.translate(x, y); X.scale(s, s);
+  const nick = Math.sin(t * 2.3) > 0.85 ? 0.25 : 0;
+  X.fillStyle = "#1F5FD1"; X.beginPath(); X.moveTo(-6, 20); X.lineTo(-30, 78); X.lineTo(-14, 80); X.lineTo(6, 24); X.fill();
+  X.fillStyle = "#E23B2E"; X.beginPath(); X.moveTo(-2, 20); X.lineTo(-18, 84); X.lineTo(-8, 84); X.lineTo(8, 22); X.fill();
+  ell(0, 6, 20, 30, "#E23B2E", -0.25);
+  X.fillStyle = "#F2C230"; X.beginPath(); X.ellipse(8, 10, 12, 24, -0.35, 0, TAU); X.fill();
+  X.fillStyle = "#2B6CE0"; X.beginPath(); X.ellipse(11, 20, 9, 18, -0.35, 0, TAU); X.fill();
+  X.save(); X.translate(-6, -24); X.rotate(nick);
+  ell(0, 0, 15, 14, "#E23B2E");
+  ell(-4, -1, 6, 5, "#FFFFFF"); ell(-5, -1, 2.4, 2.4, "#111");
+  X.fillStyle = "#EFE3C8"; X.beginPath(); X.moveTo(-12, 0); X.quadraticCurveTo(-26, 2, -18, 16); X.quadraticCurveTo(-14, 8, -9, 7); X.closePath(); X.fill();
+  X.restore();
+  linie(-4, 34, -6, 42, 3, "#555"); linie(6, 34, 6, 42, 3, "#555");
+  X.restore();
+}
+
+function drehtuer(cx, yTop, yBot, r, winkel) {
+  const g = X.createLinearGradient(0, yTop, 0, yBot); g.addColorStop(0, "#FFE7B0"); g.addColorStop(1, "#FFB46A");
+  X.fillStyle = g; X.fillRect(cx - r, yTop, 2 * r, yBot - yTop);
+  for (let k = 0; k < 3; k++) {
+    const a = winkel + k * TAU / 3;
+    const x = cx + Math.sin(a) * r * 0.95;
+    X.globalAlpha = Math.cos(a) > 0 ? 0.9 : 0.35;
+    X.fillStyle = "rgba(200,230,255,0.25)"; X.fillRect(Math.min(cx, x), yTop + 8, Math.abs(x - cx), yBot - yTop - 14);
+    linie(x, yTop + 8, x, yBot - 6, 4, "#30343F");
+    X.globalAlpha = 1;
+  }
+  linie(cx, yTop + 6, cx, yBot - 4, 4, "#30343F");
+  X.fillStyle = "rgba(190,220,255,0.12)"; X.fillRect(cx - r, yTop, 2 * r, yBot - yTop);
+  X.lineWidth = 6; X.strokeStyle = "#2A2E38"; X.strokeRect(cx - r, yTop, 2 * r, yBot - yTop);
+  rr(cx - r - 10, yTop - 18, 2 * r + 20, 20, 4, "#2A2E38");
+}
+
 function szEingang(t, lt, d) {
   kamera(1, 640, 360);
   const s = i => S("eingang", i);
   himmel("#060918", "#1A2350");
-  sterne(t, 60, 60);
-  // Fassade
-  X.fillStyle = "#252A4A"; X.fillRect(0, 50, W, 560);
-  for (let r = 0; r < 22; r++) for (let k = 0; k < 18; k++) {
-    X.fillStyle = (r + k) % 3 ? "rgba(255,255,255,0.025)" : "rgba(0,0,0,0.08)";
-    X.fillRect(k * 76 + (r % 2) * 38, 54 + r * 26, 72, 22);
-  }
+  sterne(t, 70, 150);
+  mond(1150, 64, 28);
+  // Halle aus hellen Paneelen, nachts angestrahlt
+  X.fillStyle = "#454D61"; X.fillRect(-200, 150, W + 400, 30);
+  const fg = X.createLinearGradient(0, 180, 0, 610); fg.addColorStop(0, "#7A8397"); fg.addColorStop(1, "#5D667A");
+  X.fillStyle = fg; X.fillRect(-200, 180, W + 400, 430);
+  for (let x = -200; x < W + 200; x += 64) linie(x, 182, x, 470, 2, "rgba(30,36,52,0.3)");
+  blattBand(-200, W + 200, 470, 562);
+  X.fillStyle = "#3E4558"; X.fillRect(-200, 562, W + 400, 48);
+  rr(40, 320, 290, 150, 4, "#2B4A3A");
+  blattBand(40, 330, 320, 470);
+  X.fillStyle = "rgba(255,230,170,0.16)"; X.fillRect(40, 320, 290, 150);
+  // Großes Schild „Lucky Jungle“ mit Papagei
   const neon = CUE("eingang", "neon");
   const flackert = neon.aussetzer.some(([a, dd]) => t >= a && t < a + dd);
-  rr(300, 92, 680, 160, 18, "#141831");
-  neonText("SPIELBANK", 640, 150, 84, F.koralle, flackert ? [3, 7] : [], t);
-  neonText("NEUENKIRCHEN", 640, 216, 38, F.gold, flackert ? [4] : [], t);
-  // Tür
-  const tuer = CUE("eingang", "tuer");
-  const auf = easeOut(ss(tuer.t0, tuer.t0 + 1.1, t));
-  rr(522, 290, 236, 320, 10, "#C9A24A");
-  const lg = X.createLinearGradient(0, 300, 0, 610); lg.addColorStop(0, "#FFE0A0"); lg.addColorStop(1, "#FF9A5A");
-  X.fillStyle = lg; X.fillRect(536, 302, 208, 308);
-  const breit = 104 * (1 - auf * 0.85);
-  rr(536, 302, breit, 308, 4, "#3A1F1A"); rr(744 - breit, 302, breit, 308, 4, "#3A1F1A");
-  if (auf < 0.6) { ell(536 + breit - 14, 460, 6, 6, F.gold); ell(744 - breit + 14, 460, 6, 6, F.gold); }
-  X.strokeStyle = "rgba(220,220,230,0.4)"; X.lineWidth = 1.5;
-  X.beginPath(); for (let i = 0; i < 5; i++) { X.moveTo(528, 296); X.lineTo(528 + 60 * Math.cos(i * 0.39), 296 + 60 * Math.sin(i * 0.39)); } X.stroke();
-  // Gehweg, Teppich, Absperrung, Kürbisse
-  X.fillStyle = "#33384F"; X.fillRect(0, 610, W, 110);
-  X.fillStyle = "#A3202A"; X.beginPath(); X.moveTo(540, 610); X.lineTo(740, 610); X.lineTo(860, 720); X.lineTo(420, 720); X.closePath(); X.fill();
-  for (const px of [452, 828]) { linie(px, 690, px, 600, 9, F.gold); ell(px, 596, 10, 10, F.gold); ell(px, 692, 18, 6, F.gold); }
-  X.beginPath(); X.moveTo(462, 610); X.quadraticCurveTo(495, 650 + Math.sin(t * 2) * 3, 530, 612); X.lineWidth = 7; X.strokeStyle = "#B3122A"; X.stroke();
-  kuerbis(492, 588, 22, t); kuerbis(790, 588, 22, t + 1);
+  X.save(); X.translate(1060, 250);
+  X.beginPath(); X.moveTo(-190, 30); X.quadraticCurveTo(-200, -60, -60, -78); X.quadraticCurveTo(80, -100, 190, -50); X.quadraticCurveTo(210, 30, 120, 62); X.quadraticCurveTo(-40, 80, -190, 30);
+  X.fillStyle = "#2F9A43"; X.fill(); X.lineWidth = 5; X.strokeStyle = "#1C6B2C"; X.stroke();
+  X.restore();
+  neonText("LUCKY", 1005, 210, 34, "#FFE45C", flackert ? [1] : [], t);
+  neonText("JUNGLE", 1065, 264, 64, "#FFE45C", flackert ? [2, 4] : [], t);
+  rr(940, 306, 250, 28, 4, "#15182A");
+  text("SPIELBANK NEUNKIRCHEN", 1065, 321, 15, F.creme, { gewicht: 800, abstand: "2px" });
+  papagei(1228, 156, 0.9, t);
+  // Eingang mit Schild, Palmblättern, Papagei und Drehtür
+  rr(470, 290, 320, 320, 6, "#858EA0");
+  for (let i = 0; i < 6; i++) blatt(712, 326, 46 + i * 7, -Math.PI / 2 - 1.0 + i * 0.38, i % 2 ? "#3C9A44" : "#2E8B3E");
+  papagei(726, 292, 0.72, t + 2);
+  rr(490, 322, 280, 74, 6, "#111318");
+  text("SPIELBANK", 630, 350, 32, F.creme, { gewicht: 800, abstand: "3px" });
+  text("NEUNKIRCHEN", 630, 380, 17, F.creme, { gewicht: 700, abstand: "4px" });
+  const tuer = CUE("eingang", "drehtuer");
+  drehtuer(630, 438, 610, 88, 0.45 * lt + 3.0 * Math.max(0, t - tuer.t0));
+  // Gehweg, Pflanzen, Zaun, Kürbisse
+  X.fillStyle = "#3A3F52"; X.fillRect(-200, 610, W + 400, 200);
+  for (let i = 0; i < 30; i++) linie(i * 90 - 100, 612, i * 90 - 160, 720, 1.5, "rgba(0,0,0,0.25)");
+  for (const px of [498, 762]) { rr(px - 17, 572, 34, 38, 4, "#5A4636"); ell(px, 544, 25, 32, "#2E7D3A"); ell(px - 8, 532, 12, 14, "#3C9A44"); }
+  for (let i = 0; i < 10; i++) rr(820 + i * 22, 556, 8, 54, 2, "#E9ECEF");
+  rr(816, 568, 222, 6, 2, "#E9ECEF"); rr(816, 592, 222, 6, 2, "#E9ECEF");
+  kuerbis(546, 598, 17, t); kuerbis(716, 598, 17, t + 1);
 
-  // Türsteher
+  // Türsteher neben der Drehtür
   const beiseite = ss(tuer.t0 - 0.3, tuer.t0 + 0.6, t);
-  figur({ stil: "tuersteher", x: 950 + beiseite * 140, y: 688, s: 1.04, t, m: mund("tuersteher", t), blick: -1,
+  figur({ stil: "tuersteher", x: 850 + beiseite * 110, y: 688, s: 1.04, t, m: mund("tuersteher", t), blick: -1,
     keys: [[0, "verschr"]], neigen: spricht("tuersteher", t) ? -0.05 : 0, wackeln: spricht("tuersteher", t) && t > s(2).start && t < s(2).start + 0.9 ? 2.5 : 0 });
 
-  // Aurel und Yannick kommen, reden, gehen rein
+  // Aurel und Yannick kommen, reden und gehen durch die Drehtür
   const kommen = easeOut(clamp(lt / 2.3));
-  const rein = ss(tuer.t0 + 0.35, d - 0.25, t);
+  const rein = ss(tuer.t0 + 0.2, d - 0.25, t);
   for (const w of ["aurel", "yannick"]) {
-    const ziel = w === "aurel" ? 400 : 570;
-    let x = lerp(w === "aurel" ? -160 : -40, ziel, kommen);
-    let y = 690, sc = 0.98, alpha = 1;
-    x = lerp(x, w === "aurel" ? 610 : 668, rein); y = lerp(690, 600, rein); sc = lerp(0.98, 0.62, rein); alpha = 1 - ss(0.75, 1, rein);
-    const laeuft = (lt < 2.3) || rein > 0 && rein < 1;
-    const keys = w === "aurel" ? [[0, "locker"], [s(2).ende - 0.2, "daumenR"], [tuer.t0 + 0.4, "locker"]] : [[0, "locker"], [s(1).start, "achsel"], [s(1).ende + 0.3, "locker"]];
+    let x = lerp(w === "aurel" ? -160 : -40, w === "aurel" ? 250 : 420, kommen);
+    x = lerp(x, w === "aurel" ? 600 : 660, rein);
+    const y = lerp(690, 612, rein), sc = lerp(0.98, 0.66, rein), alpha = 1 - ss(0.75, 1, rein);
+    const laeuft = lt < 2.3 || (rein > 0 && rein < 1);
+    const keys = w === "aurel" ? [[0, "locker"], [s(2).ende - 0.2, "daumenR"], [tuer.t0 + 0.3, "locker"]] : [[0, "locker"], [s(1).start, "achsel"], [s(1).ende + 0.3, "locker"]];
     figur({ stil: w, x, y, s: sc, t, m: mund(w, t), blick: 1, keys, gehen: laeuft ? t * 9 + (w === "aurel" ? 0 : 1.4) : null, alpha });
   }
 }
 
-const RAD = [0, 32, 15, 19, 4, 21, 2, 25, 17, 34, 6, 27, 13, 36, 11, 30, 8, 23, 10, 5, 24, 16, 33, 1, 20, 14, 31, 9, 22, 18, 29, 7, 28, 12, 35, 3, 26];
-const ROT = new Set([1, 3, 5, 7, 9, 12, 14, 16, 18, 19, 21, 23, 25, 27, 30, 32, 34, 36]);
-const zahlFarbe = n => (n === 0 ? "#1D8A4E" : ROT.has(n) ? "#C0212D" : "#17171D");
+// ------------------------------------------------------------------ Automatensaal mit Clover Link
 
-function rouletteRad(cx, cy, rx, ry, theta, kugel) {
-  ell(cx, cy + 14, rx * 1.1, ry * 1.1 + 4, "#2C150A");
-  ell(cx, cy, rx * 1.1, ry * 1.1, "#7A4322");
-  ell(cx, cy, rx * 0.98, ry * 0.98, "#2A160C");
-  const st = TAU / 37;
-  RAD.forEach((n, i) => {
-    const a0 = theta + (i - 0.5) * st, a1 = theta + (i + 0.5) * st;
-    X.beginPath(); X.ellipse(cx, cy, rx * 0.92, ry * 0.92, 0, a0, a1); X.ellipse(cx, cy, rx * 0.63, ry * 0.63, 0, a1, a0, true); X.closePath();
-    X.fillStyle = zahlFarbe(n); X.fill();
-    X.lineWidth = 1.2; X.strokeStyle = F.gold; X.stroke();
-    const am = theta + i * st;
-    text(String(n), cx + Math.cos(am) * rx * 0.8, cy + Math.sin(am) * ry * 0.8, 10, "#fff", { gewicht: 800 });
-  });
-  const g = X.createRadialGradient(cx, cy - ry * 0.1, 4, cx, cy, rx * 0.6);
-  g.addColorStop(0, "#E8C468"); g.addColorStop(0.5, "#A86B2C"); g.addColorStop(1, "#5A3216");
-  ell(cx, cy, rx * 0.62, ry * 0.62, g);
-  ell(cx, cy, rx * 0.1, ry * 0.12, F.gold);
-  for (let k = 0; k < 4; k++) { const a = theta * 1 + k * Math.PI / 2; linie(cx, cy, cx + Math.cos(a) * rx * 0.2, cy + Math.sin(a) * ry * 0.2, 4, F.gold); }
-  if (kugel) {
-    const bx = cx + Math.cos(kugel.a) * rx * kugel.r, by = cy + Math.sin(kugel.a) * ry * kugel.r - kugel.h;
-    ell(bx + 2, by + 3 + kugel.h, 7, 4, "rgba(0,0,0,0.4)");
-    ell(bx, by, 7.5, 7.5, "#FAFAFA"); ell(bx - 2, by - 2, 2.5, 2.5, "#fff");
+const SPIELE = [["Red Hot Burning", "#D7262B", "#FF9A3C"], ["Blazing Gems", "#2340A8", "#56B8FF"], ["Reel Attraction", "#B0247A", "#FF6FC3"], ["Queen Cleopatra", "#A8781E", "#FFD36B"]];
+const FRUCHT = ["7", "kirsche", "zitrone", "pflaume", "traube", "melone", "glocke"];
+// Früchte des ersten Spins (Walze, Reihe); wo das Drehbuch Kleeblätter vorsieht, liegen Kleeblätter
+const BASIS = [["kirsche", "7", "zitrone"], ["glocke", "pflaume", "kirsche"], ["traube", "melone", "7"], ["zitrone", "glocke", "pflaume"], ["melone", "kirsche", "traube"]];
+const JACKPOT_GRAND = 31031.31;
+
+function euro(v) {
+  const c = Math.round(v * 100), e = Math.floor(c / 100);
+  return String(e).replace(/\B(?=(\d{3})+(?!\d))/g, ".") + "," + String(c % 100).padStart(2, "0");
+}
+
+function frucht(art, x, y, g) {
+  const r = g * 0.32;
+  if (art === "7") text("7", x, y + 1, g * 0.78, "#E0262B", { gewicht: 800 });
+  else if (art === "kirsche") {
+    linie(x - r * 0.6, y + r * 0.2, x + r * 0.2, y - r * 0.9, 2, "#2E7D32"); linie(x + r * 0.6, y + r * 0.3, x + r * 0.2, y - r * 0.9, 2, "#2E7D32");
+    ell(x - r * 0.6, y + r * 0.45, r * 0.5, r * 0.5, "#D7192D"); ell(x + r * 0.6, y + r * 0.55, r * 0.5, r * 0.5, "#D7192D");
+  } else if (art === "zitrone") ell(x, y, r, r * 0.75, "#F7DA2E");
+  else if (art === "pflaume") ell(x, y, r * 0.85, r * 0.9, "#7A3BAE");
+  else if (art === "traube") { for (const [dx, dy] of [[-0.5, -0.5], [0.5, -0.5], [0, -0.05], [-0.5, 0.4], [0.5, 0.4], [0, 0.85]]) ell(x + dx * r * 0.9, y + dy * r * 0.8, r * 0.36, r * 0.36, "#8E44AD"); }
+  else if (art === "melone") {
+    X.beginPath(); X.arc(x, y - r * 0.2, r, 0, Math.PI); X.fillStyle = "#2E9E44"; X.fill();
+    X.beginPath(); X.arc(x, y - r * 0.2, r * 0.8, 0, Math.PI); X.fillStyle = "#F0544F"; X.fill();
+  } else if (art === "glocke") {
+    X.beginPath(); X.moveTo(x - r, y + r * 0.6); X.quadraticCurveTo(x - r * 0.8, y - r, x, y - r); X.quadraticCurveTo(x + r * 0.8, y - r, x + r, y + r * 0.6); X.closePath();
+    X.fillStyle = "#F2C14E"; X.fill(); ell(x, y + r * 0.7, r * 0.22, r * 0.22, "#C9962A");
   }
 }
 
-// Tischfläche: u quer (0..1), v Tiefe (0 hinten, 1 vorne)
-function tisch(u, v) {
-  const y = lerp(482, 760, v);
-  const l = lerp(70, -160, v), r = lerp(1210, 1440, v);
-  return [lerp(l, r, u), y];
+function kleeFarbe(wert) {
+  return { GRAND: "#E2262B", MAJOR: "#8E3BD1", MINOR: "#2F6BE0", MINI: "#3CC35B" }[wert] || "#3AA84E";
 }
-function zelle(u0, v0, u1, v1, farbe, zahl) {
-  const p = [tisch(u0, v0), tisch(u1, v0), tisch(u1, v1), tisch(u0, v1)];
-  X.beginPath(); X.moveTo(...p[0]); p.slice(1).forEach(q => X.lineTo(...q)); X.closePath();
-  X.fillStyle = farbe; X.fill(); X.lineWidth = 1.6; X.strokeStyle = "rgba(255,255,255,0.8)"; X.stroke();
-  const [mx, my] = tisch((u0 + u1) / 2, (v0 + v1) / 2);
-  text(zahl, mx, my, 12 + 9 * v1, "#fff", { gewicht: 800 });
-}
-const LAYOUT = { u0: 0.53, u1: 0.965, v0: 0.03, v1: 0.44 };
-function zahlFeld(n) {
-  const c = Math.ceil(n / 3) - 1, row = 2 - ((n - 1) % 3);
-  const du = (LAYOUT.u1 - LAYOUT.u0) / 12, dv = (LAYOUT.v1 - LAYOUT.v0) / 3;
-  return [LAYOUT.u0 + c * du, LAYOUT.u0 + (c + 1) * du, LAYOUT.v0 + row * dv, LAYOUT.v0 + (row + 1) * dv];
-}
-
-function szRoulette(t, lt, d) {
-  const s = i => S("roulette", i);
-  const kg = CUE("roulette", "kugel");
-  const t0 = kg.t0, tL = kg.t1 - 0.4;
-  const gewonnen = s(5).ende;
-  const k = ss(t0 + 0.3, t0 + 1.6, t) * (1 - ss(gewonnen + 0.1, gewonnen + 0.9, t));
-  const RADX = 270, RADY = 560;
-  kamera(1 + 1.25 * k, lerp(640, RADX, k), lerp(360, RADY + 40, k));
-
-  // Raum
-  const g = X.createLinearGradient(0, 0, 0, 480); g.addColorStop(0, "#2A0A14"); g.addColorStop(1, "#5A1A2A");
-  X.fillStyle = g; X.fillRect(-200, -200, W + 400, 700);
-  for (let i = 0; i < 18; i++) glow(hash(i + 30) * W, 80 + hash(i + 40) * 300, 30 + hash(i + 50) * 40, i % 2 ? "rgba(242,193,78,A)" : "rgba(255,138,112,A)", 0.18 + 0.1 * Math.sin(t * 2 + i));
-  linie(-200, 430, W + 200, 430, 4, "rgba(242,193,78,0.5)");
-  X.fillStyle = "#24070F"; X.fillRect(-200, 470, W + 400, 400);
-  // Kronleuchter
-  linie(640, -10, 640, 60, 3, F.gold);
-  X.beginPath(); X.ellipse(640, 70, 110, 22, 0, 0, Math.PI); X.lineWidth = 4; X.strokeStyle = F.gold; X.stroke();
-  for (let i = 0; i < 9; i++) { const x = 540 + i * 25; linie(x, 72, x, 92 + (i % 2) * 10, 2, "rgba(255,240,200,0.8)"); glow(x, 96 + (i % 2) * 10, 16, "rgba(255,240,200,A)", 0.6); }
-
-  // Figuren hinter dem Tisch
-  const jubel = t > gewonnen;
-  figur({ stil: "croupier", x: RADX + 10, y: 594, s: 1.0, t, m: mund("croupier", t), blick: 0.5,
-    keys: [[0, "locker"], [s(0).start, "winkenR"], [s(0).ende + 0.3, "locker"], [s(4).start, "winkenR"], [t0 - 0.35, "werfen"], [t0 + 0.4, "locker"]] });
-  figur({ stil: "yannick", x: 600, y: 594, s: 1.0, t, m: mund("yannick", t), blick: spricht("aurel", t) ? 1 : (t > t0 && t < gewonnen ? -1 : 0.3),
-    keys: [[0, "tippen"], [s(3).start, "abwehr"], [s(3).ende + 0.3, "tippen"], [gewonnen + 0.1, "jubel"], [s(7).start - 0.2, "finger"]],
-    brauen: t > s(3).start && t < s(3).ende ? 1 : 0, neigen: Math.sin(t * 6) * 0.03 * mund("yannick", t) });
-  figur({ stil: "aurel", x: 920, y: 594, s: 1.0, t, m: mund("aurel", t) + (jubel && t < s(6).start ? 0.5 : 0), blick: t > t0 && t < gewonnen ? -1 : -0.6,
-    keys: [[0, "locker"], [s(2).start + 0.8, "schieben"], [s(2).ende + 0.5, "locker"], [gewonnen + 0.1, "jubel"], [s(6).ende + 0.6, "daumenR"]],
-    neigen: jubel ? Math.sin(t * 9) * 0.06 : 0 });
-
-  // Tisch
-  const p = [tisch(0, 0), tisch(1, 0), tisch(1, 1), tisch(0, 1)];
-  X.beginPath(); X.moveTo(...p[0]); p.slice(1).forEach(q => X.lineTo(...q)); X.closePath();
-  const fg = X.createLinearGradient(0, 480, 0, 720); fg.addColorStop(0, "#14613C"); fg.addColorStop(1, "#1F7A4C");
-  X.fillStyle = fg; X.fill();
-  X.beginPath(); X.moveTo(p[0][0] - 10, p[0][1]); X.lineTo(p[1][0] + 10, p[1][1]); X.lineWidth = 18; X.strokeStyle = "#5A2E1A"; X.stroke();
-  zelle(LAYOUT.u0 - 0.035, LAYOUT.v0, LAYOUT.u0, LAYOUT.v1, zahlFarbe(0), "0");
-  for (let n = 1; n <= 36; n++) { const [u0, u1, v0, v1] = zahlFeld(n); zelle(u0, v0, u1, v1, zahlFarbe(n), String(n)); }
-  // Gewinnfeld leuchtet
-  if (t > tL) {
-    const [u0, u1, v0, v1] = zahlFeld(31);
-    const [mx, my] = tisch((u0 + u1) / 2, (v0 + v1) / 2);
-    glow(mx, my, 60, "rgba(255,230,140,A)", 0.5 + 0.3 * Math.sin(t * 10));
-  }
-
-  // Yannicks Laptop
-  X.save(); X.translate(578, 516);
-  X.beginPath(); X.moveTo(-70, 0); X.lineTo(70, 0); X.lineTo(84, 18); X.lineTo(-84, 18); X.closePath(); X.fillStyle = "#9AA3B8"; X.fill();
-  rr(-66, -86, 132, 86, 6, "#2B2F3A"); rr(-60, -80, 120, 74, 3, "#E9F2EA");
-  for (let i = 0; i < 6; i++) linie(-60, -68 + i * 12, 60, -68 + i * 12, 1, "#9CC7A4");
-  for (let i = 0; i < 4; i++) linie(-60 + i * 30, -80, -60 + i * 30, -6, 1, "#9CC7A4");
-  [18, 30, 12, 40, 24].forEach((hh, i) => rr(8 + i * 10, -10 - hh, 7, hh, 1, i === 3 ? F.koralle : "#2F7A4C"));
-  if (t > s(3).start && t < s(3).ende + 0.4) { X.fillStyle = "rgba(192,33,45,0.85)"; X.fillRect(-60, -80, 120, 74); text("#WERT!", 0, -43, 22, "#fff", { gewicht: 800 }); }
-  if (jubel) { X.fillStyle = "rgba(31,122,76,0.9)"; X.fillRect(-60, -80, 120, 74); text("31 ✓", 0, -43, 28, "#fff", { gewicht: 800 }); }
-  X.restore();
-
-  // Chips: Aurels Stapel wandert auf die 31
-  const [u0, u1, v0, v1] = zahlFeld(31);
-  const ziel = tisch((u0 + u1) / 2, (v0 + v1) / 2);
-  const start = [890, 598];
-  const w = easeOut(ss(s(2).start + 1.4, s(2).start + 2.1, t));
-  const cx = lerp(start[0], ziel[0], w), cy = lerp(start[1], ziel[1], w) - Math.sin(w * Math.PI) * 50;
-  const cfarben = [F.koralle, "#2F5BD3", "#E9E9EE", F.gold, F.koralle, "#2F5BD3"];
-  cfarben.forEach((c, i) => chip(cx, cy - i * 6, 22, c));
-  // Gewinnstapel
-  if (jubel) {
-    const wachs = ss(gewonnen + 0.2, gewonnen + 3, t);
-    for (let i = 0; i < 46 * wachs; i++) chip(700 + (i % 9) * 36 + hash(i) * 8, 642 - Math.floor(i / 9) * 9 - (i % 2) * 3, 18, cfarben[i % 6]);
-  }
-
-  // Rad und Kugel
-  const st = TAU / 37, ziel31 = RAD.indexOf(31) * st;
-  const theta = (t < tL ? -0.55 : -0.18) * (t - tL) + Math.PI / 2 - ziel31;  // so gedreht, dass die 31 vorne liegt, wenn die Kugel fällt
-  let kugel = null;
-  if (t >= t0 && t < tL) {
-    const u = (t - t0) / (tL - t0);
-    const phi = ziel31 - TAU * 6 * Math.pow(1 - u, 2.2);
-    const r = u < 0.74 ? 1.0 : lerp(1.0, 0.775, easeOut((u - 0.74) / 0.26));
-    const h = u > 0.74 ? Math.abs(Math.sin((u - 0.74) * 46)) * 9 * (1 - u) / 0.26 : 0;
-    kugel = { a: theta + phi, r, h };
-  } else if (t >= tL) kugel = { a: theta + ziel31, r: 0.775, h: 0 };
-  rouletteRad(RADX, RADY, 190, 80, theta, kugel);
-  if (t >= tL) {
-    const a = theta + ziel31, puls = 0.5 + 0.5 * Math.sin(t * 9);
-    X.beginPath(); X.ellipse(RADX + Math.cos(a) * 190 * 0.775, RADY + Math.sin(a) * 80 * 0.775, 16, 11, 0, 0, TAU);
-    X.lineWidth = 3; X.strokeStyle = `rgba(255,226,140,${0.5 + 0.5 * puls})`; X.stroke();
-  }
-
-  X.setTransform(1, 0, 0, 1, 0, 0);
-  // Spotlight während des Drehens
-  if (k > 0) {
-    const vg = X.createRadialGradient(W / 2, H / 2 + 40, 160, W / 2, H / 2, 760);
-    vg.addColorStop(0, "rgba(0,0,0,0)"); vg.addColorStop(1, `rgba(0,0,0,${0.7 * k})`);
-    X.fillStyle = vg; X.fillRect(0, 0, W, H);
-  }
-  // Ergebnis
-  const er = ss(s(5).start, s(5).start + 0.35, t) * (1 - ss(gewonnen + 0.3, gewonnen + 0.7, t));
-  if (er > 0) {
-    X.save(); X.translate(640, 150); X.scale(easeBack(er), easeBack(er));
-    ell(0, 0, 96, 96, "#17171D"); X.lineWidth = 8; X.strokeStyle = F.gold; X.beginPath(); X.arc(0, 0, 96, 0, TAU); X.stroke();
-    text("31", 0, 6, 96, "#fff", { gewicht: 800 });
-    rr(-200, 118, 400, 50, 25, "rgba(10,10,16,0.85)");
-    text("SCHWARZ · UNGERADE", 0, 144, 28, F.gold, { gewicht: 800, abstand: "3px" });
+function klee(x, y, g, wert, puls = 0, beschriftet = true) {
+  const r = g * 0.17 * (1 + puls * 0.15), farbe = kleeFarbe(wert);
+  if (puls > 0) glow(x, y, g * 0.7, "rgba(255,220,120,A)", 0.5 * puls);
+  linie(x, y + r * 0.6, x + r * 0.5, y + r * 2.1, 2, "#1F6B30");
+  for (let k = 0; k < 4; k++) { const a = k * Math.PI / 2 + Math.PI / 4; ell(x + Math.cos(a) * r, y - r * 0.4 + Math.sin(a) * r, r * 1.05, r * 1.05, farbe); }
+  ell(x, y - r * 0.4, r * 0.45, r * 0.45, "rgba(255,255,255,0.35)");
+  if (wert && beschriftet) {
+    X.save(); X.shadowColor = "#000"; X.shadowBlur = 3;
+    text(wert, x, y + g * 0.32, g * (wert.length > 4 ? 0.19 : 0.23), "#fff", { gewicht: 800 });
     X.restore();
   }
-  // Jackpot
-  if (jubel) {
-    gluehbirnen(t, true);
-    const j = ss(gewonnen, gewonnen + 0.4, t) * (1 - ss(gewonnen + 3.2, gewonnen + 3.8, t));
-    if (j > 0) {
-      X.save(); X.translate(640, 230); X.globalAlpha = j;
-      for (let i = 0; i < 16; i++) { X.rotate(TAU / 16); X.fillStyle = i % 2 ? "rgba(242,193,78,0.25)" : "rgba(233,87,57,0.2)"; X.beginPath(); X.moveTo(0, 0); X.lineTo(700, -60); X.lineTo(700, 60); X.fill(); }
-      X.setTransform(1, 0, 0, 1, 0, 0); X.translate(640, 230); X.rotate(Math.sin(t * 6) * 0.05); X.scale(easeBack(j), easeBack(j));
-      X.shadowColor = F.koralle; X.shadowBlur = 30;
-      text("JACKPOT!", 0, 0, 120, F.gold, { gewicht: 800, abstand: "4px" });
-      X.restore();
-    }
-    geldregen(t, gewonnen, 7, 160);
-  } else gluehbirnen(t, false);
 }
 
-function gluehbirnen(t, an) {
-  for (let i = 0; i < 32; i++) {
-    const x = 20 + i * 40;
-    const ein = an ? (Math.floor(t * 7) + i) % 2 === 0 : true;
-    const farbe = ein ? (an ? "rgba(255,226,140,1)" : "rgba(255,226,140,0.35)") : "rgba(120,90,60,0.6)";
-    if (ein && an) glow(x, 16, 22, "rgba(255,220,120,A)", 0.6);
-    ell(x, 16, 7, 7, farbe);
+// Zustand von Automat 31: welche Kleeblätter liegen, wie viele Re-Spins bleiben
+function featureZustand(t) {
+  const w = SZ.automaten.walzen;
+  const liegt = [];
+  let respins = 3;
+  w.forEach((spin, k) => {
+    if (k > 0 && t >= spin.t0) respins -= 1;
+    for (const [walze, reihe, wert] of spin.neu) if (t >= spin.stopps[walze]) { liegt.push({ walze, reihe, wert, k }); if (k > 0) respins = 3; }
+  });
+  return { liegt, respins: Math.max(respins, 0), feature: t >= Math.max(...w[0].stopps) + 0.25 };
+}
+
+function bildschirm31(x, y, w, h, t) {
+  const sz = SZ.automaten, ws = sz.walzen, s3 = S("automaten", 3);
+  const tWin = Math.max(...ws[4].stopps);
+  X.save(); X.beginPath(); X.rect(x, y, w, h); X.clip();
+  if (t < ws[0].t0 - 0.4) { menue(x, y, w, h, t, ss(s3.ende + 0.45, s3.ende + 0.6, t)); X.restore(); return; }
+  const z = featureZustand(t);
+  const bg = X.createLinearGradient(0, y, 0, y + h); bg.addColorStop(0, z.feature ? "#0C3A18" : "#5A0E12"); bg.addColorStop(1, z.feature ? "#06210E" : "#2A0608");
+  X.fillStyle = bg; X.fillRect(x, y, w, h);
+  // Kopfzeile
+  if (z.feature) {
+    text("CLOVER FEATURE", x + w / 2, y + 11, 11, F.gold, { gewicht: 800 });
+    text(`RE-SPINS ${z.respins}`, x + w / 2, y + 25, 10, "#FFFFFF", { gewicht: 800 });
+  } else {
+    text("RED HOT BURNING", x + w / 2, y + 12, 11, "#FFB23C", { gewicht: 800 });
+    text("CLOVER LINK", x + w / 2, y + 25, 8, "#9EF0A8", { gewicht: 800, abstand: "1px" });
+  }
+  // Walzen 5 × 3
+  const g = w / 5, gy = y + 34, gh = g * 1.12;
+  const held = (walze, reihe) => z.liegt.find(c => c.walze === walze && c.reihe === reihe);
+  for (let walze = 0; walze < 5; walze++) {
+    for (let reihe = 0; reihe < 3; reihe++) {
+      const cx = x + g * (walze + 0.5), cy = gy + gh * (reihe + 0.5);
+      X.fillStyle = (walze + reihe) % 2 ? "rgba(0,0,0,0.25)" : "rgba(0,0,0,0.15)"; X.fillRect(x + g * walze + 1, gy + gh * reihe + 1, g - 2, gh - 2);
+      const c = held(walze, reihe);
+      let dreht = false;
+      ws.forEach((spin, k) => { if (t >= spin.t0 && t < spin.stopps[walze] && !(k > 0 && c && c.k < k)) dreht = true; });
+      if (dreht) {
+        const off = (t * 11 + walze * 0.37) % 1;
+        for (let j = -1; j < 2; j++) {
+          const sy = cy + (off + j) * gh * 0.9;
+          X.globalAlpha = 0.55;
+          if (z.feature) { if (hash(walze * 7 + reihe + Math.floor(t * 11)) > 0.7) klee(cx, sy, g * 0.9, ""); }
+          else frucht(FRUCHT[Math.floor(hash(walze * 13 + reihe + Math.floor(t * 11 + j)) * 7)], cx, sy, g);
+          X.globalAlpha = 1;
+        }
+      } else if (c) {
+        const gewinn = c.wert === "GRAND" && t >= tWin;
+        klee(cx, cy, g, c.wert, gewinn ? 0.5 + 0.5 * Math.sin(t * 10) : 0);
+      } else if (!z.feature) {
+        frucht(BASIS[walze][reihe], cx, cy, g);
+      }
+    }
+  }
+  // Spannung auf Walze 5 beim letzten Re-Spin
+  const letzte = ws[4];
+  if (t > letzte.stopps[3] && t < letzte.stopps[4]) {
+    X.lineWidth = 3; X.strokeStyle = `rgba(255,214,90,${0.6 + 0.4 * Math.sin(t * 18)})`;
+    X.strokeRect(x + g * 4 + 1, gy + 1, g - 2, gh * 3 - 2);
+  }
+  // Fußzeile
+  text(z.feature ? "GEHALTEN: " + z.liegt.length : "EINSATZ 0,50 €", x + w / 2, y + h - 10, 9, F.creme, { gewicht: 700 });
+  // Grand Jackpot
+  if (t >= tWin) {
+    const a = ss(tWin + 0.15, tWin + 0.5, t);
+    X.globalAlpha = a; X.fillStyle = "rgba(10,10,14,0.55)"; X.fillRect(x, y + h * 0.3, w, h * 0.42); X.globalAlpha = 1;
+    const blink = Math.floor(t * 5) % 2 === 0;
+    X.save(); X.globalAlpha = a;
+    text("GRAND", x + w / 2, y + h * 0.42, 26, blink ? "#FF3B30" : F.gold, { gewicht: 800 });
+    text("€ " + euro(JACKPOT_GRAND), x + w / 2, y + h * 0.6, 16, "#FFFFFF", { gewicht: 800 });
+    X.restore();
+  }
+  X.restore();
+}
+
+function menue(x, y, w, h, t, gewaehlt = 0) {
+  X.fillStyle = "#1C7A34"; X.fillRect(x, y, w, h);
+  const kw = (w - 12) / 2, kh = (h - 14) / 2;
+  SPIELE.forEach(([name, a, b], i) => {
+    const kx = x + 4 + (i % 2) * (kw + 4), ky = y + 4 + Math.floor(i / 2) * (kh + 6);
+    const g = X.createLinearGradient(0, ky, 0, ky + kh); g.addColorStop(0, b); g.addColorStop(1, a);
+    rr(kx, ky, kw, kh, 4, g);
+    if (i === 0 && gewaehlt > 0) { X.lineWidth = 3; X.strokeStyle = `rgba(255,255,255,${gewaehlt})`; X.strokeRect(kx, ky, kw, kh); }
+    text(name, kx + kw / 2, ky + kh * 0.38, 8, "#FFFFFF", { gewicht: 800 });
+    ["1c", "2c", "5c", "10c"].forEach((c, j) => { rr(kx + 3 + j * (kw - 6) / 4, ky + kh - 15, (kw - 6) / 4 - 2, 11, 2, "#B81E25"); text(c, kx + 3 + j * (kw - 6) / 4 + (kw - 6) / 8 - 1, ky + kh - 9, 6, "#fff", { gewicht: 800 }); });
+  });
+}
+
+function grandSchrift(x, y, s) {
+  X.save(); X.translate(x, y); X.scale(s, s);
+  klee(0, -6, 80, "GRAND", 0, false);
+  X.font = "800 46px Manrope"; X.textAlign = "center"; X.textBaseline = "middle"; X.lineWidth = 6; X.strokeStyle = "#FFD23C";
+  X.strokeText("GRAND", 0, -4); X.fillStyle = "#E2262B"; X.fillText("GRAND", 0, -4);
+  text("JACKPOT", 0, 30, 18, "#FFFFFF", { gewicht: 800, abstand: "3px" });
+  X.restore();
+}
+
+function banner(t, tWin) {
+  const x0 = 575, y0 = 26, w = 690, h = 106;
+  const gewonnen = t >= tWin;
+  const blink = gewonnen && Math.floor(t * 5) % 2 === 0;
+  X.save(); X.shadowColor = blink ? "#FFE15A" : "#FF5A1F"; X.shadowBlur = 22; rr(x0 - 6, y0 - 6, w + 12, h + 12, 8, blink ? "#FFD23C" : "#FF6A2A"); X.restore();
+  const g = X.createLinearGradient(x0, 0, x0 + w, 0); g.addColorStop(0, "#1E8A3A"); g.addColorStop(0.5, "#0F5A22"); g.addColorStop(1, "#1E8A3A");
+  rr(x0, y0, w, h, 6, g);
+  X.fillStyle = "rgba(0,0,0,0.18)";
+  for (let yy = y0 + 3; yy < y0 + h; yy += 4) X.fillRect(x0, yy, w, 1.5);
+  grandSchrift(x0 + 115, y0 + 52, 1);
+  rr(x0 + 238, y0 + 22, 318, 62, 31, "#0B0E14");
+  let anzeige = "€ " + euro(JACKPOT_GRAND - Math.max(0, tWin - t) * 0.05);
+  if (gewonnen && t < tWin + 7) anzeige = blink ? "AUTOMAT 31" : "€ " + euro(JACKPOT_GRAND);
+  else if (gewonnen) anzeige = "€ " + euro(10000 + (t - tWin - 7) * 0.05);
+  text(anzeige, x0 + 397, y0 + 54, 40, "#FFFFFF", { gewicht: 800 });
+  grandSchrift(x0 + 625, y0 + 52, 0.72);
+}
+
+function automat(cx, nr, t, aktiv, tWin) {
+  const x0 = cx - 75, y0 = 160;
+  rr(cx - 26, y0 - 26, 52, 24, 6, "#111"); text(String(nr), cx, y0 - 13, 17, nr === 31 ? F.gold : F.creme, { gewicht: 800 });
+  rr(x0 - 6, y0, 162, 440, 14, "#14161E");
+  const jubel = t >= tWin && t < tWin + 8;
+  const rahmen = jubel && Math.floor(t * 6 + nr) % 2 ? "#FFE15A" : "#47F06E";
+  X.save(); X.shadowColor = rahmen; X.shadowBlur = 16; X.lineWidth = 3; X.strokeStyle = rahmen; X.beginPath(); X.roundRect(x0, y0 + 6, 150, 348, 10); X.stroke(); X.restore();
+  // oberer Bildschirm: Schriftzug und Jackpots
+  const og = X.createLinearGradient(0, y0 + 10, 0, y0 + 168); og.addColorStop(0, "#2DBA4E"); og.addColorStop(1, "#13792E");
+  rr(x0 + 6, y0 + 12, 138, 156, 6, og);
+  X.save(); X.lineWidth = 4; X.strokeStyle = "#5A3A08"; X.font = "800 27px Manrope"; X.textAlign = "center"; X.textBaseline = "middle";
+  X.strokeText("CLOVER", cx, y0 + 36); X.fillStyle = "#F7D46A"; X.fillText("CLOVER", cx, y0 + 36); X.restore();
+  text("Link", cx - 8, y0 + 62, 22, "#E9FFE9", { stil: "italic", familie: "Fraunces", gewicht: 500 });
+  klee(cx + 30, y0 + 60, 26, "");
+  const reihen = [["GRAND", "€ " + euro(t < tWin ? JACKPOT_GRAND - (tWin - t) * 0.05 : jubel ? JACKPOT_GRAND : 10000)], ["MAJOR", "€ 731,10"]];
+  reihen.forEach(([wert, betrag], i) => {
+    const ry = y0 + 88 + i * 24;
+    rr(x0 + 12, ry - 10, 126, 20, 10, "#0B0E14");
+    klee(x0 + 22, ry, 22, wert, 0, false);
+    text(wert, x0 + 42, ry, 8, "#fff", { gewicht: 800 });
+    text(betrag, x0 + 96, ry, 11, "#FFFFFF", { gewicht: 800 });
+  });
+  [["MINOR", 0], ["MINI", 1]].forEach(([wert, i]) => {
+    const bx = x0 + 12 + i * 64;
+    rr(bx, y0 + 134, 62, 22, 8, kleeFarbe(wert));
+    text(wert, bx + 31, y0 + 141, 8, "#fff", { gewicht: 800 }); text("BONUS", bx + 31, y0 + 151, 7, "#fff", { gewicht: 700 });
+  });
+  // unterer Bildschirm
+  rr(x0 + 6, y0 + 178, 138, 170, 6, "#0F3A1C");
+  if (aktiv) bildschirm31(x0 + 10, y0 + 182, 130, 162, t);
+  else { X.save(); X.beginPath(); X.rect(x0 + 10, y0 + 182, 130, 162); X.clip(); menue(x0 + 10, y0 + 182, 130, 162, t); X.restore(); }
+  // Tastenfeld und Sockel
+  rr(x0 - 2, y0 + 360, 154, 40, 6, "#23262F");
+  for (let i = 0; i < 6; i++) { const an = (Math.floor(t * 2) + i + nr) % 7 !== 0; rr(x0 + 8 + i * 18, y0 + 372, 13, 9, 3, an ? "#4FA3FF" : "#24507F"); }
+  rr(x0 + 118, y0 + 368, 26, 16, 4, aktiv && Math.floor(t * 3) % 2 ? "#BFF2FF" : "#3D8BFF");
+  rr(x0, y0 + 404, 150, 36, 6, "#0E1016");
+  for (let i = 0; i < 5; i++) linie(x0 + 20, y0 + 414 + i * 5, x0 + 60, y0 + 414 + i * 5, 1.5, "#2A2E38");
+}
+
+function laptop(f, zeigt) {
+  rr(-46, -248, 92, 60, 5, f("#2B2F3A")); rr(-41, -243, 82, 50, 3, f("#E9F2EA"));
+  for (let i = 0; i < 5; i++) linie(-41, -235 + i * 9, 41, -235 + i * 9, 1, f("#9CC7A4"));
+  for (let i = 0; i < 4; i++) linie(-41 + i * 20, -243, -41 + i * 20, -193, 1, f("#9CC7A4"));
+  if (zeigt === "fehler") { X.fillStyle = "rgba(192,33,45,0.9)"; X.fillRect(-41, -243, 82, 50); text("#WERT!", 0, -218, 17, "#fff", { gewicht: 800 }); }
+  if (zeigt === "gewonnen") { X.fillStyle = "rgba(31,122,76,0.92)"; X.fillRect(-41, -243, 82, 50); text("31 ✓", 0, -218, 20, "#fff", { gewicht: 800 }); }
+  rr(-52, -190, 104, 8, 3, f("#9AA3B8"));
+}
+
+function szAutomaten(t, lt, d) {
+  const s = i => S("automaten", i);
+  const ws = SZ.automaten.walzen;
+  const tWin = Math.max(...ws[4].stopps);
+  const zoom = ss(s(3).ende + 0.1, s(3).ende + 1.2, t) * (1 - ss(tWin + 1.0, tWin + 2.2, t));
+  const pan = easeOut(clamp(lt / 2.6));
+  kamera(lerp(1, 2.5, zoom), lerp(lerp(250, 680, pan), 985, zoom), lerp(360, 410, zoom));
+
+  // Saal
+  const hg = X.createLinearGradient(0, 0, 0, 560); hg.addColorStop(0, "#07091A"); hg.addColorStop(1, "#141A36");
+  X.fillStyle = hg; X.fillRect(-400, -100, W + 700, 660);
+  for (let i = 0; i < 14; i++) { const x = -360 + i * 130; glow(x, 8, 60, "rgba(255,230,180,A)", 0.22); ell(x, 4, 10, 4, "#FFF3D6"); }
+  for (let r = 0; r < 2; r++) for (let i = 0; i < 9; i++) {
+    const x = -330 + i * 92 + r * 46, y = 300 + r * 46, hh = 170 - r * 24;
+    rr(x, y, 72, hh, 8, "#10121A");
+    X.globalAlpha = 0.5 + 0.3 * Math.sin(t * 3 + i * 1.3 + r);
+    rr(x + 8, y + 10, 56, 62, 4, ["#3CFF6B", "#FF4FA3", "#4FA3FF", "#FFD24F"][(i + r) % 4]);
+    X.globalAlpha = 1;
+    rr(x + 8, y + 78, 56, 44, 4, "#1A1E2A");
+  }
+  X.fillStyle = "#2A0F1E"; X.fillRect(-400, 560, W + 700, 300);
+  for (let i = 0; i < 80; i++) ell(-380 + (i % 20) * 90 + (Math.floor(i / 20) % 2) * 45, 590 + Math.floor(i / 20) * 40, 14, 6, i % 3 ? "rgba(242,193,78,0.16)" : "rgba(79,163,255,0.16)");
+
+  // Clover-Link-Insel
+  banner(t, tWin);
+  [29, 30, 31, 32].forEach((nr, i) => automat(660 + i * 170, nr, t, nr === 31, tWin));
+
+  // Yannick mit Laptop
+  const kommY = easeOut(clamp(lt / 2.6));
+  const jubel = t >= tWin + 0.1;
+  const keysY = [[0, { L: [-44, -176, "offen"], R: [44, -176, "offen"] }], [tWin + 0.1, "jubel"], [s(8).start - 0.2, "finger"]];
+  figur({ stil: "yannick", x: lerp(-220, 780, kommY), y: 700, s: 0.95, t, m: mund("yannick", t), blick: spricht("aurel", t) ? 1 : 0.8, keys: keysY,
+    gehen: lt < 2.6 ? t * 9 + 1.4 : null, brauen: (t > s(3).start && t < s(3).ende) || (t > s(5).start && t < s(5).ende) ? 1 : 0,
+    neigen: Math.sin(t * 6) * 0.03 * mund("yannick", t),
+    extra: !jubel && t < s(8).start - 0.2 ? (f) => laptop(f, t > s(3).start && t < s(3).ende + 0.4 ? "fehler" : "") : null });
+
+  // Aurel: erst neben Yannick, dann auf dem Hocker vor Automat 31
+  const hin = ss(s(2).ende - 0.2, s(2).ende + 0.5, t);
+  const sitzt = hin > 0.5;
+  const ruhe = { L: [-60, -150, "offen"], R: [150, -150, "offen"] };
+  const keysA = sitzt ? [[0, ruhe], [s(3).ende + 0.3, { L: [-60, -150, "offen"], R: [95, -266, "zeigen"] }], [s(3).ende + 0.75, ruhe],
+    [ws[0].t0 - 0.3, { L: [-60, -150, "offen"], R: [186, -143, "zeigen"] }], [ws[0].t0 + 0.25, ruhe], [tWin + 0.1, "jubel"], [s(6).ende + 0.6, "daumenR"]]
+    : [[0, "locker"], [s(0).start, "zeigenR"], [s(0).ende + 0.3, "locker"]];
+  rr(866, 600, 28, 10, 4, "#C9CED9"); linie(880, 606, 880, 684, 6, "#9AA3B8"); ell(880, 688, 30, 7, "#9AA3B8");
+  ell(880, 596, 34, 10, "#8E1B2A");
+  figur({ stil: "aurel", x: sitzt ? 880 : lerp(lerp(-100, 620, kommY), 880, hin), y: sitzt ? 622 : 690 - hin * 40, s: 0.95, t, sitzen: sitzt,
+    m: mund("aurel", t) + (jubel && t < s(6).start ? 0.5 : 0), blick: sitzt ? 1 : (spricht("yannick", t) ? 1 : 0.5), keys: keysA,
+    gehen: lt < 2.6 || (hin > 0 && hin < 1 && !sitzt) ? t * 9 : null, neigen: jubel ? Math.sin(t * 9) * 0.06 : 0 });
+
+  // Saalaufsicht mit Funkgerät
+  const kommS = ss(s(7).start - 2.2, s(7).start - 0.2, t);
+  if (kommS > 0) figur({ stil: "aufsicht", x: lerp(-120, 520, kommS), y: 700, s: 0.95, t, m: mund("aufsicht", t), blick: 1,
+    keys: [[0, { L: [-66, -122, "offen"], R: [52, -250, "funk"] }]], gehen: kommS < 1 ? t * 8 : null });
+
+  // Jubel: Strahlen, Schriftzug, Geldregen
+  X.setTransform(1, 0, 0, 1, 0, 0);
+  if (zoom > 0 && t < tWin) {
+    const vg = X.createRadialGradient(W / 2 + 100, H / 2, 200, W / 2, H / 2, 760);
+    vg.addColorStop(0, "rgba(0,0,0,0)"); vg.addColorStop(1, `rgba(0,0,0,${0.55 * zoom})`);
+    X.fillStyle = vg; X.fillRect(0, 0, W, H);
+  }
+  if (jubel) {
+    const j = ss(tWin + 1.2, tWin + 1.6, t) * (1 - ss(tWin + 4.4, tWin + 5.0, t));
+    if (j > 0) {
+      X.save(); X.translate(640, 230); X.globalAlpha = j;
+      for (let i = 0; i < 16; i++) { X.rotate(TAU / 16); X.fillStyle = i % 2 ? "rgba(242,193,78,0.25)" : "rgba(60,200,90,0.22)"; X.beginPath(); X.moveTo(0, 0); X.lineTo(700, -60); X.lineTo(700, 60); X.fill(); }
+      X.setTransform(1, 0, 0, 1, 0, 0); X.translate(640, 230); X.rotate(Math.sin(t * 6) * 0.05); X.scale(easeBack(j), easeBack(j));
+      X.shadowColor = "#E2262B"; X.shadowBlur = 30;
+      text("GRAND JACKPOT!", 0, 0, 96, F.gold, { gewicht: 800, abstand: "3px" });
+      X.restore();
+    }
+    geldregen(t, tWin + 0.3, 7, 170);
   }
 }
 
@@ -1091,15 +1248,49 @@ function rauch(x, y, a, r) {
   }
 }
 
+// AEON Edition 4 Lounge (klare Glasbowl, Rauchsäule aus Edelstahl, ein Schlauchanschluss) mit Xkah Pro statt Kohle
+function aeonXkah(x, yb, t, anzeige, led, zug) {
+  X.beginPath(); X.moveTo(x - 44, yb); X.bezierCurveTo(x - 68, yb - 6, x - 70, yb - 66, x - 28, yb - 98); X.lineTo(x - 20, yb - 106);
+  X.lineTo(x + 20, yb - 106); X.lineTo(x + 28, yb - 98); X.bezierCurveTo(x + 70, yb - 66, x + 68, yb - 6, x + 44, yb); X.closePath();
+  X.fillStyle = "rgba(200,230,255,0.16)"; X.fill(); X.lineWidth = 2.5; X.strokeStyle = "rgba(230,245,255,0.85)"; X.stroke();
+  X.save(); X.clip(); X.fillStyle = "rgba(110,175,230,0.4)"; X.fillRect(x - 80, yb - 48, 160, 60);
+  if (zug !== null) for (let i = 0; i < 12; i++) { const by = yb - 4 - ((zug * 130 + i * 11) % 46); ell(x - 14 + hash(i) * 28, by, 2.5 + hash(i + 4) * 3, 2.5 + hash(i + 4) * 3, "rgba(255,255,255,0.85)"); }
+  X.restore();
+  linie(x - 50, yb - 26, x - 38, yb - 74, 3, "rgba(255,255,255,0.5)");
+  const sg = X.createLinearGradient(x - 10, 0, x + 10, 0); sg.addColorStop(0, "#8D95A5"); sg.addColorStop(0.5, "#EEF1F6"); sg.addColorStop(1, "#8D95A5");
+  rr(x - 24, yb - 118, 48, 14, 6, sg);
+  rr(x - 8, yb - 250, 16, 136, 4, sg);
+  ell(x, yb - 196, 11, 4, "#B8BFCC");
+  rr(x - 34, yb - 176, 28, 8, 3, sg); ell(x - 36, yb - 172, 6, 6, "#C9CED9");
+  rr(x - 11, yb - 262, 22, 14, 3, sg);
+  // Xkah Pro
+  rr(x - 30, yb - 334, 60, 74, 12, "#15171C");
+  rr(x - 30, yb - 334, 60, 10, 6, "#24272E");
+  rr(x - 21, yb - 312, 42, 22, 4, "#05060A");
+  if (anzeige) { X.save(); X.shadowColor = "#FF6A3D"; X.shadowBlur = 6; text(anzeige, x, yb - 300, 13, "#FF7A45", { gewicht: 800 }); X.restore(); }
+  linie(x - 26, yb - 264, x + 26, yb - 264, 3, `rgba(140,210,255,${led})`);
+  if (led > 0.3) glow(x, yb - 264, 40, "rgba(140,210,255,A)", 0.35 * led);
+}
+
+function seiteHand(t, keys) {
+  keys = keys.slice().sort((a, b) => a[0] - b[0]);
+  let i = 0;
+  while (i + 1 < keys.length && keys[i + 1][0] <= t) i++;
+  if (i === 0) return keys[0][1];
+  const alt = keys[i - 1][1], neu = keys[i][1], u = ss(keys[i][0], keys[i][0] + 0.28, t);
+  return [lerp(alt[0], neu[0], u), lerp(alt[1], neu[1], u), u < 0.5 ? alt[2] : neu[2]];
+}
+
 function szShisha(t, lt, d) {
   const s = i => S("shisha", i);
-  kamera(1.03 + 0.04 * ss(0, d, lt), 600, 400);
+  const SX = 600, TISCH = 586;
+  const nah = ss(SZ.shisha.start + 0.6, SZ.shisha.start + 1.5, t) * (1 - ss(s(0).ende + 0.2, s(0).ende + 1.1, t));
+  const cam = () => kamera(lerp(1.03 + 0.04 * ss(0, d, lt), 2.3, nah), lerp(600, SX - 60, nah), lerp(400, 430, nah));
+  cam();
   wohnzimmer(t);
-  // Flipchart: alles abgehakt
   X.save(); X.translate(808, 168); X.scale(0.74, 0.74); X.translate(-808, -168);
   flipchart(808, 168, 340, 330, { p1: 1, p2: 1, p3: 1, kreis: 1, seite2: 0, frage: 0, wir: 0, haken: ss(0.6, 2.2, lt) });
   X.restore();
-  // Geldhaufen
   for (let i = 0; i < 70; i++) {
     const u = hash(i + 70) * 2 - 1;
     const x = 1100 + u * 150, top = 650 - 120 * (1 - u * u);
@@ -1108,82 +1299,93 @@ function szShisha(t, lt, d) {
   }
   for (let i = 0; i < 5; i++) { const a = Math.abs(Math.sin(t * 2.5 + i * 1.7)); X.save(); X.globalAlpha = a; text("✦", 1010 + hash(i) * 180, 560 + hash(i + 3) * 70, 18, "#fff"); X.restore(); }
 
-  // Wer zieht wann an der Shisha
+  // Züge: abwechselnd, nie während jemand spricht; der eine Schlauch wandert mit
   const stoesse = CUE("shisha", "blubbern").stoesse;
   const zuege = [];
   stoesse.forEach((ts, i) => {
-    let wer = i % 2 ? "yannick" : "aurel";
-    if (spricht(wer, ts, 0.5, 1.9)) wer = wer === "aurel" ? "yannick" : "aurel";
-    if (!spricht(wer, ts, 0.5, 1.9)) zuege.push({ ts, wer });
+    let wer = i % 2 ? "aurel" : "yannick";
+    if (spricht(wer, ts, 0.6, 1.9)) wer = wer === "aurel" ? "yannick" : "aurel";
+    if (!spricht(wer, ts, 0.6, 1.9)) zuege.push({ ts, wer });
   });
-  const baseA = [[0, "sofaA"], [s(0).start, "prostA"], [s(0).ende + 0.4, "sofaA"], [s(4).start, "daumenA"], [s(4).ende + 0.8, "sofaA"]];
-  const baseY = [[0, "sofaY"], [s(1).start - 0.1, "prostY"], [s(1).ende + 0.5, "sofaY"]];
+  const HALTEN = { yannick: [42, -204, "schlauch"], aurel: [42, -204, "schlauch"] };
+  const ZIEHEN = [14, -268, "schlauch"], FREI = [42, -150, "offen"];
+  const GEBEN = { yannick: [-64, -200, "schlauch"], aurel: [112, -200, "schlauch"] };
+  const NEHMEN = { yannick: [-64, -200, "offen"], aurel: [112, -200, "offen"] };
+  const keysR = { yannick: [[0, HALTEN.yannick]], aurel: [[0, FREI]] };
+  let halter = "yannick";
   for (const z of zuege) {
-    const k = z.wer === "aurel" ? baseA : baseY;
-    k.push([z.ts - 0.35, z.wer === "aurel" ? "ziehenA" : "ziehenY"], [z.ts + 0.8, z.wer === "aurel" ? "sofaA" : "sofaY"]);
+    if (z.wer !== halter) {
+      const ander = z.wer;
+      keysR[halter].push([z.ts - 1.3, GEBEN[halter]], [z.ts - 0.75, FREI]);
+      keysR[ander].push([z.ts - 1.2, NEHMEN[ander]], [z.ts - 0.8, [...NEHMEN[ander].slice(0, 2), "schlauch"]]);
+      halter = ander;
+    }
+    keysR[z.wer].push([z.ts - 0.5, HALTEN[z.wer]], [z.ts - 0.3, ZIEHEN], [z.ts + 0.8, HALTEN[z.wer]]);
   }
-  const ausatmen = (wer) => zuege.some(z => z.wer === wer && t > z.ts + 0.95 && t < z.ts + 1.8) ? 0.32 : 0;
-  const lachen = t > s(4).ende + 0.2 ? 0.45 * Math.abs(Math.sin(t * 9)) : 0;
-  const hops = t > s(4).ende + 0.2 ? Math.abs(Math.sin(t * 9)) * 4 : 0;
+  if (t < s(0).ende) keysR.yannick.push([s(0).start + 0.2, [118, -226, "zeigen"]], [s(0).ende - 0.2, HALTEN.yannick]);
+  const GLAS = [-42, -196, "glas"], PROST = [-92, -312, "glas"];
+  const keysL = { yannick: [[0, GLAS], [s(2).start - 0.1, PROST], [s(2).ende + 0.5, GLAS]], aurel: [[0, GLAS], [s(1).start, PROST], [s(1).ende + 0.4, GLAS]] };
+  const hand = wer => ({ L: seiteHand(t, keysL[wer]), R: seiteHand(t, keysR[wer]) });
 
+  const ausatmen = wer => zuege.some(z => z.wer === wer && t > z.ts + 0.95 && t < z.ts + 1.8) ? 0.32 : 0;
+  const lachen = t > s(5).ende + 0.2 ? 0.45 * Math.abs(Math.sin(t * 9)) : 0;
+  const hops = t > s(5).ende + 0.2 ? Math.abs(Math.sin(t * 9)) * 4 : 0;
   sofaHinten();
-  const pY = { stil: "yannick", x: 176, y: 620 - hops, s: 0.86, t, sitzen: true, m: Math.max(mund("yannick", t), ausatmen("yannick"), lachen), blick: spricht("aurel", t) ? 1 : 0.3, keys: baseY };
-  const pA = { stil: "aurel", x: 372, y: 620 - hops, s: 0.86, t, sitzen: true, m: Math.max(mund("aurel", t), ausatmen("aurel"), lachen), blick: spricht("yannick", t) ? -1 : -0.3, keys: baseA };
+  const pY = { stil: "yannick", x: 372, y: 620 - hops, s: 0.86, t, sitzen: true, m: Math.max(mund("yannick", t), ausatmen("yannick"), lachen), blick: spricht("aurel", t) ? -1 : 0.5, keys: [[0, hand("yannick")]] };
+  const pA = { stil: "aurel", x: 176, y: 620 - hops, s: 0.86, t, sitzen: true, m: Math.max(mund("aurel", t), ausatmen("aurel"), lachen), blick: spricht("yannick", t) ? 1 : 0.3, keys: [[0, hand("aurel")]] };
   figur({ ...pY, ohneBeine: true }); figur({ ...pA, ohneBeine: true });
   sofaVorne();
   figur({ ...pY, nurBeine: true }); figur({ ...pA, nurBeine: true });
 
-  // Couchtisch und Shisha
-  rr(520, 586, 300, 20, 6, "#6A4A33"); rr(540, 606, 14, 46, 3, "#4C3424"); rr(786, 606, 14, 46, 3, "#4C3424");
+  // Couchtisch, Schlauch, Shisha
+  rr(470, TISCH, 270, 20, 6, "#6A4A33"); rr(488, TISCH + 20, 14, 46, 3, "#4C3424"); rr(708, TISCH + 20, 14, 46, 3, "#4C3424");
+  const handScreen = (p, h) => [p.x + h[0] * p.s, p.y + (h[1] + 55) * p.s - 34 * p.s];
+  const hY = hand("yannick").R, hA = hand("aurel").R;
+  let ende;
+  if (hY[2] === "schlauch") ende = handScreen(pY, hY);
+  else if (hA[2] === "schlauch") ende = handScreen(pA, hA);
+  else { const a = handScreen(pY, hY), b = handScreen(pA, hA); ende = [(a[0] + b[0]) / 2, (a[1] + b[1]) / 2]; }
+  X.beginPath(); X.moveTo(SX - 26, TISCH - 124); X.bezierCurveTo(SX - 60, TISCH + 70, ende[0] + 70, TISCH + 90, ende[0], ende[1] + 30);
+  X.lineWidth = 7; X.strokeStyle = "#2A2F3D"; X.lineCap = "round"; X.stroke();
+  if (hY[2] !== "schlauch" && hA[2] !== "schlauch") { rr(ende[0] - 5, ende[1] - 4, 10, 30, 4, "#C9CED9"); }
   const zug = zuege.find(z => t > z.ts - 0.1 && t < z.ts + 0.9);
-  const handPos = (p) => { const h = pose(t, p.keys).R; return [p.x + h[0] * p.s, p.y + (h[1] + 55) * p.s - 34 * p.s]; };
-  for (const [px, p] of [[664, pA], [616, pY]]) {
-    const [hx, hy] = handPos(p);
-    X.beginPath(); X.moveTo(px, 418); X.bezierCurveTo(px + (px > 640 ? 10 : -10), 660, hx + 60, 680, hx, hy + 30);
-    X.lineWidth = 7; X.strokeStyle = "#2A2F3D"; X.stroke();
+  const xkah = CUE("shisha", "xkah").t0;
+  const s0 = s(0);
+  let anzeige = "", led = 0;
+  if (t >= xkah) {
+    const heiz = clamp((t - xkah - 0.4) / 2.6);
+    anzeige = t < xkah + 0.4 ? "ON" : `${Math.round(lerp(20, 280, heiz))}°`;
+    led = 0.5 + 0.5 * Math.sin(t * 6) * (heiz < 1 ? 1 : 0) + (heiz >= 1 ? 0.5 : 0);
+    const timer = s0.start + (s0.ende - s0.start) * 0.72;
+    if (t >= timer) { const rest = Math.max(0, 31 * 60 - (t - timer)); anzeige = `${Math.floor(rest / 60)}:${String(Math.floor(rest % 60)).padStart(2, "0")}`; }
   }
-  // Bowl aus Glas mit Wasser
-  X.beginPath(); X.moveTo(616, 586); X.bezierCurveTo(548, 572, 560, 470, 626, 456); X.lineTo(654, 456); X.bezierCurveTo(720, 470, 732, 572, 664, 586); X.closePath();
-  X.fillStyle = "rgba(110,170,215,0.5)"; X.fill(); X.lineWidth = 3; X.strokeStyle = "rgba(220,240,255,0.75)"; X.stroke();
-  X.save(); X.clip(); X.fillStyle = "rgba(50,110,170,0.55)"; X.fillRect(540, 512, 200, 80);
-  if (zug) for (let i = 0; i < 12; i++) { const by = 582 - ((t - zug.ts) * 130 + i * 11) % 74; ell(624 + hash(i) * 32, by, 3 + hash(i + 4) * 3, 3 + hash(i + 4) * 3, "rgba(255,255,255,0.85)"); }
+  X.save(); X.translate(SX, TISCH); X.scale(0.72, 0.72); X.translate(-SX, -TISCH);
+  aeonXkah(SX, TISCH, t, anzeige, Math.min(1, led), zug ? t - zug.ts : null);
   X.restore();
-  // Rauchsäule aus Metall mit Ringen, Kohleteller, Tonkopf mit Kohle
-  rr(633, 316, 14, 146, 5, "#C9CED9");
-  for (const ry of [440, 404, 372]) ell(640, ry, 13, 5, F.gold);
-  for (const sx of [-1, 1]) { linie(640, 424, 640 + sx * 22, 418, 6, "#C9CED9"); ell(640 + sx * 24, 418, 5, 5, F.gold); }
-  ell(640, 346, 58, 10, "#AEB6C8"); ell(640, 343, 52, 7, "#C9CED9");
-  X.beginPath(); X.moveTo(616, 300); X.lineTo(664, 300); X.lineTo(654, 334); X.lineTo(626, 334); X.closePath(); X.fillStyle = F.koralle; X.fill();
-  ell(640, 300, 25, 6, "#D8DCE6");
-  kuerbis(560, 560, 22, t);
+  kuerbis(510, 566, 20, t);
 
-  // Licht dimmen, dann Glut und Leuchten
+  // Licht dimmen, dann Leuchten
   X.setTransform(1, 0, 0, 1, 0, 0);
-  X.fillStyle = "rgba(10,12,34,0.36)"; X.fillRect(0, 0, W, H);
-  kamera(1.03 + 0.04 * ss(0, d, lt), 600, 400);
+  X.fillStyle = `rgba(10,12,34,${0.36 * (1 - nah * 0.6)})`; X.fillRect(0, 0, W, H);
+  cam();
   X.save(); X.globalCompositeOperation = "lighter";
   glow(1180, 320, 320, "rgba(255,200,130,A)", 0.22);
-  glow(560, 560, 140, "rgba(255,160,60,A)", 0.25);
-  const glut = zug ? 0.9 : 0.45 + 0.1 * Math.sin(t * 5);
-  glow(640, 294, 80, "rgba(255,120,40,A)", glut);
+  glow(510, 566, 120, "rgba(255,160,60,A)", 0.22);
+  if (anzeige) glow(SX, TISCH - 216, 40, "rgba(255,110,60,A)", 0.35);
   X.restore();
-  kuerbis(560, 560, 22, t);
-  for (const kx of [-9, 9]) rr(640 + kx - 8, 288, 16, 9, 2, `rgba(${150 + 105 * glut | 0},${50 + 60 * glut | 0},30,1)`);
-  for (let i = 0; i < 3; i++) { const a = (t * 0.4 + i / 3) % 1; rauch(640 + Math.sin(t + i * 2) * 10 * a, 280 - a * 120, 0.35 * (1 - a), 10 + a * 30); }
+  kuerbis(510, 566, 20, t);
 
   // Rauch nach jedem Zug
   for (const z of zuege) {
     const a = t - (z.ts + 1.0);
     if (a < 0 || a > 5) continue;
     const p = z.wer === "aurel" ? pA : pY;
-    const mx = p.x, my = p.y - (272 - 55) * p.s;
-    rauch(mx + a * 40 + 30, my - a * 46, (1 - a / 5) * clamp(a * 3), 26 + a * 26);
+    rauch(p.x + a * 40 + 30, p.y - (272 - 55) * p.s - a * 46, (1 - a / 5) * clamp(a * 3), 26 + a * 26);
   }
-  // Rauchwolken mit Botschaft: €, 27, 31
   const wolken = [
-    { txt: "€", t0: SZ.shisha.start + 0.8, x: 300, y: 250 },
-    { txt: "27", t0: s(2).ende + 0.15, x: 330, y: 250 },
-    { txt: "31", t0: s(4).ende + 0.25, x: 560, y: 230 },
+    { txt: "€", t0: (zuege[0] ? zuege[0].ts : s(1).start) + 1.2, x: 300, y: 250 },
+    { txt: "27", t0: s(3).ende + 0.15, x: 330, y: 250 },
+    { txt: "31", t0: s(5).ende + 0.25, x: 560, y: 210 },
   ];
   for (const w of wolken) {
     const a = t - w.t0;
@@ -1218,9 +1420,10 @@ function szAbspann(t, lt, d) {
     ["OPERATION JACKPOT", 40, F.koralle], ["Ein Animationsfilm über den 31.10.2026", 24, F.creme], ["", 20],
     ["Yannick", 30, F.korallHell], ["der Stratege", 22, F.dunst], ["", 10],
     ["Aurel", 30, "#9CC3FF"], ["der Bauchmensch", 22, F.dunst], ["", 20],
-    ["Stimmen: Piper TTS mit Thorsten, Karlsson, Kerstin und Pavoque", 20, F.creme],
+    ["Stimmen: Piper TTS mit Thorsten, Karlsson und Kerstin", 20, F.creme],
     ["Musik und Geräusche: aus Sinuswellen und Rauschen gebaut", 20, F.creme],
-    ["Drehbuch, Animation, Ton: Claude", 20, F.creme], ["", 26],
+    ["Drehbuch, Animation, Ton: Claude", 20, F.creme],
+    ["Clover Link, AEON und Xkah sind Marken ihrer Hersteller", 16, F.dunst], ["", 22],
     ["Spiel mit Verantwortung. Glücksspiel kann süchtig machen.", 20, F.gold],
     ["Diese Geschichte ist frei erfunden – der Geldhaufen leider auch.", 20, F.gold],
   ];
@@ -1232,7 +1435,7 @@ function szAbspann(t, lt, d) {
   balken(56);
 }
 
-const SZENEN = { intro: szIntro, lage: szLage, fahrt: szFahrt, eingang: szEingang, roulette: szRoulette, heim: szHeim, shisha: szShisha, abspann: szAbspann };
+const SZENEN = { intro: szIntro, lage: szLage, fahrt: szFahrt, eingang: szEingang, automaten: szAutomaten, heim: szHeim, shisha: szShisha, abspann: szAbspann };
 
 // ------------------------------------------------------------------ Untertitel und Bildaufbau
 

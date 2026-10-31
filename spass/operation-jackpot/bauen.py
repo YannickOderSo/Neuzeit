@@ -305,15 +305,14 @@ def g_schritte(_=None):
     return norm(s, 0.45)
 
 
-def g_tuer(_=None):
-    t = zeit(1.6)
-    f = 260 + 110 * np.sin(2 * np.pi * 2.3 * t) + 40 * box(rauschen(len(t)), 0.03)
-    phase = 2 * np.pi * np.cumsum(f) / SR
-    knarzen = sum(np.sin(k * phase) / k for k in range(1, 6)) * np.sin(np.pi * np.clip(t / 1.1, 0, 1)) ** 2
-    knarzen = bandpass(knarzen * (1 + 0.6 * np.sign(np.sin(2 * np.pi * 37 * t))), 300, 3500)
-    tt = np.clip(t - 1.15, 0, None)
-    rums = tiefpass(rauschen(len(t)), 160) * np.exp(-tt / 0.06) * (t >= 1.15)
-    return norm(knarzen * 0.35 + rums, 0.5)
+def g_drehtuer(_=None):
+    """Drehtür: weiches Rauschen der Glasflügel und ein dumpfer Anschlag pro Flügel."""
+    t = zeit(1.8)
+    s = bandpass(rauschen(len(t)), 300, 2400) * np.sin(np.pi * t / t[-1]) ** 2 * 0.25
+    for z in (0.35, 0.95, 1.5):
+        tt = np.clip(t - z, 0, None)
+        s += tiefpass(rauschen(len(t)), 220) * np.exp(-tt / 0.05) * (t >= z) * 0.8
+    return norm(s, 0.45)
 
 
 def ping(f, dauer, tau):
@@ -330,40 +329,76 @@ def g_casino(dauer):
     while z < dauer:
         legen(s, ping(rng.uniform(2400, 5200), 0.3, 0.06), z, rng.uniform(0.05, 0.14), rng.uniform(-0.8, 0.8))
         z += rng.exponential(0.7)
-    for z in np.arange(2.0, dauer, 4.7):  # Spielautomaten in der Ferne
+    for z in np.arange(1.2, dauer, 2.9):  # Spielautomaten in der Ferne
         for i, m in enumerate((84, 88, 91, 96)):
             legen(s, ping(mtof(m), 0.25, 0.08) * 0.3, z + i * 0.08, 0.12, -0.6)
     return s * rampe(len(s), 0.5, 0.5)[:, None]
 
 
-def g_chips(_=None):
-    s = np.zeros((sek(0.9), 2))
-    for i in range(9):
-        z = i * 0.07 + rng.uniform(0, 0.03)
-        klick = bandpass(rauschen(sek(0.03)), 1500, 7000) * abkling(sek(0.03), 0.006)
-        klick = np.pad(klick, (0, sek(0.05)))[:sek(0.08)] + ping(rng.uniform(3000, 4600), 0.08, 0.02) * 0.4
-        legen(s, klick, z, rng.uniform(0.3, 0.6), rng.uniform(-0.3, 0.3))
-    return s * (0.8 / np.max(np.abs(s)))
+def g_touch(_=None):
+    t = zeit(0.12)
+    return norm(np.sin(2 * np.pi * 1320 * t) * np.exp(-t / 0.025) + 0.5 * np.sin(2 * np.pi * 1980 * t) * np.exp(-t / 0.015), 0.4)
 
 
-def g_kugel(dauer):
-    """Die Kugel rollt, wird langsamer und springt am Ende in ihr Fach."""
+def walze_lauf(dauer):
+    """Eine drehende Walze: schnelles Ticken mit leisem Surren."""
     t = zeit(dauer)
-    roll_ende = dauer - 1.3
-    s = bandpass(rauschen(len(t)), 400, 2500) * np.clip(1 - t / roll_ende, 0, 1) ** 0.7 * 0.12
-    z = 0.0
-    while z < roll_ende:
-        rate = 13 * (1 - z / roll_ende) + 3
-        klick = bandpass(rauschen(sek(0.02)), 1200, 6000) * abkling(sek(0.02), 0.004)
+    s = bandpass(rauschen(len(t)), 600, 3000) * 0.08
+    for z in np.arange(0.0, dauer - 0.02, 1 / 24):
         a = sek(z)
-        s[a:a + len(klick)] += klick * 0.35 * (1 - 0.5 * z / roll_ende)
-        z += 1 / rate
-    for i, dz in enumerate((0, 0.28, 0.5, 0.66, 0.78, 0.86, 0.9)):
-        klack = bandpass(rauschen(sek(0.06)), 700, 3200) * abkling(sek(0.06), 0.012)
-        klack += np.sin(2 * np.pi * 1250 * zeit(0.06)) * abkling(sek(0.06), 0.015) * 0.5
-        a = sek(roll_ende + dz)
-        s[a:a + len(klack)] += klack[:len(s) - a] * (0.9 - i * 0.11)
-    return norm(s * rampe(len(s), 0.3, 0.05), 0.6)
+        n = min(sek(0.012), len(s) - a)
+        s[a:a + n] += bandpass(rauschen(sek(0.012)), 1500, 6000)[:n] * abkling(sek(0.012), 0.003)[:n] * 0.5
+    return s * rampe(len(s), 0.02, 0.02)
+
+
+def walze_stopp(_=None):
+    t = zeit(0.18)
+    return norm(tiefpass(rauschen(len(t)), 500) * np.exp(-t / 0.03) + 0.6 * np.sin(2 * np.pi * 110 * t) * np.exp(-t / 0.05), 0.6)
+
+
+def klee_glocke(n):
+    """Glockenton für ein neues Kleeblatt; mit jedem weiteren Kleeblatt einen Ton höher."""
+    leiter = [72, 74, 76, 79, 81, 84, 86, 88, 91, 93, 96]
+    return norm(ping(mtof(leiter[min(n, len(leiter) - 1)]) / 2, 0.9, 0.35), 0.6)
+
+
+def grand_glocke(_=None):
+    t = zeit(2.0)
+    s = sum(np.sin(2 * np.pi * f * t) * np.exp(-t / d) for f, d in ((261.6, 1.2), (523.3, 0.9), (659.3, 0.7), (784.0, 0.6), (1568, 0.3)))
+    return mit_hall(norm(s * rampe(len(t), 0.003, 0.1), 0.7), 1.4, 0.25)
+
+
+def g_feature(_=None):
+    """Kurzer Jingle, wenn das Clover Feature startet."""
+    s = np.zeros(sek(1.4))
+    for i, m in enumerate((72, 76, 79, 84, 88, 91)):
+        legen_mono = ping(mtof(m), 0.6, 0.18)
+        a = sek(i * 0.09)
+        s[a:a + len(legen_mono)] += legen_mono[:len(s) - a]
+    return norm(s, 0.6)
+
+
+def g_klingel(_=None):
+    """Jackpot-Klingel: eine Alarmglocke, die drei Sekunden durchläutet."""
+    t = zeit(3.2)
+    s = np.zeros(len(t))
+    for z in np.arange(0, 3.0, 1 / 18):
+        a = sek(z)
+        p = ping(2100, 0.12, 0.04)
+        s[a:a + len(p)] += p[:len(s) - a]
+    return norm(s * rampe(len(s), 0.01, 0.4), 0.45)
+
+
+def g_xkah(_=None):
+    """Der Xkah Pro schaltet ein: zwei Pieptöne und ein aufsteigender Ton."""
+    s = np.zeros(sek(1.4))
+    for z, f in ((0.0, 1760), (0.18, 1760)):
+        t = zeit(0.09)
+        b = np.sign(np.sin(2 * np.pi * f * t)) * 0.3 * rampe(len(t), 0.003, 0.01)
+        s[sek(z):sek(z) + len(b)] += b
+    t = zeit(0.8)
+    s[sek(0.5):sek(0.5) + len(t)] += sinus_sweep(np.linspace(600, 1400, len(t))) * np.sin(np.pi * t / t[-1]) * 0.25
+    return norm(tiefpass(s, 5000), 0.4)
 
 
 def g_trommel(dauer):
@@ -434,10 +469,10 @@ GERAEUSCHE = {
     # Name: (Funktion, Lautstärke, Stereoposition)
     "boom": (g_boom, 0.8, 0), "whoosh": (g_whoosh, 0.5, 0), "pop": (g_pop, 0.35, -0.2),
     "flip": (g_flip, 0.5, -0.2), "motor": (g_motor, 0.45, 0), "gong": (g_gong, 0.45, 0),
-    "neon": (g_neon, 0.35, 0.1), "schritte": (g_schritte, 0.55, -0.3), "tuer": (g_tuer, 0.55, 0.2),
-    "casino": (g_casino, 0.55, 0), "chips": (g_chips, 0.6, 0.1), "kugel": (g_kugel, 0.75, -0.25),
-    "trommel": (g_trommel, 0.5, 0), "fanfare": (g_fanfare, 0.55, 0), "muenzen": (g_muenzen, 0.6, 0),
-    "blubbern": (g_blubbern, 0.55, 0.05),
+    "neon": (g_neon, 0.35, 0.1), "schritte": (g_schritte, 0.55, -0.3), "drehtuer": (g_drehtuer, 0.55, 0.15),
+    "casino": (g_casino, 0.5, 0), "touch": (g_touch, 0.4, 0.2), "feature": (g_feature, 0.55, 0.2),
+    "trommel": (g_trommel, 0.5, 0), "fanfare": (g_fanfare, 0.55, 0), "klingel": (g_klingel, 0.35, 0.2),
+    "muenzen": (g_muenzen, 0.6, 0), "blubbern": (g_blubbern, 0.55, 0.05), "xkah": (g_xkah, 0.4, 0),
 }
 
 
@@ -548,10 +583,14 @@ def musik_lounge(dauer):
 # ---------------------------------------------------------------- Zeitachse
 
 def anker(szene, name):
+    """Zeitpunkt zu einem Anker: start, ende, S3 (Satzbeginn), S3e (Satzende), W2 (Walzenstart), W2e (letzter Walzenstopp)."""
     if name == "start":
         return szene["start"]
     if name == "ende":
         return szene["ende"]
+    if name.startswith("W"):
+        w = szene["walzen"][int(name[1:].rstrip("e"))]
+        return max(w["stopps"]) if name.endswith("e") else w["t0"]
     if name.endswith("e"):
         return szene["saetze"][int(name[1:-1])]["ende"]
     return szene["saetze"][int(name[1:])]["start"]
@@ -570,7 +609,7 @@ def main():
         szene = {"id": sz["id"], "start": round(t, 3), "saetze": []}
         cursor = t + sz["vorlauf"]
         for i, satz in enumerate(sz["saetze"]):
-            stimme = stimmen[satz["wer"]]
+            stimme = stimmen[satz.get("stimme", satz["wer"])]
             trocken = sprechen(satz, stimme)
             cursor += satz.get("pause", 0 if i == 0 else LUECKE)
             dauer = len(trocken) / SR  # die Hallfahne zählt nicht zur Satzlänge
@@ -582,6 +621,13 @@ def main():
             cursor += dauer
         t = cursor + sz["nachlauf"]
         szene["ende"] = round(t, 3)
+        if "walzen" in sz:
+            szene["walzen"] = []
+            for w in sz["walzen"]:
+                t0 = anker(szene, w["anker"]) + w["versatz"]
+                stopps = [t0 + w["lauf"] + i * w.get("abstand", 0.2) for i in range(5)]
+                stopps[4] += w.get("spannung", 0)
+                szene["walzen"].append({"t0": round(t0, 3), "stopps": [round(x, 3) for x in stopps], "neu": w["neu"]})
         szenen.append(szene)
     gesamt = t
     n = sek(gesamt)
@@ -615,6 +661,22 @@ def main():
             if BLUBB:
                 eintrag["stoesse"] = [round(t0 + z, 3) for z in BLUBB]
             cues.append(eintrag)
+    for szene in szenen:
+        gehalten, anzahl = set(), 0
+        for i, w in enumerate(szene.get("walzen", [])):
+            for walze in range(5):
+                # Im Clover Feature drehen nur Walzen, auf denen noch ein Feld frei ist
+                if i > 0 and all((walze, reihe) in gehalten for reihe in range(3)):
+                    continue
+                stopp = w["stopps"][walze]
+                legen(geraeuschspur, walze_lauf(stopp - w["t0"]), w["t0"], 0.3, (walze - 2) * 0.2)
+                legen(geraeuschspur, walze_stopp(), stopp, 0.5, (walze - 2) * 0.2)
+                for k, (_, reihe, wert) in enumerate(x for x in w["neu"] if x[0] == walze):
+                    legen(geraeuschspur, klee_glocke(anzahl), stopp + k * 0.07, 0.5, (walze - 2) * 0.2)
+                    if wert == "GRAND":
+                        legen(geraeuschspur, grand_glocke(), stopp, 0.45, (walze - 2) * 0.2)
+                    gehalten.add((walze, reihe))
+                    anzahl += 1
 
     print("Musik …")
     spuren = {"heist": musik_heist(gesamt)}
